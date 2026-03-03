@@ -58,6 +58,7 @@ export interface SubmitEvalRequest {
   target_type?: string;
   level?: number;
   domains?: string[];
+  eval_mode?: "quick" | "standard" | "full";
 }
 
 export interface SubmitEvalResponse {
