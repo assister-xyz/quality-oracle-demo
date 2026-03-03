@@ -57,7 +57,7 @@ function RankBadge({ rank }: { rank: number }) {
       </div>
     );
   return (
-    <div className="w-7 h-7 rounded-full bg-muted/20 flex items-center justify-center">
+    <div className="w-7 h-7 rounded-full bg-muted/30 flex items-center justify-center">
       <span className="text-xs font-mono text-muted-foreground">{rank}</span>
     </div>
   );
@@ -90,9 +90,9 @@ export default function LeaderboardPage() {
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return <ArrowUpDown className="h-3 w-3 text-muted-foreground/40" />;
     return sortDir === "asc" ? (
-      <ArrowUp className="h-3 w-3 text-primary" />
+      <ArrowUp className="h-3 w-3 text-[#F66824]" />
     ) : (
-      <ArrowDown className="h-3 w-3 text-primary" />
+      <ArrowDown className="h-3 w-3 text-[#F66824]" />
     );
   };
 
@@ -137,8 +137,8 @@ export default function LeaderboardPage() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          MCP Server <span className="text-[#00f0ff]">Leaderboard</span>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          MCP Server <span className="brand-gradient-text">Leaderboard</span>
         </h1>
         <p className="text-muted-foreground">
           {loading ? "Loading..." : `${servers.length} servers evaluated with multi-judge consensus scoring.`}
@@ -153,7 +153,7 @@ export default function LeaderboardPage() {
             placeholder="Search servers..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-card/50 border-border/50"
+            className="pl-9 border-border"
           />
         </div>
         <div className="flex gap-1.5">
@@ -161,7 +161,7 @@ export default function LeaderboardPage() {
             variant={tierFilter === "all" ? "default" : "outline"}
             size="sm"
             onClick={() => setTierFilter("all")}
-            className={tierFilter === "all" ? "bg-primary/20 text-primary border-primary/30" : ""}
+            className={tierFilter === "all" ? "bg-[#F66824]/10 text-[#F66824] border-[#F66824]/30 hover:bg-[#F66824]/20" : ""}
           >
             <Filter className="h-3 w-3 mr-1" /> All
           </Button>
@@ -189,7 +189,7 @@ export default function LeaderboardPage() {
 
       <div className="grid lg:grid-cols-[1fr_380px] gap-6">
         {/* Table */}
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
+        <Card className="bg-white shadow-sm border-border/60 overflow-hidden">
           <div className="overflow-x-auto">
             {loading ? (
               <div className="p-4 space-y-3">
@@ -200,7 +200,7 @@ export default function LeaderboardPage() {
             ) : (
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border/50">
+                  <tr className="border-b border-border">
                     <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground w-10">#</th>
                     <th
                       className="text-left px-4 py-3 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground"
@@ -239,10 +239,10 @@ export default function LeaderboardPage() {
                     return (
                       <tr
                         key={server.id}
-                        className={`border-b border-border/30 cursor-pointer transition-colors ${
+                        className={`border-b border-border/50 cursor-pointer transition-colors ${
                           isSelected
-                            ? "bg-primary/5 border-primary/20"
-                            : "hover:bg-muted/10"
+                            ? "bg-[#F66824]/5 border-[#F66824]/20"
+                            : "hover:bg-muted/30"
                         }`}
                         onClick={() => handleRowClick(server)}
                       >
@@ -251,7 +251,7 @@ export default function LeaderboardPage() {
                         </td>
                         <td className="px-4 py-3">
                           <div>
-                            <div className="font-medium">{server.name}</div>
+                            <div className="font-medium text-foreground">{server.name}</div>
                             <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
                               <Badge variant="outline" className="text-[9px] px-1 py-0 h-3.5">
                                 {server.transport === "sse" ? "SSE" : "HTTP"}
@@ -284,7 +284,7 @@ export default function LeaderboardPage() {
                         <td className="px-4 py-3">
                           <ChevronRight
                             className={`h-4 w-4 text-muted-foreground transition-transform ${
-                              isSelected ? "rotate-90 text-primary" : ""
+                              isSelected ? "rotate-90 text-[#F66824]" : ""
                             }`}
                           />
                         </td>
@@ -308,10 +308,10 @@ export default function LeaderboardPage() {
         <div className="space-y-4">
           {displayServer ? (
             <>
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm sticky top-20">
+              <Card className="bg-white shadow-sm border-border/60 sticky top-20">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{displayServer.name}</CardTitle>
+                    <CardTitle className="text-base text-foreground">{displayServer.name}</CardTitle>
                     <ScoreGauge
                       score={displayServer.score}
                       tier={displayServer.tier}
@@ -352,12 +352,12 @@ export default function LeaderboardPage() {
                           <h4 className="text-xs font-medium text-muted-foreground">Tool Scores</h4>
                           {Object.entries(displayServer.tool_scores).map(([tool, scores]) => (
                             <div key={tool} className="flex items-center gap-2">
-                              <code className="text-[10px] font-mono bg-muted/30 px-1 py-0.5 rounded truncate max-w-[140px]">
+                              <code className="text-[10px] font-mono bg-muted/50 px-1 py-0.5 rounded truncate max-w-[140px]">
                                 {tool}
                               </code>
-                              <div className="flex-1 h-1 rounded-full bg-muted/30 overflow-hidden">
+                              <div className="flex-1 h-1 rounded-full bg-muted/50 overflow-hidden">
                                 <div
-                                  className="h-full rounded-full bg-[#00f0ff]"
+                                  className="h-full rounded-full bg-[#F66824]"
                                   style={{ width: `${scores.score}%` }}
                                 />
                               </div>
@@ -405,7 +405,7 @@ export default function LeaderboardPage() {
               </Card>
             </>
           ) : (
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm border-dashed">
+            <Card className="bg-white shadow-sm border-border/60 border-dashed">
               <CardContent className="p-8 text-center">
                 <div className="text-muted-foreground space-y-2">
                   <Trophy className="h-8 w-8 mx-auto opacity-30" />

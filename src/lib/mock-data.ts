@@ -83,12 +83,12 @@ const TIER_CONFIG: Record<QualityTier, { color: string; bg: string; border: stri
 export { TIER_CONFIG };
 
 const DIMENSION_CONFIG: Record<keyof Dimensions, { label: string; weight: number; color: string }> = {
-  accuracy: { label: "Accuracy", weight: 0.35, color: "#00f0ff" },
-  safety: { label: "Safety", weight: 0.20, color: "#a855f7" },
+  accuracy: { label: "Accuracy", weight: 0.35, color: "#F66824" },
+  safety: { label: "Safety", weight: 0.20, color: "#DB5F94" },
   reliability: { label: "Reliability", weight: 0.15, color: "#3b82f6" },
   latency: { label: "Latency", weight: 0.10, color: "#10b981" },
   process_quality: { label: "Process Quality", weight: 0.10, color: "#f59e0b" },
-  schema_quality: { label: "Schema Quality", weight: 0.10, color: "#ec4899" },
+  schema_quality: { label: "Schema Quality", weight: 0.10, color: "#6941C6" },
 };
 
 export { DIMENSION_CONFIG };

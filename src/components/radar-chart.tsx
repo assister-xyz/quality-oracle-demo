@@ -29,36 +29,36 @@ export function QualityRadarChart({ dimensions, compareDimensions, height = 280 
   return (
     <ResponsiveContainer width="100%" height={height}>
       <RadarChart data={data} cx="50%" cy="50%" outerRadius="70%">
-        <PolarGrid stroke="rgba(255,255,255,0.08)" />
+        <PolarGrid stroke="rgba(0,0,0,0.08)" />
         <PolarAngleAxis
           dataKey="axis"
-          tick={{ fill: "#94a3b8", fontSize: 11 }}
+          tick={{ fill: "#535862", fontSize: 11 }}
         />
         <PolarRadiusAxis
           angle={90}
           domain={[0, 100]}
-          tick={{ fill: "#64748b", fontSize: 9 }}
+          tick={{ fill: "#717680", fontSize: 9 }}
           axisLine={false}
         />
         <Radar
           name="Score"
           dataKey="value"
-          stroke="#00f0ff"
-          fill="#00f0ff"
+          stroke="#F66824"
+          fill="#F66824"
           fillOpacity={0.15}
           strokeWidth={2}
-          dot={{ r: 3, fill: "#00f0ff" }}
+          dot={{ r: 3, fill: "#F66824" }}
         />
         {compareDimensions && (
           <Radar
             name="Compare"
             dataKey="compare"
-            stroke="#a855f7"
-            fill="#a855f7"
+            stroke="#DB5F94"
+            fill="#DB5F94"
             fillOpacity={0.1}
             strokeWidth={2}
             strokeDasharray="4 4"
-            dot={{ r: 3, fill: "#a855f7" }}
+            dot={{ r: 3, fill: "#DB5F94" }}
           />
         )}
       </RadarChart>

@@ -30,7 +30,7 @@ export function DimensionBar({ dimension, value, compact = false }: DimensionBar
             style={{
               width: `${width}%`,
               backgroundColor: config.color,
-              boxShadow: `0 0 8px ${config.color}40`,
+              boxShadow: `0 0 4px ${config.color}25`,
             }}
           />
         </div>
@@ -52,7 +52,7 @@ export function DimensionBar({ dimension, value, compact = false }: DimensionBar
           style={{
             width: `${width}%`,
             backgroundColor: config.color,
-            boxShadow: `0 0 8px ${config.color}40`,
+            boxShadow: `0 0 4px ${config.color}25`,
           }}
         />
       </div>

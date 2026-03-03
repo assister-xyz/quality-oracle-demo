@@ -65,25 +65,25 @@ export default function DashboardPage() {
   const recentEvals = servers.slice(0, 6);
 
   const kpiCards = [
-    { label: "Total Evaluations", value: kpis.totalEvaluations, icon: BarChart3, color: "#00f0ff" },
+    { label: "Total Evaluations", value: kpis.totalEvaluations, icon: BarChart3, color: "#F66824" },
     { label: "Average Score", value: kpis.averageScore > 0 ? `${kpis.averageScore}/100` : "--", icon: Award, color: "#10b981" },
-    { label: "Pass Rate", value: kpis.passRate > 0 ? `${kpis.passRate}%` : "--", icon: Shield, color: "#a855f7" },
+    { label: "Pass Rate", value: kpis.passRate > 0 ? `${kpis.passRate}%` : "--", icon: Shield, color: "#DB5F94" },
     { label: "Expert Agents", value: kpis.expertCount, icon: Zap, color: "#f59e0b" },
     { label: "Avg Eval Time", value: kpis.avgLatencyMs > 0
       ? kpis.avgLatencyMs >= 60000
         ? `${(kpis.avgLatencyMs / 60000).toFixed(1)}m`
         : `${(kpis.avgLatencyMs / 1000).toFixed(0)}s`
       : "--", icon: Clock, color: "#3b82f6" },
-    { label: "Tools Tested", value: kpis.totalToolsTested, icon: Wrench, color: "#ec4899" },
+    { label: "Tools Tested", value: kpis.totalToolsTested, icon: Wrench, color: "#6941C6" },
   ];
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Hero */}
       <div className="space-y-3">
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Quality Oracle{" "}
-          <span className="text-[#00f0ff]">Dashboard</span>
+          <span className="brand-gradient-text">Dashboard</span>
         </h1>
         <p className="text-muted-foreground max-w-2xl">
           Pre-payment quality verification for AI agents, MCP servers, and skills.
@@ -91,7 +91,7 @@ export default function DashboardPage() {
         </p>
         <div className="flex gap-3 pt-1">
           <Link href="/evaluate">
-            <Button className="bg-[#00f0ff]/10 text-[#00f0ff] border border-[#00f0ff]/20 hover:bg-[#00f0ff]/20">
+            <Button className="bg-gradient-to-r from-[#F66824] to-[#DB5F94] text-white font-medium hover:from-[#F66824CC] hover:to-[#DB5F94CC]">
               <Search className="h-4 w-4 mr-2" />
               Evaluate Agent
             </Button>
@@ -124,7 +124,7 @@ export default function DashboardPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {kpiCards.map((kpi) => (
-          <Card key={kpi.label} className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card key={kpi.label} className="bg-white shadow-sm border-border/60 card-hover">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <kpi.icon className="h-4 w-4" style={{ color: kpi.color }} />
@@ -144,7 +144,7 @@ export default function DashboardPage() {
 
       {/* Tier Distribution + Evaluation Standards */}
       <div className="grid md:grid-cols-2 gap-6">
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <Card className="bg-white shadow-sm border-border/60">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Tier Distribution</CardTitle>
           </CardHeader>
@@ -169,7 +169,7 @@ export default function DashboardPage() {
                       <div className="w-20">
                         <TierBadge tier={tier} />
                       </div>
-                      <div className="flex-1 h-2 rounded-full bg-muted/30 overflow-hidden">
+                      <div className="flex-1 h-2 rounded-full bg-muted/50 overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-700"
                           style={{ width: `${pct}%`, backgroundColor: config.color }}
@@ -186,7 +186,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <Card className="bg-white shadow-sm border-border/60">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Evaluation Standards</CardTitle>
           </CardHeader>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
                 { label: "Anti-Gaming", detail: "Question paraphrasing, canaries, production correlation", icon: Zap },
               ].map((item) => (
                 <div key={item.label} className="flex items-start gap-3">
-                  <item.icon className="h-4 w-4 mt-0.5 text-primary shrink-0" />
+                  <item.icon className="h-4 w-4 mt-0.5 text-[#F66824] shrink-0" />
                   <div>
                     <div className="font-medium text-foreground">{item.label}</div>
                     <div className="text-xs text-muted-foreground">{item.detail}</div>
@@ -215,15 +215,15 @@ export default function DashboardPage() {
       {/* Recent Evaluations */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Recent Evaluations</h2>
-          <Link href="/leaderboard" className="text-sm text-primary hover:underline flex items-center gap-1">
+          <h2 className="text-lg font-semibold text-foreground">Recent Evaluations</h2>
+          <Link href="/leaderboard" className="text-sm text-[#F66824] hover:underline flex items-center gap-1">
             View all <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="border-border/50 bg-card/50 backdrop-blur-sm">
+              <Card key={i} className="bg-white shadow-sm border-border/60">
                 <CardContent className="p-4 space-y-3">
                   <Skeleton className="h-5 w-32" />
                   <Skeleton className="h-4 w-full" />
@@ -233,12 +233,12 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : recentEvals.length === 0 ? (
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm border-dashed">
+          <Card className="bg-white shadow-sm border-border/60 border-dashed">
             <CardContent className="p-8 text-center">
               <Search className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
               <p className="text-sm text-muted-foreground">
                 No evaluations yet.{" "}
-                <Link href="/evaluate" className="text-primary hover:underline">
+                <Link href="/evaluate" className="text-[#F66824] hover:underline">
                   Run your first evaluation
                 </Link>
               </p>
@@ -248,11 +248,11 @@ export default function DashboardPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {recentEvals.map((server) => (
               <Link key={server.id} href={`/evaluate?result=${server.id}`}>
-                <Card className="border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 transition-colors cursor-pointer group">
+                <Card className="bg-white shadow-sm border-border/60 hover:border-[#F66824]/30 hover:shadow-md transition-all cursor-pointer group card-hover">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <div className="font-medium group-hover:text-primary transition-colors">{server.name}</div>
+                        <div className="font-medium group-hover:text-[#F66824] transition-colors">{server.name}</div>
                         <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
                           <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">
                             {server.transport === "sse" ? "SSE" : "HTTP"}
@@ -279,7 +279,7 @@ export default function DashboardPage() {
       </div>
 
       {/* How it works */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+      <Card className="bg-white shadow-sm border-border/60">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium text-muted-foreground">How Quality Oracle Works</CardTitle>
         </CardHeader>
@@ -292,10 +292,10 @@ export default function DashboardPage() {
               { step: "4", title: "Attest", desc: "Generate 6-axis quality score, tier badge, and Ed25519-signed attestation (UAQA)." },
             ].map((item) => (
               <div key={item.step} className="text-center space-y-2">
-                <div className="mx-auto w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm">
+                <div className="mx-auto w-10 h-10 rounded-full bg-gradient-to-br from-[#F66824]/10 to-[#DB5F94]/10 border border-[#F66824]/20 flex items-center justify-center font-bold text-sm brand-gradient-text">
                   {item.step}
                 </div>
-                <div className="font-medium">{item.title}</div>
+                <div className="font-medium text-foreground">{item.title}</div>
                 <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
               </div>
             ))}
@@ -308,7 +308,7 @@ export default function DashboardPage() {
         <p>Quality Oracle v1.0 — Evaluation Version v1.0</p>
         <p>
           Built by{" "}
-          <a href="https://assisterr.ai" target="_blank" rel="noopener" className="text-primary hover:underline inline-flex items-center gap-0.5">
+          <a href="https://assisterr.ai" target="_blank" rel="noopener" className="text-[#F66824] hover:underline inline-flex items-center gap-0.5">
             Assisterr <ExternalLink className="h-2.5 w-2.5" />
           </a>
         </p>

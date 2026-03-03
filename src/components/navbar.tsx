@@ -19,17 +19,17 @@ export function Navbar() {
   const { isLive } = useBackendHealth();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-white/80 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00f0ff]/10 border border-[#00f0ff]/20">
-              <Shield className="h-4 w-4 text-[#00f0ff]" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg brand-gradient">
+              <Shield className="h-4 w-4 text-white" />
             </div>
-            <span className="text-lg font-semibold tracking-tight">
+            <span className="text-lg font-semibold tracking-tight text-foreground">
               Quality Oracle
             </span>
-            <span className="hidden sm:inline-flex items-center rounded-full bg-[#a855f7]/10 border border-[#a855f7]/20 px-2 py-0.5 text-[10px] font-medium text-[#a855f7]">
+            <span className="hidden sm:inline-flex items-center rounded-full bg-[#DB5F94]/10 border border-[#DB5F94]/20 px-2 py-0.5 text-[10px] font-medium text-[#DB5F94]">
               DEMO
             </span>
           </Link>
@@ -44,7 +44,7 @@ export function Navbar() {
                   className={cn(
                     "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-primary/10 text-primary"
+                      ? "bg-[#F66824]/10 text-[#F66824]"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   )}
                 >

@@ -48,17 +48,16 @@ function ServerSelector({
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg border transition-colors"
+        className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg border bg-white transition-colors shadow-sm"
         style={{
           borderColor: selected ? `${color}40` : undefined,
-          backgroundColor: selected ? `${color}08` : undefined,
         }}
       >
         <div className="flex items-center gap-3 min-w-0">
           <span
             className="text-xs font-medium px-2 py-0.5 rounded-full"
             style={{
-              backgroundColor: `${color}20`,
+              backgroundColor: `${color}15`,
               color: color,
             }}
           >
@@ -66,7 +65,7 @@ function ServerSelector({
           </span>
           {selected ? (
             <div className="text-left min-w-0">
-              <div className="font-medium truncate">{selected.name}</div>
+              <div className="font-medium truncate text-foreground">{selected.name}</div>
               <div className="text-[10px] text-muted-foreground truncate">
                 {selected.url}
               </div>
@@ -85,7 +84,7 @@ function ServerSelector({
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-border/50 bg-card/95 backdrop-blur-xl shadow-xl max-h-64 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-white shadow-xl max-h-64 overflow-y-auto">
           {loading ? (
             <div className="p-4 space-y-2">
               {[1, 2, 3].map((i) => (
@@ -104,10 +103,10 @@ function ServerSelector({
                   onSelect(server);
                   setOpen(false);
                 }}
-                className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-muted/20 transition-colors border-b border-border/20 last:border-0"
+                className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-muted/30 transition-colors border-b border-border/30 last:border-0"
               >
                 <div className="min-w-0">
-                  <div className="text-sm font-medium truncate">
+                  <div className="text-sm font-medium truncate text-foreground">
                     {server.name}
                   </div>
                   <div className="text-[10px] text-muted-foreground truncate">
@@ -170,38 +169,32 @@ function DimensionCompareRow({
       </div>
       <div className="flex gap-1 items-center">
         <div className="flex-1 flex justify-end">
-          <div className="w-full h-2 rounded-full bg-muted/20 overflow-hidden">
+          <div className="w-full h-2 rounded-full bg-muted/30 overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-700"
               style={{
                 width: `${valueA}%`,
-                backgroundColor: "#00f0ff",
-                boxShadow:
-                  valueA >= valueB ? `0 0 8px rgba(0,240,255,0.4)` : undefined,
+                backgroundColor: "#F66824",
               }}
             />
           </div>
         </div>
         <div className="w-14 text-center">
-          <span className="text-[10px] font-mono text-[#00f0ff]">
+          <span className="text-[10px] font-mono text-[#F66824]">
             {valueA}
           </span>
           <span className="text-[10px] text-muted-foreground mx-0.5">vs</span>
-          <span className="text-[10px] font-mono text-[#a855f7]">
+          <span className="text-[10px] font-mono text-[#DB5F94]">
             {valueB}
           </span>
         </div>
         <div className="flex-1">
-          <div className="w-full h-2 rounded-full bg-muted/20 overflow-hidden">
+          <div className="w-full h-2 rounded-full bg-muted/30 overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-700"
               style={{
                 width: `${valueB}%`,
-                backgroundColor: "#a855f7",
-                boxShadow:
-                  valueB > valueA
-                    ? `0 0 8px rgba(168,85,247,0.4)`
-                    : undefined,
+                backgroundColor: "#DB5F94",
               }}
             />
           </div>
@@ -226,8 +219,8 @@ export default function ComparePage() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Compare <span className="text-[#00f0ff]">Servers</span>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Compare <span className="brand-gradient-text">Servers</span>
         </h1>
         <p className="text-muted-foreground">
           Side-by-side comparison of two MCP server evaluations across all
@@ -241,7 +234,7 @@ export default function ComparePage() {
           selected={serverA}
           onSelect={setServerA}
           label="A"
-          color="#00f0ff"
+          color="#F66824"
           servers={servers}
           loading={loading}
         />
@@ -252,14 +245,14 @@ export default function ComparePage() {
           selected={serverB}
           onSelect={setServerB}
           label="B"
-          color="#a855f7"
+          color="#DB5F94"
           servers={servers}
           loading={loading}
         />
       </div>
 
       {!hasComparison && (
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm border-dashed">
+        <Card className="bg-white shadow-sm border-border/60 border-dashed">
           <CardContent className="p-12 text-center">
             <GitCompareArrows className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
             <p className="text-sm text-muted-foreground">
@@ -274,7 +267,7 @@ export default function ComparePage() {
       {hasComparison && (
         <div className="space-y-6 animate-fade-up">
           {/* Score Comparison Header */}
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card className="bg-white shadow-sm border-border/60">
             <CardContent className="p-6">
               <div className="grid grid-cols-[1fr_auto_1fr] gap-6 items-center">
                 {/* Server A */}
@@ -286,7 +279,7 @@ export default function ComparePage() {
                     strokeWidth={6}
                   />
                   <div className="min-w-0">
-                    <div className="font-semibold truncate">{serverA.name}</div>
+                    <div className="font-semibold truncate text-foreground">{serverA.name}</div>
                     <div className="flex items-center gap-2 mt-1">
                       <TierBadge tier={serverA.tier} />
                       <Badge variant="outline" className="text-[10px]">
@@ -320,7 +313,7 @@ export default function ComparePage() {
                 {/* Server B */}
                 <div className="flex items-center gap-4 justify-end">
                   <div className="min-w-0 text-right">
-                    <div className="font-semibold truncate">{serverB.name}</div>
+                    <div className="font-semibold truncate text-foreground">{serverB.name}</div>
                     <div className="flex items-center gap-2 mt-1 justify-end">
                       <Badge variant="outline" className="text-[10px]">
                         {serverB.transport === "sse" ? "SSE" : "HTTP"}
@@ -352,18 +345,18 @@ export default function ComparePage() {
 
           {/* Radar + Dimensions */}
           <div className="grid md:grid-cols-2 gap-6">
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="bg-white shadow-sm border-border/60">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Quality Profile Overlay
                 </CardTitle>
                 <div className="flex items-center gap-4 text-[10px]">
                   <span className="flex items-center gap-1">
-                    <span className="w-3 h-0.5 bg-[#00f0ff] rounded-full" />
+                    <span className="w-3 h-0.5 bg-[#F66824] rounded-full" />
                     {serverA.name}
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="w-3 h-0.5 bg-[#a855f7] rounded-full border-dashed" />
+                    <span className="w-3 h-0.5 bg-[#DB5F94] rounded-full" />
                     {serverB.name}
                   </span>
                 </div>
@@ -377,7 +370,7 @@ export default function ComparePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="bg-white shadow-sm border-border/60">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Dimension Comparison
@@ -397,13 +390,13 @@ export default function ComparePage() {
                   ))}
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-border/30">
+                <div className="mt-6 pt-4 border-t border-border/50">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">
                       Dimensions won
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="text-[#00f0ff] font-mono font-bold">
+                      <span className="text-[#F66824] font-mono font-bold">
                         {
                           (
                             Object.keys(
@@ -416,7 +409,7 @@ export default function ComparePage() {
                         }
                       </span>
                       <span className="text-muted-foreground">-</span>
-                      <span className="text-[#a855f7] font-mono font-bold">
+                      <span className="text-[#DB5F94] font-mono font-bold">
                         {
                           (
                             Object.keys(
@@ -437,7 +430,7 @@ export default function ComparePage() {
 
           {/* Tool Scores Comparison */}
           {allTools.length > 0 && (
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="bg-white shadow-sm border-border/60">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Wrench className="h-4 w-4" />
@@ -452,12 +445,12 @@ export default function ComparePage() {
                     return (
                       <div key={tool} className="space-y-1">
                         <div className="flex items-center justify-between">
-                          <code className="text-[11px] font-mono bg-muted/30 px-1.5 py-0.5 rounded">
+                          <code className="text-[11px] font-mono bg-muted/50 px-1.5 py-0.5 rounded">
                             {tool}
                           </code>
                           <div className="flex items-center gap-3 text-[11px] font-mono">
                             {scoreA !== undefined ? (
-                              <span className="text-[#00f0ff]">{scoreA}</span>
+                              <span className="text-[#F66824]">{scoreA}</span>
                             ) : (
                               <span className="text-muted-foreground/40">
                                 --
@@ -465,7 +458,7 @@ export default function ComparePage() {
                             )}
                             <span className="text-muted-foreground/30">|</span>
                             {scoreB !== undefined ? (
-                              <span className="text-[#a855f7]">{scoreB}</span>
+                              <span className="text-[#DB5F94]">{scoreB}</span>
                             ) : (
                               <span className="text-muted-foreground/40">
                                 --
@@ -474,17 +467,17 @@ export default function ComparePage() {
                           </div>
                         </div>
                         <div className="flex gap-1">
-                          <div className="flex-1 h-1.5 rounded-full bg-muted/20 overflow-hidden">
+                          <div className="flex-1 h-1.5 rounded-full bg-muted/30 overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-[#00f0ff] transition-all duration-700"
+                              className="h-full rounded-full bg-[#F66824] transition-all duration-700"
                               style={{
                                 width: scoreA !== undefined ? `${scoreA}%` : "0%",
                               }}
                             />
                           </div>
-                          <div className="flex-1 h-1.5 rounded-full bg-muted/20 overflow-hidden">
+                          <div className="flex-1 h-1.5 rounded-full bg-muted/30 overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-[#a855f7] transition-all duration-700"
+                              className="h-full rounded-full bg-[#DB5F94] transition-all duration-700"
                               style={{
                                 width: scoreB !== undefined ? `${scoreB}%` : "0%",
                               }}
@@ -501,7 +494,7 @@ export default function ComparePage() {
 
           {/* Safety Probes Comparison */}
           {serverA.safety_probes.length > 0 && serverB.safety_probes.length > 0 && (
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="bg-white shadow-sm border-border/60">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Shield className="h-4 w-4" />
@@ -512,14 +505,14 @@ export default function ComparePage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-border/30">
+                      <tr className="border-b border-border/50">
                         <th className="text-left py-2 text-xs font-medium text-muted-foreground">
                           Probe
                         </th>
-                        <th className="text-center py-2 text-xs font-medium text-[#00f0ff] w-24">
+                        <th className="text-center py-2 text-xs font-medium text-[#F66824] w-24">
                           {serverA.name}
                         </th>
-                        <th className="text-center py-2 text-xs font-medium text-[#a855f7] w-24">
+                        <th className="text-center py-2 text-xs font-medium text-[#DB5F94] w-24">
                           {serverB.name}
                         </th>
                       </tr>
@@ -533,7 +526,7 @@ export default function ComparePage() {
                         return (
                           <tr
                             key={probeA.probe_type}
-                            className="border-b border-border/20"
+                            className="border-b border-border/30"
                           >
                             <td className="py-2.5 text-xs">{label}</td>
                             <td className="py-2.5 text-center">
@@ -587,25 +580,25 @@ export default function ComparePage() {
           )}
 
           {/* Quick Verdict */}
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card className="bg-white shadow-sm border-border/60">
             <CardContent className="p-6">
               <div className="text-center space-y-2">
                 <h3 className="text-sm font-medium text-muted-foreground">
                   Verdict
                 </h3>
                 {serverA.score === serverB.score ? (
-                  <p className="text-lg font-semibold">
+                  <p className="text-lg font-semibold text-foreground">
                     It&apos;s a <span className="text-[#f59e0b]">tie</span> at{" "}
                     <span className="font-mono">{serverA.score}/100</span>
                   </p>
                 ) : (
-                  <p className="text-lg font-semibold">
+                  <p className="text-lg font-semibold text-foreground">
                     <span
                       style={{
                         color:
                           serverA.score > serverB.score
-                            ? "#00f0ff"
-                            : "#a855f7",
+                            ? "#F66824"
+                            : "#DB5F94",
                       }}
                     >
                       {serverA.score > serverB.score

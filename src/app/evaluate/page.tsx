@@ -71,7 +71,7 @@ function StepIcon({ status }: { status: EvalStep["status"] }) {
     case "done":
       return <CheckCircle2 className="h-4 w-4 text-[#10b981]" />;
     case "running":
-      return <Loader2 className="h-4 w-4 text-[#00f0ff] animate-spin" />;
+      return <Loader2 className="h-4 w-4 text-[#F66824] animate-spin" />;
     case "error":
       return <XCircle className="h-4 w-4 text-[#ef4444]" />;
     default:
@@ -274,8 +274,8 @@ function EvaluateContent() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Evaluate <span className="text-[#00f0ff]">Agent Quality</span>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Evaluate <span className="brand-gradient-text">Agent Quality</span>
         </h1>
         <p className="text-muted-foreground">
           Paste any MCP server URL to run a comprehensive quality evaluation with multi-judge consensus.
@@ -283,7 +283,7 @@ function EvaluateContent() {
       </div>
 
       {/* URL Input */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-sm glow-cyan">
+      <Card className="bg-white shadow-sm border-border/60">
         <CardContent className="p-6">
           <div className="flex gap-3">
             <div className="relative flex-1">
@@ -293,14 +293,14 @@ function EvaluateContent() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && startEvaluation()}
-                className="pl-9 h-12 text-base bg-background/50 border-border/50 focus:border-primary"
+                className="pl-9 h-12 text-base border-border focus:border-[#F66824]"
                 disabled={isEvaluating}
               />
             </div>
             <Button
               onClick={startEvaluation}
               disabled={isEvaluating || !url.trim()}
-              className="h-12 px-6 bg-gradient-to-r from-[#00f0ff] to-[#a855f7] text-black font-semibold hover:opacity-90"
+              className="h-12 px-6 bg-gradient-to-r from-[#F66824] to-[#DB5F94] text-white font-semibold hover:from-[#F66824CC] hover:to-[#DB5F94CC]"
             >
               {isEvaluating ? (
                 <>
@@ -315,9 +315,9 @@ function EvaluateContent() {
 
           {/* In-progress banner */}
           {isEvaluating && (
-            <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-md bg-[#00f0ff]/5 border border-[#00f0ff]/20">
-              <Loader2 className="h-3 w-3 animate-spin text-[#00f0ff]" />
-              <span className="text-xs text-[#00f0ff]">Evaluation in progress — scroll down to see progress</span>
+            <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-md bg-[#F66824]/5 border border-[#F66824]/20">
+              <Loader2 className="h-3 w-3 animate-spin text-[#F66824]" />
+              <span className="text-xs text-[#F66824]">Evaluation in progress — scroll down to see progress</span>
             </div>
           )}
 
@@ -328,7 +328,7 @@ function EvaluateContent() {
               <button
                 key={ex.name}
                 onClick={() => setUrl(ex.url)}
-                className="text-xs text-primary/70 hover:text-primary underline-offset-2 hover:underline transition-colors"
+                className="text-xs text-[#F66824]/70 hover:text-[#F66824] underline-offset-2 hover:underline transition-colors"
                 disabled={isEvaluating}
               >
                 {ex.name}
@@ -364,17 +364,17 @@ function EvaluateContent() {
 
       {/* Reconnecting banner */}
       {reconnecting && (
-        <Card className="border-[#00f0ff]/30 bg-[#00f0ff]/5">
+        <Card className="border-[#F66824]/30 bg-[#F66824]/5">
           <CardContent className="p-4 flex items-center gap-3">
-            <RefreshCw className="h-4 w-4 text-[#00f0ff] animate-spin" />
-            <span className="text-sm text-[#00f0ff]">Reconnecting to evaluation...</span>
+            <RefreshCw className="h-4 w-4 text-[#F66824] animate-spin" />
+            <span className="text-sm text-[#F66824]">Reconnecting to evaluation...</span>
           </CardContent>
         </Card>
       )}
 
       {/* Loading result from URL param */}
       {loadingResult && (
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <Card className="bg-white shadow-sm border-border/60">
           <CardContent className="p-6 space-y-4">
             <Skeleton className="h-6 w-48" />
             <Skeleton className="h-4 w-full" />
@@ -385,10 +385,10 @@ function EvaluateContent() {
 
       {/* Evaluation Progress */}
       {steps.length > 0 && !result && !error && (
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <Card className="bg-white shadow-sm border-border/60">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <Loader2 className="h-4 w-4 animate-spin text-[#F66824]" />
               Evaluation in Progress
             </CardTitle>
           </CardHeader>
@@ -402,7 +402,7 @@ function EvaluateContent() {
                   }`}
                 >
                   <StepIcon status={step.status} />
-                  <span className={step.status === "running" ? "text-[#00f0ff]" : ""}>{step.name}</span>
+                  <span className={step.status === "running" ? "text-[#F66824] font-medium" : ""}>{step.name}</span>
                 </div>
               ))}
             </div>
@@ -419,12 +419,12 @@ function EvaluateContent() {
       {result && (
         <div className="space-y-6 animate-fade-up">
           {/* Summary Header */}
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card className="bg-white shadow-sm border-border/60">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-bold">{result.name}</h2>
+                    <h2 className="text-xl font-bold text-foreground">{result.name}</h2>
                     <TierBadge tier={result.tier} />
                     <Badge variant="outline" className="text-xs">
                       {result.transport === "sse" ? "SSE" : "Streamable HTTP"}
@@ -446,7 +446,7 @@ function EvaluateContent() {
                       href={result.url}
                       target="_blank"
                       rel="noopener"
-                      className="flex items-center gap-1 hover:text-primary"
+                      className="flex items-center gap-1 hover:text-[#F66824]"
                     >
                       <ExternalLink className="h-3 w-3" /> {result.url}
                     </a>
@@ -460,7 +460,7 @@ function EvaluateContent() {
           {/* 6-Axis Radar + Dimension Bars */}
           {(result.dimensions.accuracy > 0 || result.dimensions.safety > 0) && (
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+              <Card className="bg-white shadow-sm border-border/60">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">6-Axis Quality Profile</CardTitle>
                 </CardHeader>
@@ -469,7 +469,7 @@ function EvaluateContent() {
                 </CardContent>
               </Card>
 
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+              <Card className="bg-white shadow-sm border-border/60">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Dimension Breakdown</CardTitle>
                 </CardHeader>
@@ -484,7 +484,7 @@ function EvaluateContent() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Tool Scores */}
             {Object.keys(result.tool_scores).length > 0 && (
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+              <Card className="bg-white shadow-sm border-border/60">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     Tool Scores ({Object.keys(result.tool_scores).length} tools)
@@ -495,18 +495,15 @@ function EvaluateContent() {
                     {Object.entries(result.tool_scores).map(([tool, scores]) => (
                       <div key={tool} className="space-y-1">
                         <div className="flex items-center justify-between text-sm">
-                          <code className="text-xs font-mono bg-muted/30 px-1.5 py-0.5 rounded">{tool}</code>
+                          <code className="text-xs font-mono bg-muted/50 px-1.5 py-0.5 rounded">{tool}</code>
                           <span className="font-mono tabular-nums text-xs">
                             {scores.tests_passed}/{scores.tests_total} passed
                           </span>
                         </div>
-                        <div className="h-1.5 rounded-full bg-muted/30 overflow-hidden">
+                        <div className="h-1.5 rounded-full bg-muted/50 overflow-hidden">
                           <div
-                            className="h-full rounded-full bg-[#00f0ff] transition-all duration-700"
-                            style={{
-                              width: `${scores.score}%`,
-                              boxShadow: "0 0 8px rgba(0,240,255,0.3)",
-                            }}
+                            className="h-full rounded-full bg-[#F66824] transition-all duration-700"
+                            style={{ width: `${scores.score}%` }}
                           />
                         </div>
                         <div className="text-right text-[10px] text-muted-foreground font-mono">{scores.score}/100</div>
@@ -519,7 +516,7 @@ function EvaluateContent() {
 
             {/* Safety Probes */}
             {result.safety_probes.length > 0 && (
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+              <Card className="bg-white shadow-sm border-border/60">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Shield className="h-4 w-4" />
@@ -531,7 +528,7 @@ function EvaluateContent() {
                     {result.safety_probes.map((probe, idx) => (
                       <div
                         key={`${probe.probe_type}-${idx}`}
-                        className="flex items-start gap-3 p-2 rounded-lg bg-muted/10"
+                        className="flex items-start gap-3 p-2 rounded-lg bg-muted/30"
                       >
                         <ProbeIcon passed={probe.passed} />
                         <div className="flex-1 min-w-0">
@@ -562,7 +559,7 @@ function EvaluateContent() {
 
           {/* Judge Responses */}
           {result.judge_responses.length > 0 && (
-            <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+            <Card className="bg-white shadow-sm border-border/60">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Judge Consensus Responses
@@ -571,10 +568,10 @@ function EvaluateContent() {
               <CardContent>
                 <div className="space-y-3">
                   {result.judge_responses.map((jr, i) => (
-                    <div key={i} className="p-3 rounded-lg bg-muted/10 space-y-2">
+                    <div key={i} className="p-3 rounded-lg bg-muted/30 space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <code className="text-xs font-mono bg-muted/30 px-1.5 py-0.5 rounded">{jr.tool}</code>
+                          <code className="text-xs font-mono bg-muted/50 px-1.5 py-0.5 rounded">{jr.tool}</code>
                           <Badge variant="outline" className="text-[10px]">
                             {jr.method}
                           </Badge>
@@ -598,7 +595,7 @@ function EvaluateContent() {
           )}
 
           {/* Badge & Attestation */}
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card className="bg-white shadow-sm border-border/60">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Badge & Attestation</CardTitle>
             </CardHeader>
@@ -607,7 +604,7 @@ function EvaluateContent() {
                 <div className="space-y-2">
                   <p className="text-xs text-muted-foreground">Embed this quality badge in your README:</p>
                   <div className="flex items-center gap-2">
-                    <code className="text-[11px] font-mono bg-muted/30 px-3 py-1.5 rounded border border-border/50 max-w-md truncate">
+                    <code className="text-[11px] font-mono bg-muted/50 px-3 py-1.5 rounded border border-border/50 max-w-md truncate">
                       ![Quality Score](https://quality-oracle.assisterr.ai/v1/badge/{encodeURIComponent(result.url)}.svg)
                     </code>
                     <Button variant="outline" size="sm" onClick={handleCopyBadge} className="shrink-0">

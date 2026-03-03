@@ -48,7 +48,7 @@ function StatusIcon({ status }: { status: BulkItem["status"] }) {
     case "completed":
       return <CheckCircle2 className="h-4 w-4 text-[#10b981]" />;
     case "running":
-      return <Loader2 className="h-4 w-4 text-[#00f0ff] animate-spin" />;
+      return <Loader2 className="h-4 w-4 text-[#F66824] animate-spin" />;
     case "error":
       return <XCircle className="h-4 w-4 text-[#ef4444]" />;
     default:
@@ -290,8 +290,8 @@ export default function BulkPage() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Bulk <span className="text-[#00f0ff]">Evaluation</span>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Bulk <span className="brand-gradient-text">Evaluation</span>
         </h1>
         <p className="text-muted-foreground">
           Evaluate multiple MCP servers in parallel. Paste URLs, upload a list,
@@ -300,21 +300,21 @@ export default function BulkPage() {
       </div>
 
       {/* URL Input */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+      <Card className="bg-white shadow-sm border-border/60">
         <CardContent className="p-6 space-y-4">
           <div className="flex gap-3">
             <textarea
               placeholder="Paste MCP server URLs (one per line or comma-separated)&#10;https://mcp.example.com/mcp&#10;https://another-server.com/sse"
               value={urlText}
               onChange={(e) => setUrlText(e.target.value)}
-              className="flex-1 min-h-[100px] rounded-lg border border-border/50 bg-background/50 px-4 py-3 text-sm font-mono resize-y focus:outline-none focus:border-primary placeholder:text-muted-foreground/50"
+              className="flex-1 min-h-[100px] rounded-lg border border-border bg-background px-4 py-3 text-sm font-mono resize-y focus:outline-none focus:border-[#F66824] placeholder:text-muted-foreground/50"
               disabled={isRunning}
             />
             <div className="flex flex-col gap-2">
               <Button
                 onClick={addUrls}
                 disabled={isRunning || !urlText.trim()}
-                className="bg-[#00f0ff]/10 text-[#00f0ff] border border-[#00f0ff]/20 hover:bg-[#00f0ff]/20"
+                className="bg-[#F66824]/10 text-[#F66824] border border-[#F66824]/20 hover:bg-[#F66824]/20"
               >
                 <Plus className="h-4 w-4 mr-1" /> Add
               </Button>
@@ -354,7 +354,7 @@ export default function BulkPage() {
                 key={preset.name}
                 onClick={() => loadPreset(preset.urls)}
                 disabled={isRunning}
-                className="text-xs text-primary/70 hover:text-primary underline-offset-2 hover:underline transition-colors disabled:opacity-40"
+                className="text-xs text-[#F66824]/70 hover:text-[#F66824] underline-offset-2 hover:underline transition-colors disabled:opacity-40"
               >
                 {preset.name}
               </button>
@@ -386,7 +386,7 @@ export default function BulkPage() {
               value={concurrency}
               onChange={(e) => setConcurrency(Number(e.target.value))}
               disabled={isRunning}
-              className="bg-card border border-border/50 rounded px-2 py-1 text-xs"
+              className="bg-white border border-border rounded px-2 py-1 text-xs"
             >
               <option value={1}>1</option>
               <option value={2}>2</option>
@@ -400,7 +400,7 @@ export default function BulkPage() {
               <Button
                 onClick={runBulk}
                 disabled={items.filter((i) => i.status === "queued").length === 0}
-                className="bg-gradient-to-r from-[#00f0ff] to-[#a855f7] text-black font-semibold hover:opacity-90"
+                className="bg-gradient-to-r from-[#F66824] to-[#DB5F94] text-white font-semibold hover:from-[#F66824CC] hover:to-[#DB5F94CC]"
               >
                 <Play className="h-4 w-4 mr-1" /> Run All
               </Button>
@@ -419,10 +419,10 @@ export default function BulkPage() {
       {/* Summary Stats */}
       {completedItems.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card className="bg-white shadow-sm border-border/60">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
-                <BarChart3 className="h-4 w-4 text-[#00f0ff]" />
+                <BarChart3 className="h-4 w-4 text-[#F66824]" />
                 <span className="text-xs text-muted-foreground">Avg Score</span>
               </div>
               <div
@@ -442,13 +442,13 @@ export default function BulkPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card className="bg-white shadow-sm border-border/60">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
-                <Shield className="h-4 w-4 text-[#a855f7]" />
+                <Shield className="h-4 w-4 text-[#DB5F94]" />
                 <span className="text-xs text-muted-foreground">Pass Rate</span>
               </div>
-              <div className="text-2xl font-bold font-mono text-[#a855f7]">
+              <div className="text-2xl font-bold font-mono text-[#DB5F94]">
                 {completedItems.length > 0
                   ? Math.round((passCount / completedItems.length) * 100)
                   : 0}
@@ -456,7 +456,7 @@ export default function BulkPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card className="bg-white shadow-sm border-border/60">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Zap className="h-4 w-4 text-[#f59e0b]" />
@@ -467,7 +467,7 @@ export default function BulkPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <Card className="bg-white shadow-sm border-border/60">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Download className="h-4 w-4 text-[#10b981]" />
@@ -492,11 +492,11 @@ export default function BulkPage() {
           {items.map((item) => (
             <Card
               key={item.id}
-              className={`border-border/50 bg-card/50 backdrop-blur-sm transition-all ${
+              className={`bg-white shadow-sm border-border/60 transition-all card-hover ${
                 item.status === "completed"
                   ? "border-[#10b981]/20"
                   : item.status === "running"
-                  ? "border-[#00f0ff]/20 glow-cyan"
+                  ? "border-[#F66824]/30 shadow-md"
                   : item.status === "error"
                   ? "border-[#ef4444]/20"
                   : ""
@@ -552,16 +552,16 @@ export default function BulkPage() {
                 {item.status === "running" && (
                   <div className="mt-3 space-y-1.5">
                     <div className="flex items-center justify-between text-[10px]">
-                      <span className="text-[#00f0ff]">
+                      <span className="text-[#F66824]">
                         {item.currentStep || "Starting..."}
                       </span>
                       <span className="text-muted-foreground font-mono">
                         {item.progressPct || 0}%
                       </span>
                     </div>
-                    <div className="h-1 rounded-full bg-muted/30 overflow-hidden">
+                    <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-[#00f0ff] transition-all duration-300"
+                        className="h-full rounded-full bg-[#F66824] transition-all duration-300"
                         style={{
                           width: `${item.progressPct || 0}%`,
                         }}
@@ -597,7 +597,7 @@ export default function BulkPage() {
                       ).map(([key, val]) => (
                         <div
                           key={key}
-                          className="flex-1 h-1 rounded-full bg-muted/20 overflow-hidden"
+                          className="flex-1 h-1 rounded-full bg-muted/30 overflow-hidden"
                           title={`${key}: ${val}`}
                         >
                           <div
@@ -614,7 +614,7 @@ export default function BulkPage() {
 
                     <Link
                       href={`/evaluate?result=${item.result.id}`}
-                      className="text-[10px] text-primary hover:underline flex items-center gap-0.5"
+                      className="text-[10px] text-[#F66824] hover:underline flex items-center gap-0.5"
                     >
                       View Details{" "}
                       <ExternalLink className="h-2.5 w-2.5" />
@@ -636,7 +636,7 @@ export default function BulkPage() {
 
       {/* Empty state */}
       {items.length === 0 && (
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm border-dashed">
+        <Card className="bg-white shadow-sm border-border/60 border-dashed">
           <CardContent className="p-12 text-center">
             <ListPlus className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
             <p className="text-sm text-muted-foreground mb-4">
