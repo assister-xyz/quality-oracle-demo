@@ -39,7 +39,10 @@ function computeKPIs(servers: ServerEvaluation[]) {
   const avgScore = Math.round(completed.reduce((sum, s) => sum + s.score, 0) / completed.length);
   const passRate = Math.round((completed.filter((s) => s.score >= 50).length / completed.length) * 100);
   const expertCount = completed.filter((s) => s.tier === "expert").length;
-  const avgLatency = Math.round(completed.reduce((sum, s) => sum + s.duration_ms, 0) / completed.length);
+  const withDuration = completed.filter((s) => s.duration_ms > 0);
+  const avgLatency = withDuration.length > 0
+    ? Math.round(withDuration.reduce((sum, s) => sum + s.duration_ms, 0) / withDuration.length)
+    : 0;
   const totalTools = completed.reduce((sum, s) => sum + s.tools_count, 0);
 
   return {
@@ -82,7 +85,7 @@ export default function DashboardPage() {
       {/* Hero */}
       <div className="space-y-3">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Quality Oracle{" "}
+          AgentTrust{" "}
           <span className="brand-gradient-text">Dashboard</span>
         </h1>
         <p className="text-muted-foreground max-w-2xl">
@@ -91,7 +94,7 @@ export default function DashboardPage() {
         </p>
         <div className="flex gap-3 pt-1">
           <Link href="/evaluate">
-            <Button className="bg-gradient-to-r from-[#F66824] to-[#DB5F94] text-white font-medium hover:from-[#F66824CC] hover:to-[#DB5F94CC]">
+            <Button className="bg-[#181D27] text-white font-semibold hover:bg-[#6941C6]">
               <Search className="h-4 w-4 mr-2" />
               Evaluate Agent
             </Button>
@@ -113,7 +116,7 @@ export default function DashboardPage() {
             <div>
               <p className="text-sm font-medium text-[#f59e0b]">Backend Offline</p>
               <p className="text-xs text-muted-foreground">
-                Cannot connect to Quality Oracle backend at {process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002"}.
+                Cannot connect to AgentTrust backend at {process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002"}.
                 Start the backend to see real data.
               </p>
             </div>
@@ -124,7 +127,7 @@ export default function DashboardPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {kpiCards.map((kpi) => (
-          <Card key={kpi.label} className="bg-white shadow-sm border-border/60 card-hover">
+          <Card key={kpi.label} className="bg-white shadow-sm border-[#E9EAEB] card-hover">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <kpi.icon className="h-4 w-4" style={{ color: kpi.color }} />
@@ -133,7 +136,7 @@ export default function DashboardPage() {
               {loading ? (
                 <Skeleton className="h-8 w-16" />
               ) : (
-                <div className="text-2xl font-bold font-mono tabular-nums" style={{ color: kpi.color }}>
+                <div className="text-2xl font-bold font-mono tabular-nums text-foreground">
                   {kpi.value}
                 </div>
               )}
@@ -144,7 +147,7 @@ export default function DashboardPage() {
 
       {/* Tier Distribution + Evaluation Standards */}
       <div className="grid md:grid-cols-2 gap-6">
-        <Card className="bg-white shadow-sm border-border/60">
+        <Card className="bg-white shadow-sm border-[#E9EAEB]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Tier Distribution</CardTitle>
           </CardHeader>
@@ -186,24 +189,26 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white shadow-sm border-border/60">
+        <Card className="bg-white shadow-sm border-[#E9EAEB]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Evaluation Standards</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3 text-sm">
+            <div className="grid grid-cols-1 gap-2">
               {[
                 { label: "Multi-Judge Consensus", detail: "2-3 parallel LLM judges with agreement threshold", icon: Shield },
                 { label: "6-Axis Scoring", detail: "Accuracy, Safety, Reliability, Latency, Process, Schema", icon: BarChart3 },
                 { label: "Adversarial Probes", detail: "Injection, extraction, PII, hallucination, overflow", icon: Shield },
-                { label: "UAQA Attestation", detail: "Ed25519-signed JWT with W3C VC compatibility", icon: Award },
+                { label: "AQVC Attestation", detail: "Ed25519-signed JWT with W3C VC compatibility (AgentTrust Verified)", icon: Award },
                 { label: "Anti-Gaming", detail: "Question paraphrasing, canaries, production correlation", icon: Zap },
               ].map((item) => (
-                <div key={item.label} className="flex items-start gap-3">
-                  <item.icon className="h-4 w-4 mt-0.5 text-[#F66824] shrink-0" />
-                  <div>
-                    <div className="font-medium text-foreground">{item.label}</div>
-                    <div className="text-xs text-muted-foreground">{item.detail}</div>
+                <div key={item.label} className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-[#FAFAFA] border border-[#E9EAEB]/60">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#181D27] shrink-0">
+                    <item.icon className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium text-foreground">{item.label}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">{item.detail}</div>
                   </div>
                 </div>
               ))}
@@ -216,14 +221,14 @@ export default function DashboardPage() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-foreground">Recent Evaluations</h2>
-          <Link href="/leaderboard" className="text-sm text-[#F66824] hover:underline flex items-center gap-1">
+          <Link href="/leaderboard" className="text-sm text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1">
             View all <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="bg-white shadow-sm border-border/60">
+              <Card key={i} className="bg-white shadow-sm border-[#E9EAEB]">
                 <CardContent className="p-4 space-y-3">
                   <Skeleton className="h-5 w-32" />
                   <Skeleton className="h-4 w-full" />
@@ -233,12 +238,12 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : recentEvals.length === 0 ? (
-          <Card className="bg-white shadow-sm border-border/60 border-dashed">
+          <Card className="bg-white shadow-sm border-[#E9EAEB] border-dashed">
             <CardContent className="p-8 text-center">
               <Search className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
               <p className="text-sm text-muted-foreground">
                 No evaluations yet.{" "}
-                <Link href="/evaluate" className="text-[#F66824] hover:underline">
+                <Link href="/evaluate" className="text-foreground font-medium hover:underline">
                   Run your first evaluation
                 </Link>
               </p>
@@ -248,11 +253,11 @@ export default function DashboardPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {recentEvals.map((server) => (
               <Link key={server.id} href={`/evaluate?result=${server.id}`}>
-                <Card className="bg-white shadow-sm border-border/60 hover:border-[#F66824]/30 hover:shadow-md transition-all cursor-pointer group card-hover">
+                <Card className="bg-white shadow-sm border-[#E9EAEB] hover:border-[#D5D7DA] hover:shadow-md transition-all cursor-pointer group card-hover">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <div className="font-medium group-hover:text-[#F66824] transition-colors">{server.name}</div>
+                        <div className="font-medium group-hover:text-foreground transition-colors">{server.name}</div>
                         <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
                           <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">
                             {server.transport === "sse" ? "SSE" : "HTTP"}
@@ -279,9 +284,9 @@ export default function DashboardPage() {
       </div>
 
       {/* How it works */}
-      <Card className="bg-white shadow-sm border-border/60">
+      <Card className="bg-white shadow-sm border-[#E9EAEB]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-muted-foreground">How Quality Oracle Works</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">How AgentTrust Works</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-4 gap-6">
@@ -289,10 +294,10 @@ export default function DashboardPage() {
               { step: "1", title: "Connect", desc: "Paste any MCP server URL. We auto-detect SSE or Streamable HTTP transport." },
               { step: "2", title: "Discover", desc: "Automatically list all tools, validate manifest schema, check documentation quality." },
               { step: "3", title: "Evaluate", desc: "Run functional tests per tool. Multiple LLM judges score responses independently." },
-              { step: "4", title: "Attest", desc: "Generate 6-axis quality score, tier badge, and Ed25519-signed attestation (UAQA)." },
+              { step: "4", title: "Attest", desc: "Generate 6-axis quality score, tier badge, and Ed25519-signed AQVC attestation (AgentTrust Verified)." },
             ].map((item) => (
               <div key={item.step} className="text-center space-y-2">
-                <div className="mx-auto w-10 h-10 rounded-full bg-gradient-to-br from-[#F66824]/10 to-[#DB5F94]/10 border border-[#F66824]/20 flex items-center justify-center font-bold text-sm brand-gradient-text">
+                <div className="mx-auto w-10 h-10 rounded-full bg-[#181D27] flex items-center justify-center font-bold text-sm text-white">
                   {item.step}
                 </div>
                 <div className="font-medium text-foreground">{item.title}</div>
@@ -305,10 +310,10 @@ export default function DashboardPage() {
 
       {/* Footer */}
       <div className="text-center text-xs text-muted-foreground pt-4 pb-8 space-y-1">
-        <p>Quality Oracle v1.0 — Evaluation Version v1.0</p>
+        <p>AgentTrust v1.0 — Evaluation Version v1.0</p>
         <p>
           Built by{" "}
-          <a href="https://assisterr.ai" target="_blank" rel="noopener" className="text-[#F66824] hover:underline inline-flex items-center gap-0.5">
+          <a href="https://assisterr.ai" target="_blank" rel="noopener" className="text-foreground font-medium hover:underline inline-flex items-center gap-0.5">
             Assisterr <ExternalLink className="h-2.5 w-2.5" />
           </a>
         </p>

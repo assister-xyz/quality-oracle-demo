@@ -1,6 +1,6 @@
 # Public MCP Servers for Evaluation Testing
 
-No-auth MCP servers that can be used for Quality Oracle evaluation testing.
+No-auth MCP servers that can be used for AgentTrust evaluation testing.
 Last verified: 2026-03-02
 
 ## Evaluated & Working (L2 scores verified)

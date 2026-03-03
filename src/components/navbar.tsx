@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useBackendHealth } from "@/lib/hooks";
-import { Shield, BarChart3, Search, Trophy, GitCompareArrows, Layers, Wifi, WifiOff } from "lucide-react";
+import { Shield, BarChart3, Search, Trophy, GitCompareArrows, Layers } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: BarChart3 },
@@ -19,17 +19,17 @@ export function Navbar() {
   const { isLive } = useBackendHealth();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-white/80 backdrop-blur-xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#E9EAEB] bg-white/80 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg brand-gradient">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#181D27]">
               <Shield className="h-4 w-4 text-white" />
             </div>
             <span className="text-lg font-semibold tracking-tight text-foreground">
-              Quality Oracle
+              AgentTrust
             </span>
-            <span className="hidden sm:inline-flex items-center rounded-full bg-[#DB5F94]/10 border border-[#DB5F94]/20 px-2 py-0.5 text-[10px] font-medium text-[#DB5F94]">
+            <span className="hidden sm:inline-flex items-center rounded-full bg-[#181D27] px-2 py-0.5 text-[10px] font-medium text-white">
               DEMO
             </span>
           </Link>
@@ -42,10 +42,10 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    "flex items-center gap-2 rounded-[10px] px-3 py-2 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-[#F66824]/10 text-[#F66824]"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      ? "bg-[#181D27] text-white"
+                      : "text-muted-foreground hover:text-foreground hover:bg-[#181D27] hover:text-white"
                   )}
                 >
                   <item.icon className="h-4 w-4" />

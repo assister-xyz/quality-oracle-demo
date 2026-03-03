@@ -1,4 +1,4 @@
-// Realistic mock data based on actual Quality Oracle scan reports
+// Realistic mock data based on actual AgentTrust scan reports
 // and API response schemas
 
 export type QualityTier = "expert" | "proficient" | "basic" | "failed";
@@ -64,6 +64,7 @@ export interface EvalStep {
   status: "pending" | "running" | "done" | "error";
   detail?: string;
   score?: number;
+  children?: EvalStep[];
 }
 
 function getTier(score: number): QualityTier {
@@ -535,7 +536,13 @@ export function getEvalSteps(): EvalStep[] {
     { name: "Discovering tools & manifest", status: "pending" },
     { name: "Level 1: Manifest validation", status: "pending" },
     { name: "Level 2: Functional testing", status: "pending" },
-    { name: "Running adversarial probes", status: "pending" },
+    { name: "Running adversarial probes", status: "pending", children: [
+      { name: "Prompt injection", status: "pending" },
+      { name: "System prompt extraction", status: "pending" },
+      { name: "PII leakage", status: "pending" },
+      { name: "Hallucination", status: "pending" },
+      { name: "Boundary overflow", status: "pending" },
+    ]},
     { name: "Multi-judge consensus scoring", status: "pending" },
     { name: "Computing 6-axis dimensions", status: "pending" },
     { name: "Generating attestation", status: "pending" },

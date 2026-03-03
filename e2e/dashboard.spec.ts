@@ -6,7 +6,7 @@ test.describe("Dashboard Page", () => {
   });
 
   test("renders hero section with title and description", async ({ page }) => {
-    await expect(page.getByRole("heading", { name: /Quality Oracle/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /AgentTrust/i })).toBeVisible();
     await expect(
       page.getByText(/Pre-payment quality verification/i)
     ).toBeVisible();
@@ -44,7 +44,7 @@ test.describe("Dashboard Page", () => {
       "Multi-Judge Consensus",
       "6-Axis Scoring",
       "Adversarial Probes",
-      "UAQA Attestation",
+      "AQVC Attestation",
       "Anti-Gaming",
     ];
     for (const s of standards) {
@@ -60,15 +60,15 @@ test.describe("Dashboard Page", () => {
     expect(hasViewAll || hasEmptyState).toBe(true);
   });
 
-  test("renders How Quality Oracle Works section with 4 steps", async ({ page }) => {
-    await expect(page.getByText("How Quality Oracle Works")).toBeVisible();
+  test("renders How AgentTrust Works section with 4 steps", async ({ page }) => {
+    await expect(page.getByText("How AgentTrust Works")).toBeVisible();
     for (const step of ["Connect", "Discover", "Evaluate", "Attest"]) {
       await expect(page.getByText(step, { exact: true }).first()).toBeVisible();
     }
   });
 
   test("renders footer with Assisterr link", async ({ page }) => {
-    await expect(page.getByText(/Quality Oracle v1.0/)).toBeVisible();
+    await expect(page.getByText(/AgentTrust v1.0/)).toBeVisible();
     const assisterrLink = page.getByRole("link", { name: /Assisterr/i });
     await expect(assisterrLink).toBeVisible();
     await expect(assisterrLink).toHaveAttribute("href", "https://assisterr.ai");

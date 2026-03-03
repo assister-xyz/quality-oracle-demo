@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Quality Oracle — AI Agent Evaluation Platform",
+  title: "AgentTrust — AI Agent Evaluation Platform",
   description: "Pre-payment quality verification for AI agents, MCP servers, and skills. Multi-judge consensus scoring with 6-axis evaluation.",
 };
 

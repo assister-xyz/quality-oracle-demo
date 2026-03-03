@@ -47,22 +47,44 @@ const EXAMPLE_URLS = [
   { name: "Context7", url: "https://mcp.context7.com/mcp" },
 ];
 
-// Map backend progress_pct to our 8 evaluation steps
+// Map backend progress_pct to our evaluation steps
+// Adversarial probes (step 4) span 60-75%, sub-steps animate within that range
 function progressToSteps(pct: number): EvalStep[] {
   const steps = getEvalSteps();
   const thresholds = [10, 30, 40, 60, 75, 85, 95, 100];
 
   return steps.map((step, i) => {
-    if (pct >= thresholds[i]) {
-      return { ...step, status: "done" as const };
+    const parentStatus = pct >= thresholds[i]
+      ? "done" as const
+      : i === 0 && pct < thresholds[0]
+        ? (pct > 0 ? "running" as const : "pending" as const)
+        : i > 0 && pct >= thresholds[i - 1] && pct < thresholds[i]
+          ? "running" as const
+          : "pending" as const;
+
+    // Animate adversarial sub-steps (step index 4, range 60-75%)
+    if (step.children && i === 4) {
+      const subStart = thresholds[i - 1]; // 60
+      const subEnd = thresholds[i];       // 75
+      const subRange = subEnd - subStart;  // 15
+      const subCount = step.children.length;
+
+      const children = step.children.map((child, ci) => {
+        const childThreshold = subStart + (subRange / subCount) * (ci + 1);
+        const childPrevThreshold = subStart + (subRange / subCount) * ci;
+        if (pct >= childThreshold) {
+          return { ...child, status: "done" as const };
+        }
+        if (pct >= childPrevThreshold && pct < childThreshold) {
+          return { ...child, status: "running" as const };
+        }
+        return child;
+      });
+
+      return { ...step, status: parentStatus, children };
     }
-    if (i === 0 && pct < thresholds[0]) {
-      return { ...step, status: pct > 0 ? "running" as const : "pending" as const };
-    }
-    if (i > 0 && pct >= thresholds[i - 1] && pct < thresholds[i]) {
-      return { ...step, status: "running" as const };
-    }
-    return step;
+
+    return { ...step, status: parentStatus };
   });
 }
 
@@ -77,6 +99,22 @@ function StepIcon({ status }: { status: EvalStep["status"] }) {
     default:
       return <Circle className="h-4 w-4 text-muted-foreground/30" />;
   }
+}
+
+function ElapsedTimer() {
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    const start = Date.now();
+    const interval = setInterval(() => setElapsed(Math.floor((Date.now() - start) / 1000)), 1000);
+    return () => clearInterval(interval);
+  }, []);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  return (
+    <span className="text-xs text-muted-foreground font-mono tabular-nums ml-auto">
+      {mins > 0 ? `${mins}m ${secs.toString().padStart(2, "0")}s` : `${secs}s`}
+    </span>
+  );
 }
 
 function ProbeIcon({ passed }: { passed: boolean }) {
@@ -106,6 +144,7 @@ export default function EvaluatePage() {
 function EvaluateContent() {
   const searchParams = useSearchParams();
   const [url, setUrl] = useState("");
+  const [evalMode, setEvalMode] = useState<"quick" | "standard" | "full">("standard");
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [steps, setSteps] = useState<EvalStep[]>([]);
   const [result, setResult] = useState<ServerEvaluation | null>(null);
@@ -238,7 +277,7 @@ function EvaluateContent() {
     setSteps(getEvalSteps());
 
     try {
-      const response = await submitEvaluation({ target_url: url.trim(), level: 2 });
+      const response = await submitEvaluation({ target_url: url.trim(), level: 2, eval_mode: evalMode });
       setEvaluationId(response.evaluation_id);
       // Persist to URL and sessionStorage for reconnection
       window.history.replaceState(null, "", `/evaluate?eval=${response.evaluation_id}`);
@@ -259,12 +298,12 @@ function EvaluateContent() {
         return next;
       });
     }
-  }, [url]);
+  }, [url, evalMode]);
 
   const handleCopyBadge = () => {
     if (!result) return;
     navigator.clipboard.writeText(
-      `![Quality Score](https://quality-oracle.assisterr.ai/v1/badge/${encodeURIComponent(result.url)}.svg)`
+      `![Quality Score](https://agenttrust.assisterr.ai/v1/badge/${encodeURIComponent(result.url)}.svg)`
     );
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -283,7 +322,7 @@ function EvaluateContent() {
       </div>
 
       {/* URL Input */}
-      <Card className="bg-white shadow-sm border-border/60">
+      <Card className="bg-white shadow-sm border-[#E9EAEB]">
         <CardContent className="p-6">
           <div className="flex gap-3">
             <div className="relative flex-1">
@@ -293,14 +332,14 @@ function EvaluateContent() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && startEvaluation()}
-                className="pl-9 h-12 text-base border-border focus:border-[#F66824]"
+                className="pl-9 h-12 text-base border-[#E9EAEB] focus:border-[#181D27]"
                 disabled={isEvaluating}
               />
             </div>
             <Button
               onClick={startEvaluation}
               disabled={isEvaluating || !url.trim()}
-              className="h-12 px-6 bg-gradient-to-r from-[#F66824] to-[#DB5F94] text-white font-semibold hover:from-[#F66824CC] hover:to-[#DB5F94CC]"
+              className="h-12 px-6 bg-[#181D27] text-white font-semibold hover:bg-[#6941C6]"
             >
               {isEvaluating ? (
                 <>
@@ -321,6 +360,31 @@ function EvaluateContent() {
             </div>
           )}
 
+          {/* Eval mode selector */}
+          <div className="mt-4 space-y-2">
+            <div className="flex items-center gap-1.5">
+              {(["quick", "standard", "full"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setEvalMode(mode)}
+                  disabled={isEvaluating}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    evalMode === mode
+                      ? "bg-[#181D27] text-white"
+                      : "bg-white text-muted-foreground border border-[#E9EAEB] hover:border-[#181D27] hover:text-foreground"
+                  } disabled:opacity-50`}
+                >
+                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              {evalMode === "quick" && "~30s \u00b7 1 test per tool (max 3 tools) \u00b7 single judge \u00b7 no safety probes"}
+              {evalMode === "standard" && "~90s \u00b7 3 tests per tool \u00b7 single judge \u00b7 safety probes included"}
+              {evalMode === "full" && "~3min \u00b7 all tests \u00b7 consensus judging (2\u20133 judges) \u00b7 safety + consistency checks"}
+            </p>
+          </div>
+
           {/* Quick examples */}
           <div className="flex flex-wrap gap-2 mt-3">
             <span className="text-xs text-muted-foreground">Try:</span>
@@ -328,7 +392,7 @@ function EvaluateContent() {
               <button
                 key={ex.name}
                 onClick={() => setUrl(ex.url)}
-                className="text-xs text-[#F66824]/70 hover:text-[#F66824] underline-offset-2 hover:underline transition-colors"
+                className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline transition-colors"
                 disabled={isEvaluating}
               >
                 {ex.name}
@@ -374,7 +438,7 @@ function EvaluateContent() {
 
       {/* Loading result from URL param */}
       {loadingResult && (
-        <Card className="bg-white shadow-sm border-border/60">
+        <Card className="bg-white shadow-sm border-[#E9EAEB]">
           <CardContent className="p-6 space-y-4">
             <Skeleton className="h-6 w-48" />
             <Skeleton className="h-4 w-full" />
@@ -385,24 +449,47 @@ function EvaluateContent() {
 
       {/* Evaluation Progress */}
       {steps.length > 0 && !result && !error && (
-        <Card className="bg-white shadow-sm border-border/60">
+        <Card className="bg-white shadow-sm border-[#E9EAEB]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin text-[#F66824]" />
               Evaluation in Progress
+              <Badge variant="outline" className="text-[10px] font-normal capitalize">
+                {evalMode}
+              </Badge>
+              {isEvaluating && <ElapsedTimer />}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2.5">
               {steps.map((step, i) => (
-                <div
-                  key={i}
-                  className={`flex items-center gap-3 text-sm transition-opacity ${
-                    step.status === "pending" ? "opacity-40" : "opacity-100"
-                  }`}
-                >
-                  <StepIcon status={step.status} />
-                  <span className={step.status === "running" ? "text-[#F66824] font-medium" : ""}>{step.name}</span>
+                <div key={i}>
+                  <div
+                    className={`flex items-center gap-3 text-sm transition-opacity ${
+                      step.status === "pending" ? "opacity-40" : "opacity-100"
+                    }`}
+                  >
+                    <StepIcon status={step.status} />
+                    <span className={step.status === "running" ? "text-[#F66824] font-medium" : ""}>{step.name}</span>
+                  </div>
+                  {/* Adversarial sub-steps */}
+                  {step.children && (step.status === "running" || step.status === "done") && (
+                    <div className="ml-7 mt-1.5 mb-1 space-y-1.5 border-l-2 border-border/40 pl-3">
+                      {step.children.map((child, ci) => (
+                        <div
+                          key={ci}
+                          className={`flex items-center gap-2 text-xs transition-opacity ${
+                            child.status === "pending" ? "opacity-30" : "opacity-100"
+                          }`}
+                        >
+                          <StepIcon status={child.status} />
+                          <span className={child.status === "running" ? "text-[#F66824]" : "text-muted-foreground"}>
+                            {child.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -419,7 +506,7 @@ function EvaluateContent() {
       {result && (
         <div className="space-y-6 animate-fade-up">
           {/* Summary Header */}
-          <Card className="bg-white shadow-sm border-border/60">
+          <Card className="bg-white shadow-sm border-[#E9EAEB]">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-2">
@@ -446,7 +533,7 @@ function EvaluateContent() {
                       href={result.url}
                       target="_blank"
                       rel="noopener"
-                      className="flex items-center gap-1 hover:text-[#F66824]"
+                      className="flex items-center gap-1 hover:text-foreground"
                     >
                       <ExternalLink className="h-3 w-3" /> {result.url}
                     </a>
@@ -460,7 +547,7 @@ function EvaluateContent() {
           {/* 6-Axis Radar + Dimension Bars */}
           {(result.dimensions.accuracy > 0 || result.dimensions.safety > 0) && (
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-white shadow-sm border-border/60">
+              <Card className="bg-white shadow-sm border-[#E9EAEB]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">6-Axis Quality Profile</CardTitle>
                 </CardHeader>
@@ -469,7 +556,7 @@ function EvaluateContent() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white shadow-sm border-border/60">
+              <Card className="bg-white shadow-sm border-[#E9EAEB]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Dimension Breakdown</CardTitle>
                 </CardHeader>
@@ -484,7 +571,7 @@ function EvaluateContent() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Tool Scores */}
             {Object.keys(result.tool_scores).length > 0 && (
-              <Card className="bg-white shadow-sm border-border/60">
+              <Card className="bg-white shadow-sm border-[#E9EAEB]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     Tool Scores ({Object.keys(result.tool_scores).length} tools)
@@ -516,7 +603,7 @@ function EvaluateContent() {
 
             {/* Safety Probes */}
             {result.safety_probes.length > 0 && (
-              <Card className="bg-white shadow-sm border-border/60">
+              <Card className="bg-white shadow-sm border-[#E9EAEB]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Shield className="h-4 w-4" />
@@ -559,7 +646,7 @@ function EvaluateContent() {
 
           {/* Judge Responses */}
           {result.judge_responses.length > 0 && (
-            <Card className="bg-white shadow-sm border-border/60">
+            <Card className="bg-white shadow-sm border-[#E9EAEB]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Judge Consensus Responses
@@ -595,7 +682,7 @@ function EvaluateContent() {
           )}
 
           {/* Badge & Attestation */}
-          <Card className="bg-white shadow-sm border-border/60">
+          <Card className="bg-white shadow-sm border-[#E9EAEB]">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Badge & Attestation</CardTitle>
             </CardHeader>
@@ -605,7 +692,7 @@ function EvaluateContent() {
                   <p className="text-xs text-muted-foreground">Embed this quality badge in your README:</p>
                   <div className="flex items-center gap-2">
                     <code className="text-[11px] font-mono bg-muted/50 px-3 py-1.5 rounded border border-border/50 max-w-md truncate">
-                      ![Quality Score](https://quality-oracle.assisterr.ai/v1/badge/{encodeURIComponent(result.url)}.svg)
+                      ![Quality Score](https://agenttrust.assisterr.ai/v1/badge/{encodeURIComponent(result.url)}.svg)
                     </code>
                     <Button variant="outline" size="sm" onClick={handleCopyBadge} className="shrink-0">
                       {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
@@ -613,7 +700,7 @@ function EvaluateContent() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">Attestation (UAQA v1.0, Ed25519):</p>
+                  <p className="text-xs text-muted-foreground">Attestation (AQVC v1.0, Ed25519):</p>
                   <Badge variant="outline" className="text-[10px] font-mono">
                     JWT: eyJhbGciOiJFZERTQSJ9...
                   </Badge>
