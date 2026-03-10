@@ -4,12 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useBackendHealth } from "@/lib/hooks";
-import { Shield, BarChart3, Search, Trophy, GitCompareArrows, Layers } from "lucide-react";
+import { Shield, BarChart3, Search, Trophy, GitCompareArrows, Layers, Swords, Crown } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: BarChart3 },
   { href: "/evaluate", label: "Evaluate", icon: Search },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
+  { href: "/battle", label: "Battle", icon: Swords },
+  { href: "/ladder", label: "Ladder", icon: Crown },
   { href: "/compare", label: "Compare", icon: GitCompareArrows },
   { href: "/bulk", label: "Bulk", icon: Layers },
 ];
@@ -28,9 +30,6 @@ export function Navbar() {
             </div>
             <span className="text-lg font-semibold tracking-tight text-foreground">
               AgentTrust
-            </span>
-            <span className="hidden sm:inline-flex items-center rounded-full bg-[#181D27] px-2 py-0.5 text-[10px] font-medium text-white">
-              DEMO
             </span>
           </Link>
 

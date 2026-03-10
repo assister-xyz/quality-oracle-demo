@@ -9,6 +9,7 @@ import type {
   JudgeResponse,
   SafetyProbe,
   QualityTier,
+  TrustLevel,
   Transport,
   TargetType,
 } from "./mock-data";
@@ -170,6 +171,7 @@ export function transformEvalStatus(
     safety_probes: safetyProbes,
     evaluated_at: new Date().toISOString(),
     evaluation_version: data.evaluation_version || "v1.0",
+    trust_level: (data.eval_mode as TrustLevel) || undefined,
   };
 }
 
@@ -206,5 +208,6 @@ export function transformScoreItem(item: ScoresListItem): ServerEvaluation {
     safety_probes: parseSafetyProbes(item.safety_report),
     evaluated_at: item.last_evaluated_at || new Date().toISOString(),
     evaluation_version: "v1.0",
+    trust_level: (item.last_eval_mode as TrustLevel) || undefined,
   };
 }
