@@ -2,6 +2,7 @@
 // and API response schemas
 
 export type QualityTier = "expert" | "proficient" | "basic" | "failed";
+export type TrustLevel = "verified" | "certified" | "audited";
 export type TargetType = "mcp_server" | "agent" | "skill";
 export type EvalStatus = "pending" | "running" | "completed" | "failed";
 export type Transport = "sse" | "streamable_http";
@@ -57,6 +58,8 @@ export interface ServerEvaluation {
   safety_probes: SafetyProbe[];
   evaluated_at: string;
   evaluation_version: string;
+  trust_level?: TrustLevel;
+  battle_record?: { wins: number; losses: number; draws: number };
 }
 
 export interface EvalStep {
@@ -82,6 +85,14 @@ const TIER_CONFIG: Record<QualityTier, { color: string; bg: string; border: stri
 };
 
 export { TIER_CONFIG };
+
+const TRUST_LEVEL_CONFIG: Record<TrustLevel, { color: string; bg: string; border: string; label: string; description: string }> = {
+  verified:  { color: "#F66824", bg: "rgba(246,104,36,0.08)", border: "rgba(246,104,36,0.3)", label: "Verified",  description: "Spot check — Domain Validated" },
+  certified: { color: "#F66824", bg: "rgba(246,104,36,0.08)", border: "rgba(246,104,36,0.3)", label: "Certified", description: "Full test suite — Org Validated" },
+  audited:   { color: "#F66824", bg: "rgba(246,104,36,0.08)", border: "rgba(246,104,36,0.3)", label: "Audited",   description: "Comprehensive audit — Extended Validation" },
+};
+
+export { TRUST_LEVEL_CONFIG };
 
 const DIMENSION_CONFIG: Record<keyof Dimensions, { label: string; weight: number; color: string }> = {
   accuracy: { label: "Accuracy", weight: 0.35, color: "#F66824" },

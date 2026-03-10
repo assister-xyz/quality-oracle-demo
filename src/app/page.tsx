@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScoreGauge } from "@/components/score-gauge";
 import { TierBadge } from "@/components/tier-badge";
+import { TrustLevelBadge } from "@/components/trust-level-badge";
 import { TIER_CONFIG, type QualityTier, type ServerEvaluation } from "@/lib/mock-data";
-import { useScoresList, useBackendHealth } from "@/lib/hooks";
+import { useScoresList, useBackendHealth, useBattleList } from "@/lib/hooks";
 import {
   BarChart3,
   Shield,
@@ -21,6 +22,7 @@ import {
   Trophy,
   ExternalLink,
   WifiOff,
+  Swords,
 } from "lucide-react";
 
 function computeKPIs(servers: ServerEvaluation[]) {
@@ -268,7 +270,10 @@ export default function DashboardPage() {
                       <ScoreGauge score={server.score} tier={server.tier} size={56} strokeWidth={4} showLabel={false} />
                     </div>
                     <div className="flex items-center justify-between">
-                      <TierBadge tier={server.tier} />
+                      <div className="flex items-center gap-1.5">
+                        <TierBadge tier={server.tier} />
+                        {server.trust_level && <TrustLevelBadge level={server.trust_level} showIcon={false} />}
+                      </div>
                       {server.duration_ms > 0 && (
                         <span className="text-[10px] text-muted-foreground">
                           {(server.duration_ms / 1000).toFixed(1)}s
@@ -282,6 +287,9 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Recent Battles */}
+      <RecentBattles />
 
       {/* How it works */}
       <Card className="bg-white shadow-sm border-[#E9EAEB]">
@@ -317,6 +325,64 @@ export default function DashboardPage() {
             Assisterr <ExternalLink className="h-2.5 w-2.5" />
           </a>
         </p>
+      </div>
+    </div>
+  );
+}
+
+function RecentBattles() {
+  const { data, loading } = useBattleList(1, 5);
+
+  if (loading) return null;
+  if (!data || data.items.length === 0) return null;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+          <Swords className="h-4 w-4" />
+          Recent Battles
+        </h2>
+        <Link href="/battle" className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
+          View all <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {data.items.slice(0, 6).map((battle) => (
+          <Link key={battle.battle_id} href={`/battle?id=${battle.battle_id}`}>
+            <Card className="bg-white shadow-sm border-[#E9EAEB] hover:border-[#D5D7DA] hover:shadow-md transition-all cursor-pointer">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-medium text-foreground">
+                    {battle.agent_a.name || "Agent A"}
+                  </div>
+                  <div className="text-xs font-black text-[#ef4444]">VS</div>
+                  <div className="text-sm font-medium text-foreground text-right">
+                    {battle.agent_b.name || "Agent B"}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-lg font-bold">
+                  <span className={battle.winner === "a" ? "text-[#10b981]" : "text-muted-foreground"}>
+                    {battle.agent_a.overall_score}
+                  </span>
+                  <span className={battle.winner === "b" ? "text-[#10b981]" : "text-muted-foreground"}>
+                    {battle.agent_b.overall_score}
+                  </span>
+                </div>
+                <div className="mt-2 text-center">
+                  {battle.winner ? (
+                    <Badge variant="outline" className="text-[10px] border-[#10b981]/30 text-[#10b981]">
+                      <Trophy className="h-3 w-3 mr-1" />
+                      {battle.winner === "a" ? battle.agent_a.name : battle.agent_b.name} wins
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-[10px] border-[#3b82f6]/30 text-[#3b82f6]">Draw</Badge>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
     </div>
   );

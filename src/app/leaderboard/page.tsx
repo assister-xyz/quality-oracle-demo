@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScoreGauge } from "@/components/score-gauge";
 import { TierBadge } from "@/components/tier-badge";
+import { TrustLevelBadge } from "@/components/trust-level-badge";
 import { DimensionBar } from "@/components/dimension-bar";
 import { QualityRadarChart } from "@/components/radar-chart";
 import {
@@ -161,7 +162,7 @@ export default function LeaderboardPage() {
             variant={tierFilter === "all" ? "default" : "outline"}
             size="sm"
             onClick={() => setTierFilter("all")}
-            className={tierFilter === "all" ? "bg-[#F66824]/10 text-[#F66824] border-[#F66824]/30 hover:bg-[#F66824]/20" : ""}
+            className={tierFilter === "all" ? "bg-[#181D27] text-white border-[#181D27] hover:bg-[#181D27]/90" : ""}
           >
             <Filter className="h-3 w-3 mr-1" /> All
           </Button>
@@ -189,7 +190,7 @@ export default function LeaderboardPage() {
 
       <div className="grid lg:grid-cols-[1fr_380px] gap-6">
         {/* Table */}
-        <Card className="bg-white shadow-sm border-border/60 overflow-hidden">
+        <Card className="bg-white shadow-sm border-[#E9EAEB] overflow-hidden">
           <div className="overflow-x-auto">
             {loading ? (
               <div className="p-4 space-y-3">
@@ -219,6 +220,8 @@ export default function LeaderboardPage() {
                       </div>
                     </th>
                     <th className="text-center px-4 py-3 text-xs font-medium text-muted-foreground">Tier</th>
+                    <th className="text-center px-4 py-3 text-xs font-medium text-muted-foreground hidden md:table-cell">Trust</th>
+                    <th className="text-center px-4 py-3 text-xs font-medium text-muted-foreground hidden md:table-cell">Record</th>
                     <th
                       className="text-center px-4 py-3 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground hidden md:table-cell"
                       onClick={() => toggleSort("tools_count")}
@@ -241,7 +244,7 @@ export default function LeaderboardPage() {
                         key={server.id}
                         className={`border-b border-border/50 cursor-pointer transition-colors ${
                           isSelected
-                            ? "bg-[#F66824]/5 border-[#F66824]/20"
+                            ? "bg-[#181D27]/5 border-[#181D27]/20"
                             : "hover:bg-muted/30"
                         }`}
                         onClick={() => handleRowClick(server)}
@@ -272,6 +275,22 @@ export default function LeaderboardPage() {
                           <TierBadge tier={server.tier} />
                         </td>
                         <td className="px-4 py-3 text-center hidden md:table-cell">
+                          {server.trust_level ? (
+                            <TrustLevelBadge level={server.trust_level} showIcon={false} />
+                          ) : (
+                            <span className="text-[10px] text-muted-foreground">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center hidden md:table-cell">
+                          {server.battle_record ? (
+                            <span className="text-xs font-mono text-foreground">
+                              {server.battle_record.wins}-{server.battle_record.losses}-{server.battle_record.draws}
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-muted-foreground">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center hidden md:table-cell">
                           <span className="font-mono text-xs">{server.tools_count}</span>
                         </td>
                         <td className="px-4 py-3 hidden lg:table-cell">
@@ -284,7 +303,7 @@ export default function LeaderboardPage() {
                         <td className="px-4 py-3">
                           <ChevronRight
                             className={`h-4 w-4 text-muted-foreground transition-transform ${
-                              isSelected ? "rotate-90 text-[#F66824]" : ""
+                              isSelected ? "rotate-90 text-[#181D27]" : ""
                             }`}
                           />
                         </td>
@@ -308,7 +327,7 @@ export default function LeaderboardPage() {
         <div className="space-y-4">
           {displayServer ? (
             <>
-              <Card className="bg-white shadow-sm border-border/60 sticky top-20">
+              <Card className="bg-white shadow-sm border-[#E9EAEB] sticky top-20">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base text-foreground">{displayServer.name}</CardTitle>
@@ -322,6 +341,7 @@ export default function LeaderboardPage() {
                   </div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <TierBadge tier={displayServer.tier} />
+                    {displayServer.trust_level && <TrustLevelBadge level={displayServer.trust_level} />}
                     <span className="flex items-center gap-1">
                       <Wrench className="h-3 w-3" /> {displayServer.tools_count} tools
                     </span>
@@ -405,7 +425,7 @@ export default function LeaderboardPage() {
               </Card>
             </>
           ) : (
-            <Card className="bg-white shadow-sm border-border/60 border-dashed">
+            <Card className="bg-white shadow-sm border-[#E9EAEB] border-dashed">
               <CardContent className="p-8 text-center">
                 <div className="text-muted-foreground space-y-2">
                   <Trophy className="h-8 w-8 mx-auto opacity-30" />

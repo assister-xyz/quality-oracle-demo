@@ -24,35 +24,37 @@ export function ScoreGauge({ score, tier, size = 80, strokeWidth = 6, showLabel 
   }, [score]);
 
   return (
-    <div className="relative inline-flex flex-col items-center gap-1">
-      <svg width={size} height={size} className="-rotate-90">
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          className="text-muted/30"
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={config.color}
-          strokeWidth={strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          className="transition-all duration-1000 ease-out"
-          style={{ filter: `drop-shadow(0 0 4px ${config.color}30)` }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-lg font-bold font-mono tabular-nums" style={{ color: config.color }}>
-          {animatedScore}
-        </span>
+    <div className="inline-flex flex-col items-center gap-1">
+      <div className="relative">
+        <svg width={size} height={size} className="-rotate-90">
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            className="text-muted/30"
+          />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke={config.color}
+            strokeWidth={strokeWidth}
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            className="transition-all duration-1000 ease-out"
+            style={{ filter: `drop-shadow(0 0 4px ${config.color}30)` }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-lg font-bold font-mono tabular-nums" style={{ color: config.color }}>
+            {animatedScore}
+          </span>
+        </div>
       </div>
       {showLabel && (
         <span

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScoreGauge } from "@/components/score-gauge";
 import { TierBadge } from "@/components/tier-badge";
+import { TrustLevelBadge } from "@/components/trust-level-badge";
 import { QualityRadarChart } from "@/components/radar-chart";
 import {
   TIER_CONFIG,
@@ -252,7 +253,7 @@ export default function ComparePage() {
       </div>
 
       {!hasComparison && (
-        <Card className="bg-white shadow-sm border-border/60 border-dashed">
+        <Card className="bg-white shadow-sm border-[#E9EAEB] border-dashed">
           <CardContent className="p-12 text-center">
             <GitCompareArrows className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
             <p className="text-sm text-muted-foreground">
@@ -267,7 +268,7 @@ export default function ComparePage() {
       {hasComparison && (
         <div className="space-y-6 animate-fade-up">
           {/* Score Comparison Header */}
-          <Card className="bg-white shadow-sm border-border/60">
+          <Card className="bg-white shadow-sm border-[#E9EAEB]">
             <CardContent className="p-6">
               <div className="grid grid-cols-[1fr_auto_1fr] gap-6 items-center">
                 {/* Server A */}
@@ -282,6 +283,7 @@ export default function ComparePage() {
                     <div className="font-semibold truncate text-foreground">{serverA.name}</div>
                     <div className="flex items-center gap-2 mt-1">
                       <TierBadge tier={serverA.tier} />
+                      {serverA.trust_level && <TrustLevelBadge level={serverA.trust_level} />}
                       <Badge variant="outline" className="text-[10px]">
                         {serverA.transport === "sse" ? "SSE" : "HTTP"}
                       </Badge>
@@ -319,6 +321,7 @@ export default function ComparePage() {
                         {serverB.transport === "sse" ? "SSE" : "HTTP"}
                       </Badge>
                       <TierBadge tier={serverB.tier} />
+                      {serverB.trust_level && <TrustLevelBadge level={serverB.trust_level} />}
                     </div>
                     <div className="flex items-center gap-3 text-[10px] text-muted-foreground mt-1 justify-end">
                       <span className="flex items-center gap-0.5">
@@ -345,7 +348,7 @@ export default function ComparePage() {
 
           {/* Radar + Dimensions */}
           <div className="grid md:grid-cols-2 gap-6">
-            <Card className="bg-white shadow-sm border-border/60">
+            <Card className="bg-white shadow-sm border-[#E9EAEB]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Quality Profile Overlay
@@ -370,7 +373,7 @@ export default function ComparePage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-sm border-border/60">
+            <Card className="bg-white shadow-sm border-[#E9EAEB]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Dimension Comparison
@@ -430,7 +433,7 @@ export default function ComparePage() {
 
           {/* Tool Scores Comparison */}
           {allTools.length > 0 && (
-            <Card className="bg-white shadow-sm border-border/60">
+            <Card className="bg-white shadow-sm border-[#E9EAEB]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Wrench className="h-4 w-4" />
@@ -494,7 +497,7 @@ export default function ComparePage() {
 
           {/* Safety Probes Comparison */}
           {serverA.safety_probes.length > 0 && serverB.safety_probes.length > 0 && (
-            <Card className="bg-white shadow-sm border-border/60">
+            <Card className="bg-white shadow-sm border-[#E9EAEB]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Shield className="h-4 w-4" />
@@ -580,7 +583,7 @@ export default function ComparePage() {
           )}
 
           {/* Quick Verdict */}
-          <Card className="bg-white shadow-sm border-border/60">
+          <Card className="bg-white shadow-sm border-[#E9EAEB]">
             <CardContent className="p-6">
               <div className="text-center space-y-2">
                 <h3 className="text-sm font-medium text-muted-foreground">

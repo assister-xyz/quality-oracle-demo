@@ -58,7 +58,7 @@ export interface SubmitEvalRequest {
   target_type?: string;
   level?: number;
   domains?: string[];
-  eval_mode?: "quick" | "standard" | "full";
+  eval_mode?: "verified" | "certified" | "audited";
 }
 
 export interface SubmitEvalResponse {
@@ -82,6 +82,7 @@ export interface EvaluationStatusResponse {
   progress_pct: number;
   score: number | null;
   tier: string | null;
+  eval_mode: string | null;
   evaluation_version: string | null;
   report: {
     level1?: {
@@ -175,6 +176,7 @@ export interface ScoresListItem {
   safety_report: unknown[];
   latency_stats?: { avg_ms?: number; p50_ms?: number; p95_ms?: number; p99_ms?: number };
   duration_ms?: number | null;
+  last_eval_mode?: string | null;
 }
 
 export interface ScoresListResponse {
@@ -221,4 +223,96 @@ export interface ScoreHistoryItem {
 
 export function getScoreHistory(targetId: string): Promise<{ items: ScoreHistoryItem[] }> {
   return apiFetch<{ items: ScoreHistoryItem[] }>(`/v1/score/${encodeURIComponent(targetId)}/history`);
+}
+
+// ---------- Battle Arena ----------
+export interface BattleParticipant {
+  target_id: string;
+  target_url: string;
+  name: string;
+  overall_score: number;
+  scores: Record<string, number>;
+  rating_before?: { mu: number; sigma: number } | null;
+  rating_after?: { mu: number; sigma: number } | null;
+}
+
+export interface BattleResult {
+  battle_id: string;
+  agent_a: BattleParticipant;
+  agent_b: BattleParticipant;
+  winner: "a" | "b" | null;
+  margin: number;
+  photo_finish: boolean;
+  match_quality: number;
+  status: "pending" | "running" | "completed" | "failed";
+  duration_ms: number;
+  created_at: string;
+  error?: string | null;
+}
+
+export interface BattleListResponse {
+  items: BattleResult[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export function createBattle(agentAUrl: string, agentBUrl: string, options?: { domain?: string; challenge_count?: number }): Promise<{ battle_id: string; status: string; poll_url: string }> {
+  return apiFetch("/v1/battle", {
+    method: "POST",
+    body: JSON.stringify({ agent_a_url: agentAUrl, agent_b_url: agentBUrl, ...options }),
+  });
+}
+
+export function getBattle(battleId: string): Promise<BattleResult> {
+  return apiFetch<BattleResult>(`/v1/battle/${battleId}`);
+}
+
+export function listBattles(page = 1, limit = 20): Promise<BattleListResponse> {
+  return apiFetch<BattleListResponse>(`/v1/battles?page=${page}&limit=${limit}`);
+}
+
+// ---------- Arena (Ladder) ----------
+export interface LadderEntry {
+  target_id: string;
+  domain: string | null;
+  position: number;
+  name: string;
+  overall_score: number;
+  openskill_mu: number;
+  openskill_sigma: number;
+  battle_record: { wins: number; losses: number; draws: number };
+  defenses: number;
+  last_challenge_at: string | null;
+}
+
+export interface LadderResponse {
+  items: LadderEntry[];
+  domain: string | null;
+  count: number;
+}
+
+export interface MatchPrediction {
+  agent_a_id: string;
+  agent_b_id: string;
+  win_probability_a: number;
+  win_probability_b: number;
+  match_quality: number;
+  recommendation: "good_match" | "one_sided" | "too_unbalanced";
+}
+
+export function getLadder(domain?: string): Promise<LadderResponse> {
+  const path = domain ? `/v1/arena/ladder/${encodeURIComponent(domain)}` : "/v1/arena/ladder";
+  return apiFetch<LadderResponse>(path);
+}
+
+export function issueLadderChallenge(challengerId: string, targetId: string, domain?: string): Promise<{ battle_id: string; status: string; poll_url: string }> {
+  return apiFetch("/v1/arena/challenge", {
+    method: "POST",
+    body: JSON.stringify({ challenger_id: challengerId, target_id: targetId, domain }),
+  });
+}
+
+export function getMatchPrediction(idA: string, idB: string): Promise<MatchPrediction> {
+  return apiFetch<MatchPrediction>(`/v1/arena/predict/${encodeURIComponent(idA)}/${encodeURIComponent(idB)}`);
 }

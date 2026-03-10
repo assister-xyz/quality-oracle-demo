@@ -9,11 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScoreGauge } from "@/components/score-gauge";
 import { TierBadge } from "@/components/tier-badge";
+import { TrustLevelBadge } from "@/components/trust-level-badge";
+import { TrustCertificate } from "@/components/trust-certificate";
 import { DimensionBars } from "@/components/dimension-bar";
 import { QualityRadarChart } from "@/components/radar-chart";
 import {
   type ServerEvaluation,
   type EvalStep,
+  type TrustLevel,
   getEvalSteps,
 } from "@/lib/mock-data";
 import { submitEvaluation, getEvaluationStatus, ApiError } from "@/lib/api";
@@ -144,11 +147,10 @@ export default function EvaluatePage() {
 function EvaluateContent() {
   const searchParams = useSearchParams();
   const [url, setUrl] = useState("");
-  const [evalMode, setEvalMode] = useState<"quick" | "standard" | "full">("standard");
+  const [evalMode, setEvalMode] = useState<"verified" | "certified" | "audited">("certified");
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [steps, setSteps] = useState<EvalStep[]>([]);
   const [result, setResult] = useState<ServerEvaluation | null>(null);
-  const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [evaluationId, setEvaluationId] = useState<string | null>(null);
   const [loadingResult, setLoadingResult] = useState(false);
@@ -300,13 +302,17 @@ function EvaluateContent() {
     }
   }, [url, evalMode]);
 
-  const handleCopyBadge = () => {
-    if (!result) return;
-    navigator.clipboard.writeText(
-      `![Quality Score](https://agenttrust.assisterr.ai/v1/badge/${encodeURIComponent(result.url)}.svg)`
-    );
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const badgeBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
+  const badgeSvgUrl = result ? `${badgeBaseUrl}/v1/badge/${encodeURIComponent(result.url)}.svg` : "";
+  const badgeMarkdown = result ? `![AgentTrust Quality](${badgeSvgUrl})` : "";
+  const badgeHtml = result ? `<a href="${badgeBaseUrl}/v1/score/${encodeURIComponent(result.url)}"><img src="${badgeSvgUrl}" alt="AgentTrust Quality Score" /></a>` : "";
+
+  const [copiedField, setCopiedField] = useState<"markdown" | "html" | null>(null);
+
+  const handleCopy = (text: string, field: "markdown" | "html") => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
   };
 
   return (
@@ -360,29 +366,59 @@ function EvaluateContent() {
             </div>
           )}
 
-          {/* Eval mode selector */}
-          <div className="mt-4 space-y-2">
-            <div className="flex items-center gap-1.5">
-              {(["quick", "standard", "full"] as const).map((mode) => (
-                <button
-                  key={mode}
-                  onClick={() => setEvalMode(mode)}
-                  disabled={isEvaluating}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    evalMode === mode
-                      ? "bg-[#181D27] text-white"
-                      : "bg-white text-muted-foreground border border-[#E9EAEB] hover:border-[#181D27] hover:text-foreground"
-                  } disabled:opacity-50`}
-                >
-                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                </button>
-              ))}
+          {/* Eval mode selector — SSL-style trust levels, unified Assisterr brand */}
+          <div className="mt-4">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Trust Level</p>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                {
+                  mode: "verified" as const,
+                  icon: Shield,
+                  label: "Verified",
+                  analogy: "Domain Validated (DV)",
+                  desc: "~30s \u00b7 spot check \u00b7 1 judge",
+                },
+                {
+                  mode: "certified" as const,
+                  icon: ShieldCheck,
+                  label: "Certified",
+                  analogy: "Org Validated (OV)",
+                  desc: "~90s \u00b7 full suite \u00b7 safety probes",
+                },
+                {
+                  mode: "audited" as const,
+                  icon: ShieldAlert,
+                  label: "Audited",
+                  analogy: "Extended Validation (EV)",
+                  desc: "~3min \u00b7 full audit \u00b7 2-3 judges",
+                },
+              ]).map(({ mode, icon: Icon, label, analogy, desc }) => {
+                const isActive = evalMode === mode;
+                return (
+                  <button
+                    key={mode}
+                    onClick={() => setEvalMode(mode)}
+                    disabled={isEvaluating}
+                    className={`relative rounded-lg p-3 text-left transition-all disabled:opacity-50 cursor-pointer border-[1.5px] ${
+                      isActive
+                        ? "bg-[#F66824]/[0.07] border-[#F66824]"
+                        : "bg-muted/30 border-[#E9EAEB] hover:border-[#F66824]/40"
+                    }`}
+                    style={isActive ? { boxShadow: "0 0 0 1px rgba(246,104,36,0.2)" } : undefined}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <Icon className={`h-4.5 w-4.5 ${isActive ? "text-[#F66824]" : "text-[#181D27]/60"}`} />
+                      <span className={`text-sm font-semibold ${isActive ? "text-[#181D27]" : "text-[#181D27]/70"}`}>{label}</span>
+                    </div>
+                    <p className={`text-[10px] font-medium ${isActive ? "text-[#F66824]" : "text-muted-foreground"}`}>{analogy}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{desc}</p>
+                    {isActive && (
+                      <div className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#F66824]" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
-            <p className="text-[11px] text-muted-foreground">
-              {evalMode === "quick" && "~30s \u00b7 1 test per tool (max 3 tools) \u00b7 single judge \u00b7 no safety probes"}
-              {evalMode === "standard" && "~90s \u00b7 3 tests per tool \u00b7 single judge \u00b7 safety probes included"}
-              {evalMode === "full" && "~3min \u00b7 all tests \u00b7 consensus judging (2\u20133 judges) \u00b7 safety + consistency checks"}
-            </p>
           </div>
 
           {/* Quick examples */}
@@ -454,9 +490,7 @@ function EvaluateContent() {
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin text-[#F66824]" />
               Evaluation in Progress
-              <Badge variant="outline" className="text-[10px] font-normal capitalize">
-                {evalMode}
-              </Badge>
+              <TrustLevelBadge level={evalMode} />
               {isEvaluating && <ElapsedTimer />}
             </CardTitle>
           </CardHeader>
@@ -513,6 +547,7 @@ function EvaluateContent() {
                   <div className="flex items-center gap-3">
                     <h2 className="text-xl font-bold text-foreground">{result.name}</h2>
                     <TierBadge tier={result.tier} />
+                    {result.trust_level && <TrustLevelBadge level={result.trust_level} />}
                     <Badge variant="outline" className="text-xs">
                       {result.transport === "sse" ? "SSE" : "Streamable HTTP"}
                     </Badge>
@@ -543,6 +578,17 @@ function EvaluateContent() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Trust Certificate */}
+          {result.trust_level && (
+            <TrustCertificate
+              level={result.trust_level}
+              score={result.score}
+              tier={result.tier}
+              serverName={result.name}
+              evaluatedAt={result.evaluated_at}
+            />
+          )}
 
           {/* 6-Axis Radar + Dimension Bars */}
           {(result.dimensions.accuracy > 0 || result.dimensions.safety > 0) && (
@@ -686,25 +732,53 @@ function EvaluateContent() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Badge & Attestation</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4 items-start">
-                <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">Embed this quality badge in your README:</p>
+            <CardContent className="space-y-4">
+              {/* Live badge preview */}
+              <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/30 border border-border/50">
+                <div className="shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={badgeSvgUrl}
+                    alt="AgentTrust Quality Badge"
+                    className="h-5"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Live quality badge — embed in your README or docs</p>
+              </div>
+
+              {/* Embed snippets */}
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <p className="text-[11px] font-medium text-muted-foreground">Markdown</p>
                   <div className="flex items-center gap-2">
-                    <code className="text-[11px] font-mono bg-muted/50 px-3 py-1.5 rounded border border-border/50 max-w-md truncate">
-                      ![Quality Score](https://agenttrust.assisterr.ai/v1/badge/{encodeURIComponent(result.url)}.svg)
+                    <code className="text-[10px] font-mono bg-muted/50 px-2.5 py-1.5 rounded border border-border/50 flex-1 truncate">
+                      {badgeMarkdown}
                     </code>
-                    <Button variant="outline" size="sm" onClick={handleCopyBadge} className="shrink-0">
-                      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    <Button variant="outline" size="sm" onClick={() => handleCopy(badgeMarkdown, "markdown")} className="shrink-0 h-7 w-7 p-0">
+                      {copiedField === "markdown" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                     </Button>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">Attestation (AQVC v1.0, Ed25519):</p>
-                  <Badge variant="outline" className="text-[10px] font-mono">
-                    JWT: eyJhbGciOiJFZERTQSJ9...
-                  </Badge>
+                <div className="space-y-1.5">
+                  <p className="text-[11px] font-medium text-muted-foreground">HTML</p>
+                  <div className="flex items-center gap-2">
+                    <code className="text-[10px] font-mono bg-muted/50 px-2.5 py-1.5 rounded border border-border/50 flex-1 truncate">
+                      {badgeHtml}
+                    </code>
+                    <Button variant="outline" size="sm" onClick={() => handleCopy(badgeHtml, "html")} className="shrink-0 h-7 w-7 p-0">
+                      {copiedField === "html" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    </Button>
+                  </div>
                 </div>
+              </div>
+
+              {/* Attestation */}
+              <div className="pt-2 border-t border-border/50">
+                <p className="text-xs text-muted-foreground mb-1.5">Attestation (AQVC v1.0, Ed25519):</p>
+                <Badge variant="outline" className="text-[10px] font-mono">
+                  JWT: eyJhbGciOiJFZERTQSJ9...
+                </Badge>
               </div>
             </CardContent>
           </Card>
