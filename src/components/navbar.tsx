@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useBackendHealth } from "@/lib/hooks";
-import { Shield, BarChart3, Search, Trophy, GitCompareArrows, Layers, Swords, Crown } from "lucide-react";
+import { BarChart3, Search, Trophy, GitCompareArrows, Layers, Swords, Crown } from "lucide-react";
+import { LaurelLogo } from "@/components/laurel-logo";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: BarChart3 },
@@ -26,7 +27,7 @@ export function Navbar() {
         <div className="flex h-14 items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#0E0E0C]">
-              <Shield className="h-3.5 w-3.5 text-[#F5F5F3]" />
+              <LaurelLogo size={16} className="text-[#F5F5F3]" />
             </div>
             <span className="font-display text-lg font-bold tracking-tight text-foreground">
               Laureum

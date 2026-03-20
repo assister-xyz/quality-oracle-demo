@@ -301,7 +301,7 @@ export default function BulkPage() {
       </div>
 
       {/* URL Input */}
-      <Card className="bg-white shadow-sm border-[#E5E3E0]">
+      <Card className="bg-white border-[#E5E3E0]">
         <CardContent className="p-6 space-y-4">
           <div className="flex gap-3">
             <textarea
@@ -420,7 +420,7 @@ export default function BulkPage() {
       {/* Summary Stats */}
       {completedItems.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <BarChart3 className="h-4 w-4 text-[#E2754D]" />
@@ -443,7 +443,7 @@ export default function BulkPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Shield className="h-4 w-4 text-[#DB5F94]" />
@@ -457,7 +457,7 @@ export default function BulkPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Zap className="h-4 w-4 text-[#f59e0b]" />
@@ -468,7 +468,7 @@ export default function BulkPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Download className="h-4 w-4 text-[#10b981]" />
@@ -493,11 +493,11 @@ export default function BulkPage() {
           {items.map((item) => (
             <Card
               key={item.id}
-              className={`bg-white shadow-sm border-[#E5E3E0] transition-all card-hover ${
+              className={`bg-white border-[#E5E3E0] transition-all card-hover ${
                 item.status === "completed"
                   ? "border-[#10b981]/20"
                   : item.status === "running"
-                  ? "border-[#0E0E0C]/20 shadow-md"
+                  ? "border-[#0E0E0C]/20" 
                   : item.status === "error"
                   ? "border-[#ef4444]/20"
                   : ""
@@ -640,7 +640,7 @@ export default function BulkPage() {
 
       {/* Empty state */}
       {items.length === 0 && (
-        <Card className="bg-white shadow-sm border-[#E5E3E0] border-dashed">
+        <Card className="bg-white border-[#E5E3E0] border-dashed">
           <CardContent className="p-12 text-center">
             <ListPlus className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
             <p className="text-sm text-muted-foreground mb-4">
