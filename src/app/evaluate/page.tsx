@@ -39,6 +39,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { LaurelBadge } from "@/components/laurel-badge";
+import { LaurelIcon } from "@/components/laurel-icon";
 
 const EXAMPLE_URLS = [
   { name: "GitMCP", url: "https://gitmcp.io/anthropics/anthropic-cookbook" },
@@ -367,33 +368,30 @@ function EvaluateContent() {
             </div>
           )}
 
-          {/* Eval mode selector — SSL-style trust levels, unified Assisterr brand */}
+          {/* Eval mode selector — trust levels with laurel badge icons */}
           <div className="mt-4">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Trust Level</p>
+            <p className="label-xs mb-2">Trust Level</p>
             <div className="grid grid-cols-3 gap-2">
               {([
                 {
                   mode: "verified" as const,
-                  icon: Shield,
                   label: "Verified",
                   analogy: "Domain Validated (DV)",
                   desc: "~30s \u00b7 spot check \u00b7 1 judge",
                 },
                 {
                   mode: "certified" as const,
-                  icon: ShieldCheck,
                   label: "Certified",
                   analogy: "Org Validated (OV)",
                   desc: "~90s \u00b7 full suite \u00b7 safety probes",
                 },
                 {
                   mode: "audited" as const,
-                  icon: ShieldAlert,
                   label: "Audited",
                   analogy: "Extended Validation (EV)",
                   desc: "~3min \u00b7 full audit \u00b7 2-3 judges",
                 },
-              ]).map(({ mode, icon: Icon, label, analogy, desc }) => {
+              ]).map(({ mode, label, analogy, desc }) => {
                 const isActive = evalMode === mode;
                 return (
                   <button
@@ -405,10 +403,10 @@ function EvaluateContent() {
                         ? "bg-[#E2754D]/[0.07] border-[#E2754D]"
                         : "bg-muted/30 border-[#E5E3E0] hover:border-[#E2754D]/40"
                     }`}
-                    style={isActive ? { boxShadow: "0 0 0 1px rgba(246,104,36,0.2)" } : undefined}
+                    style={isActive ? { boxShadow: "0 0 0 1px rgba(226,117,77,0.2)" } : undefined}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <Icon className={`h-4.5 w-4.5 ${isActive ? "text-[#E2754D]" : "text-[#0E0E0C]/60"}`} />
+                      <LaurelIcon tier={mode} size={20} />
                       <span className={`text-sm font-semibold ${isActive ? "text-[#0E0E0C]" : "text-[#0E0E0C]/70"}`}>{label}</span>
                     </div>
                     <p className={`text-[10px] font-medium ${isActive ? "text-[#E2754D]" : "text-muted-foreground"}`}>{analogy}</p>
