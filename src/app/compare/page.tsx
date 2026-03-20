@@ -175,13 +175,13 @@ function DimensionCompareRow({
               className="h-full rounded-full transition-all duration-700"
               style={{
                 width: `${valueA}%`,
-                backgroundColor: "#F66824",
+                backgroundColor: "#E2754D",
               }}
             />
           </div>
         </div>
         <div className="w-14 text-center">
-          <span className="text-[10px] font-mono text-[#F66824]">
+          <span className="text-[10px] font-mono text-[#E2754D]">
             {valueA}
           </span>
           <span className="text-[10px] text-muted-foreground mx-0.5">vs</span>
@@ -235,7 +235,7 @@ export default function ComparePage() {
           selected={serverA}
           onSelect={setServerA}
           label="A"
-          color="#F66824"
+          color="#E2754D"
           servers={servers}
           loading={loading}
         />
@@ -253,7 +253,7 @@ export default function ComparePage() {
       </div>
 
       {!hasComparison && (
-        <Card className="bg-white shadow-sm border-[#E9EAEB] border-dashed">
+        <Card className="bg-white shadow-sm border-[#E5E3E0] border-dashed">
           <CardContent className="p-12 text-center">
             <GitCompareArrows className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
             <p className="text-sm text-muted-foreground">
@@ -268,7 +268,7 @@ export default function ComparePage() {
       {hasComparison && (
         <div className="space-y-6 animate-fade-up">
           {/* Score Comparison Header */}
-          <Card className="bg-white shadow-sm border-[#E9EAEB]">
+          <Card className="bg-white shadow-sm border-[#E5E3E0]">
             <CardContent className="p-6">
               <div className="grid grid-cols-[1fr_auto_1fr] gap-6 items-center">
                 {/* Server A */}
@@ -348,14 +348,14 @@ export default function ComparePage() {
 
           {/* Radar + Dimensions */}
           <div className="grid md:grid-cols-2 gap-6">
-            <Card className="bg-white shadow-sm border-[#E9EAEB]">
+            <Card className="bg-white shadow-sm border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Quality Profile Overlay
                 </CardTitle>
                 <div className="flex items-center gap-4 text-[10px]">
                   <span className="flex items-center gap-1">
-                    <span className="w-3 h-0.5 bg-[#F66824] rounded-full" />
+                    <span className="w-3 h-0.5 bg-[#E2754D] rounded-full" />
                     {serverA.name}
                   </span>
                   <span className="flex items-center gap-1">
@@ -373,7 +373,7 @@ export default function ComparePage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-sm border-[#E9EAEB]">
+            <Card className="bg-white shadow-sm border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Dimension Comparison
@@ -399,7 +399,7 @@ export default function ComparePage() {
                       Dimensions won
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="text-[#F66824] font-mono font-bold">
+                      <span className="text-[#E2754D] font-mono font-bold">
                         {
                           (
                             Object.keys(
@@ -433,7 +433,7 @@ export default function ComparePage() {
 
           {/* Tool Scores Comparison */}
           {allTools.length > 0 && (
-            <Card className="bg-white shadow-sm border-[#E9EAEB]">
+            <Card className="bg-white shadow-sm border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Wrench className="h-4 w-4" />
@@ -453,7 +453,7 @@ export default function ComparePage() {
                           </code>
                           <div className="flex items-center gap-3 text-[11px] font-mono">
                             {scoreA !== undefined ? (
-                              <span className="text-[#F66824]">{scoreA}</span>
+                              <span className="text-[#E2754D]">{scoreA}</span>
                             ) : (
                               <span className="text-muted-foreground/40">
                                 --
@@ -472,7 +472,7 @@ export default function ComparePage() {
                         <div className="flex gap-1">
                           <div className="flex-1 h-1.5 rounded-full bg-muted/30 overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-[#F66824] transition-all duration-700"
+                              className="h-full rounded-full bg-[#E2754D] transition-all duration-700"
                               style={{
                                 width: scoreA !== undefined ? `${scoreA}%` : "0%",
                               }}
@@ -497,7 +497,7 @@ export default function ComparePage() {
 
           {/* Safety Probes Comparison */}
           {serverA.safety_probes.length > 0 && serverB.safety_probes.length > 0 && (
-            <Card className="bg-white shadow-sm border-[#E9EAEB]">
+            <Card className="bg-white shadow-sm border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Shield className="h-4 w-4" />
@@ -512,7 +512,7 @@ export default function ComparePage() {
                         <th className="text-left py-2 text-xs font-medium text-muted-foreground">
                           Probe
                         </th>
-                        <th className="text-center py-2 text-xs font-medium text-[#F66824] w-24">
+                        <th className="text-center py-2 text-xs font-medium text-[#E2754D] w-24">
                           {serverA.name}
                         </th>
                         <th className="text-center py-2 text-xs font-medium text-[#DB5F94] w-24">
@@ -583,7 +583,7 @@ export default function ComparePage() {
           )}
 
           {/* Quick Verdict */}
-          <Card className="bg-white shadow-sm border-[#E9EAEB]">
+          <Card className="bg-white shadow-sm border-[#E5E3E0]">
             <CardContent className="p-6">
               <div className="text-center space-y-2">
                 <h3 className="text-sm font-medium text-muted-foreground">
@@ -600,7 +600,7 @@ export default function ComparePage() {
                       style={{
                         color:
                           serverA.score > serverB.score
-                            ? "#F66824"
+                            ? "#E2754D"
                             : "#DB5F94",
                       }}
                     >

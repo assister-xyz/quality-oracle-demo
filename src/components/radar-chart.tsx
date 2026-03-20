@@ -43,11 +43,11 @@ export function QualityRadarChart({ dimensions, compareDimensions, height = 280 
         <Radar
           name="Score"
           dataKey="value"
-          stroke="#F66824"
-          fill="#F66824"
+          stroke="#E2754D"
+          fill="#E2754D"
           fillOpacity={0.15}
           strokeWidth={2}
-          dot={{ r: 3, fill: "#F66824" }}
+          dot={{ r: 3, fill: "#E2754D" }}
         />
         {compareDimensions && (
           <Radar

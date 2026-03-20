@@ -70,7 +70,7 @@ export default function DashboardPage() {
   const recentEvals = servers.slice(0, 6);
 
   const kpiCards = [
-    { label: "Total Evaluations", value: kpis.totalEvaluations, icon: BarChart3, color: "#F66824" },
+    { label: "Total Evaluations", value: kpis.totalEvaluations, icon: BarChart3, color: "#E2754D" },
     { label: "Average Score", value: kpis.averageScore > 0 ? `${kpis.averageScore}/100` : "--", icon: Award, color: "#10b981" },
     { label: "Pass Rate", value: kpis.passRate > 0 ? `${kpis.passRate}%` : "--", icon: Shield, color: "#DB5F94" },
     { label: "Expert Agents", value: kpis.expertCount, icon: Zap, color: "#f59e0b" },
@@ -96,7 +96,7 @@ export default function DashboardPage() {
         </p>
         <div className="flex gap-3 pt-1">
           <Link href="/evaluate">
-            <Button className="bg-[#181D27] text-white font-semibold hover:bg-[#6941C6]">
+            <Button className="bg-[#0E0E0C] text-white font-semibold hover:bg-[#6941C6]">
               <Search className="h-4 w-4 mr-2" />
               Evaluate Agent
             </Button>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {kpiCards.map((kpi) => (
-          <Card key={kpi.label} className="bg-white shadow-sm border-[#E9EAEB] card-hover">
+          <Card key={kpi.label} className="bg-white shadow-sm border-[#E5E3E0] card-hover">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <kpi.icon className="h-4 w-4" style={{ color: kpi.color }} />
@@ -149,7 +149,7 @@ export default function DashboardPage() {
 
       {/* Tier Distribution + Evaluation Standards */}
       <div className="grid md:grid-cols-2 gap-6">
-        <Card className="bg-white shadow-sm border-[#E9EAEB]">
+        <Card className="bg-white shadow-sm border-[#E5E3E0]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Tier Distribution</CardTitle>
           </CardHeader>
@@ -191,7 +191,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white shadow-sm border-[#E9EAEB]">
+        <Card className="bg-white shadow-sm border-[#E5E3E0]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Evaluation Standards</CardTitle>
           </CardHeader>
@@ -204,8 +204,8 @@ export default function DashboardPage() {
                 { label: "AQVC Attestation", detail: "Ed25519-signed JWT with W3C VC compatibility (AgentTrust Verified)", icon: Award },
                 { label: "Anti-Gaming", detail: "Question paraphrasing, canaries, production correlation", icon: Zap },
               ].map((item) => (
-                <div key={item.label} className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-[#FAFAFA] border border-[#E9EAEB]/60">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#181D27] shrink-0">
+                <div key={item.label} className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-[#F1EFED] border border-[#E5E3E0]/60">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0E0E0C] shrink-0">
                     <item.icon className="h-3.5 w-3.5 text-white" />
                   </div>
                   <div className="min-w-0">
@@ -230,7 +230,7 @@ export default function DashboardPage() {
         {loading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="bg-white shadow-sm border-[#E9EAEB]">
+              <Card key={i} className="bg-white shadow-sm border-[#E5E3E0]">
                 <CardContent className="p-4 space-y-3">
                   <Skeleton className="h-5 w-32" />
                   <Skeleton className="h-4 w-full" />
@@ -240,7 +240,7 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : recentEvals.length === 0 ? (
-          <Card className="bg-white shadow-sm border-[#E9EAEB] border-dashed">
+          <Card className="bg-white shadow-sm border-[#E5E3E0] border-dashed">
             <CardContent className="p-8 text-center">
               <Search className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
               <p className="text-sm text-muted-foreground">
@@ -255,7 +255,7 @@ export default function DashboardPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {recentEvals.map((server) => (
               <Link key={server.id} href={`/evaluate?result=${server.id}`}>
-                <Card className="bg-white shadow-sm border-[#E9EAEB] hover:border-[#D5D7DA] hover:shadow-md transition-all cursor-pointer group card-hover">
+                <Card className="bg-white shadow-sm border-[#E5E3E0] hover:border-[#D5D7DA] hover:shadow-md transition-all cursor-pointer group card-hover">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div>
@@ -292,7 +292,7 @@ export default function DashboardPage() {
       <RecentBattles />
 
       {/* How it works */}
-      <Card className="bg-white shadow-sm border-[#E9EAEB]">
+      <Card className="bg-white shadow-sm border-[#E5E3E0]">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium text-muted-foreground">How AgentTrust Works</CardTitle>
         </CardHeader>
@@ -305,7 +305,7 @@ export default function DashboardPage() {
               { step: "4", title: "Attest", desc: "Generate 6-axis quality score, tier badge, and Ed25519-signed AQVC attestation (AgentTrust Verified)." },
             ].map((item) => (
               <div key={item.step} className="text-center space-y-2">
-                <div className="mx-auto w-10 h-10 rounded-full bg-[#181D27] flex items-center justify-center font-bold text-sm text-white">
+                <div className="mx-auto w-10 h-10 rounded-full bg-[#0E0E0C] flex items-center justify-center font-bold text-sm text-white">
                   {item.step}
                 </div>
                 <div className="font-medium text-foreground">{item.title}</div>
@@ -350,7 +350,7 @@ function RecentBattles() {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {data.items.slice(0, 6).map((battle) => (
           <Link key={battle.battle_id} href={`/battle?id=${battle.battle_id}`}>
-            <Card className="bg-white shadow-sm border-[#E9EAEB] hover:border-[#D5D7DA] hover:shadow-md transition-all cursor-pointer">
+            <Card className="bg-white shadow-sm border-[#E5E3E0] hover:border-[#D5D7DA] hover:shadow-md transition-all cursor-pointer">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="text-sm font-medium text-foreground">

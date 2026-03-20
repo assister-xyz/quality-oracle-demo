@@ -44,7 +44,7 @@ export default function LadderPage() {
     <div className="mx-auto max-w-5xl px-4 pt-24 pb-16">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 rounded-full bg-[#181D27] px-4 py-2 mb-4">
+        <div className="inline-flex items-center gap-2 rounded-full bg-[#0E0E0C] px-4 py-2 mb-4">
           <Crown className="h-5 w-5 text-[#f59e0b]" />
           <span className="text-sm font-semibold text-white tracking-wide">CHALLENGE LADDER</span>
         </div>
@@ -64,8 +64,8 @@ export default function LadderPage() {
             onClick={() => setDomain(tab.key)}
             className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
               domain === tab.key
-                ? "bg-[#181D27] text-white"
-                : "border border-[#E9EAEB] text-muted-foreground hover:text-foreground hover:bg-[#FAFAFA]"
+                ? "bg-[#0E0E0C] text-white"
+                : "border border-[#E5E3E0] text-muted-foreground hover:text-foreground hover:bg-[#F1EFED]"
             }`}
           >
             {tab.label}
@@ -76,22 +76,22 @@ export default function LadderPage() {
       {/* Ladder Table */}
       {loading ? (
         <div className="text-center py-12">
-          <Loader2 className="h-8 w-8 text-[#F66824] animate-spin mx-auto" />
+          <Loader2 className="h-8 w-8 text-[#E2754D] animate-spin mx-auto" />
           <p className="mt-3 text-sm text-muted-foreground">Loading ladder...</p>
         </div>
       ) : ladderError ? (
-        <div className="rounded-2xl border border-[#E9EAEB] bg-white p-8 text-center">
+        <div className="rounded-lg border border-[#E5E3E0] bg-white p-8 text-center">
           <AlertCircle className="h-8 w-8 text-[#f59e0b] mx-auto mb-3" />
           <p className="text-muted-foreground">No ladder data available. Seed the ladder first via the API.</p>
         </div>
       ) : data && data.items.length === 0 ? (
-        <div className="rounded-2xl border border-[#E9EAEB] bg-white p-8 text-center">
+        <div className="rounded-lg border border-[#E5E3E0] bg-white p-8 text-center">
           <Crown className="h-8 w-8 text-[#f59e0b] mx-auto mb-3" />
           <h3 className="text-lg font-semibold text-foreground mb-2">Ladder is Empty</h3>
           <p className="text-muted-foreground text-sm">No agents on the ladder yet. Seed from existing scores via <code>POST /v1/arena/seed</code>.</p>
         </div>
       ) : (
-        <div className="rounded-2xl border border-[#E9EAEB] bg-white overflow-hidden">
+        <div className="rounded-lg border border-[#E5E3E0] bg-white overflow-hidden">
           <table className="w-full table-fixed">
             <colgroup>
               <col className="w-[60px]" />
@@ -103,7 +103,7 @@ export default function LadderPage() {
               <col className="w-[110px]" />
             </colgroup>
             <thead>
-              <tr className="border-b border-[#E9EAEB] bg-[#FAFAFA]">
+              <tr className="border-b border-[#E5E3E0] bg-[#F1EFED]">
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground">#</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground">Agent</th>
                 <th className="px-4 py-3 text-center text-xs font-semibold text-muted-foreground">Score</th>
@@ -115,7 +115,7 @@ export default function LadderPage() {
             </thead>
             <tbody>
               {data?.items.map((entry) => (
-                <tr key={entry.target_id} className="border-b border-[#E9EAEB] last:border-0 hover:bg-[#FAFAFA] transition-colors">
+                <tr key={entry.target_id} className="border-b border-[#E5E3E0] last:border-0 hover:bg-[#F1EFED] transition-colors">
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-1">
                       {entry.position === 1 && <Crown className="h-4 w-4 text-[#f59e0b]" />}
@@ -149,7 +149,7 @@ export default function LadderPage() {
                   <td className="px-4 py-4 text-right">
                     <button
                       onClick={() => setChallengeTarget(entry)}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#E9EAEB] px-3 py-1.5 text-xs font-medium text-foreground hover:bg-[#181D27] hover:text-white transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#E5E3E0] px-3 py-1.5 text-xs font-medium text-foreground hover:bg-[#0E0E0C] hover:text-white transition-colors"
                     >
                       <Swords className="h-3.5 w-3.5" />
                       Challenge
@@ -165,7 +165,7 @@ export default function LadderPage() {
       {/* Challenge Modal */}
       {challengeTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setChallengeTarget(null)}>
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-bold text-foreground mb-1">Challenge {challengeTarget.name || challengeTarget.target_id.slice(0, 12)}</h3>
             <p className="text-sm text-muted-foreground mb-4">Position #{challengeTarget.position} on the ladder</p>
 
@@ -176,12 +176,12 @@ export default function LadderPage() {
                 value={challengerId}
                 onChange={(e) => setChallengerId(e.target.value)}
                 placeholder="Enter your agent target_id"
-                className="w-full rounded-xl border border-[#E9EAEB] bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F66824]/20 focus:border-[#F66824]"
+                className="w-full rounded-xl border border-[#E5E3E0] bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#E2754D]/20 focus:border-[#E2754D]"
               />
             </div>
 
             {prediction && (
-              <div className="rounded-xl bg-[#FAFAFA] border border-[#E9EAEB] p-3 mb-4">
+              <div className="rounded-xl bg-[#F1EFED] border border-[#E5E3E0] p-3 mb-4">
                 <div className="grid grid-cols-3 gap-3 text-center text-sm">
                   <div>
                     <div className="font-bold text-[#3b82f6]">{Math.round(prediction.win_probability_a * 100)}%</div>
@@ -192,7 +192,7 @@ export default function LadderPage() {
                     <div className="text-xs text-muted-foreground">Quality</div>
                   </div>
                   <div>
-                    <div className="font-bold text-[#F66824]">{Math.round(prediction.win_probability_b * 100)}%</div>
+                    <div className="font-bold text-[#E2754D]">{Math.round(prediction.win_probability_b * 100)}%</div>
                     <div className="text-xs text-muted-foreground">Their chance</div>
                   </div>
                 </div>
@@ -216,14 +216,14 @@ export default function LadderPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setChallengeTarget(null)}
-                className="flex-1 rounded-xl border border-[#E9EAEB] px-4 py-2.5 text-sm font-medium text-foreground hover:bg-[#FAFAFA] transition-colors"
+                className="flex-1 rounded-xl border border-[#E5E3E0] px-4 py-2.5 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleChallenge}
                 disabled={!challengerId || challenging}
-                className="flex-1 rounded-xl bg-[#181D27] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#181D27]/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                className="flex-1 rounded-xl bg-[#0E0E0C] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0E0E0C]/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
               >
                 {challenging ? <Loader2 className="h-4 w-4 animate-spin" /> : <Swords className="h-4 w-4" />}
                 Confirm Challenge

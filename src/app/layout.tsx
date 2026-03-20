@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { Syne, Inter } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const syne = Syne({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const inter = Inter({
+  variable: "--font-body",
   subsets: ["latin"],
 });
 
@@ -15,8 +21,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgentTrust — AI Agent Evaluation Platform",
-  description: "Pre-payment quality verification for AI agents, MCP servers, and skills. Multi-judge consensus scoring with 6-axis evaluation.",
+  title: "Laureum — AI Agent Quality Verification",
+  description: "Pre-payment quality verification for AI agents, MCP servers, and skills. Multi-judge consensus scoring across 6 dimensions.",
 };
 
 export default function RootLayout({
@@ -27,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${dmSans.variable} ${geistMono.variable} font-sans antialiased min-h-screen`}
+        className={`${syne.variable} ${inter.variable} ${geistMono.variable} font-body antialiased min-h-screen`}
       >
         <Navbar />
         <main className="pt-16">
