@@ -92,7 +92,16 @@ export default function LadderPage() {
         </div>
       ) : (
         <div className="rounded-2xl border border-[#E9EAEB] bg-white overflow-hidden">
-          <table className="w-full">
+          <table className="w-full table-fixed">
+            <colgroup>
+              <col className="w-[60px]" />
+              <col />
+              <col className="w-[80px]" />
+              <col className="w-[80px]" />
+              <col className="w-[90px]" />
+              <col className="w-[90px]" />
+              <col className="w-[110px]" />
+            </colgroup>
             <thead>
               <tr className="border-b border-[#E9EAEB] bg-[#FAFAFA]">
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground">#</th>
@@ -115,8 +124,10 @@ export default function LadderPage() {
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-4">
-                    <div className="text-sm font-medium text-foreground">{entry.name || entry.target_id.slice(0, 12)}</div>
+                  <td className="px-4 py-4 max-w-[300px]">
+                    <div className="text-sm font-medium text-foreground truncate" title={entry.name || entry.target_id}>
+                      {entry.name || entry.target_id}
+                    </div>
                   </td>
                   <td className="px-4 py-4 text-center">
                     <span className="text-sm font-semibold text-foreground">{entry.overall_score}</span>
