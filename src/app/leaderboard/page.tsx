@@ -91,9 +91,9 @@ export default function LeaderboardPage() {
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return <ArrowUpDown className="h-3 w-3 text-muted-foreground/40" />;
     return sortDir === "asc" ? (
-      <ArrowUp className="h-3 w-3 text-[#F66824]" />
+      <ArrowUp className="h-3 w-3 text-[#E2754D]" />
     ) : (
-      <ArrowDown className="h-3 w-3 text-[#F66824]" />
+      <ArrowDown className="h-3 w-3 text-[#E2754D]" />
     );
   };
 
@@ -162,7 +162,7 @@ export default function LeaderboardPage() {
             variant={tierFilter === "all" ? "default" : "outline"}
             size="sm"
             onClick={() => setTierFilter("all")}
-            className={tierFilter === "all" ? "bg-[#181D27] text-white border-[#181D27] hover:bg-[#181D27]/90" : ""}
+            className={tierFilter === "all" ? "bg-[#0E0E0C] text-white border-[#0E0E0C] hover:bg-[#0E0E0C]/90" : ""}
           >
             <Filter className="h-3 w-3 mr-1" /> All
           </Button>
@@ -190,7 +190,7 @@ export default function LeaderboardPage() {
 
       <div className="grid lg:grid-cols-[1fr_380px] gap-6">
         {/* Table */}
-        <Card className="bg-white shadow-sm border-[#E9EAEB] overflow-hidden">
+        <Card className="bg-white shadow-sm border-[#E5E3E0] overflow-hidden">
           <div className="overflow-x-auto">
             {loading ? (
               <div className="p-4 space-y-3">
@@ -244,7 +244,7 @@ export default function LeaderboardPage() {
                         key={server.id}
                         className={`border-b border-border/50 cursor-pointer transition-colors ${
                           isSelected
-                            ? "bg-[#181D27]/5 border-[#181D27]/20"
+                            ? "bg-[#0E0E0C]/5 border-[#0E0E0C]/20"
                             : "hover:bg-muted/30"
                         }`}
                         onClick={() => handleRowClick(server)}
@@ -303,7 +303,7 @@ export default function LeaderboardPage() {
                         <td className="px-4 py-3">
                           <ChevronRight
                             className={`h-4 w-4 text-muted-foreground transition-transform ${
-                              isSelected ? "rotate-90 text-[#181D27]" : ""
+                              isSelected ? "rotate-90 text-[#0E0E0C]" : ""
                             }`}
                           />
                         </td>
@@ -327,7 +327,7 @@ export default function LeaderboardPage() {
         <div className="space-y-4">
           {displayServer ? (
             <>
-              <Card className="bg-white shadow-sm border-[#E9EAEB] sticky top-20">
+              <Card className="bg-white shadow-sm border-[#E5E3E0] sticky top-20">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base text-foreground">{displayServer.name}</CardTitle>
@@ -377,7 +377,7 @@ export default function LeaderboardPage() {
                               </code>
                               <div className="flex-1 h-1 rounded-full bg-muted/50 overflow-hidden">
                                 <div
-                                  className="h-full rounded-full bg-[#F66824]"
+                                  className="h-full rounded-full bg-[#E2754D]"
                                   style={{ width: `${scores.score}%` }}
                                 />
                               </div>
@@ -425,7 +425,7 @@ export default function LeaderboardPage() {
               </Card>
             </>
           ) : (
-            <Card className="bg-white shadow-sm border-[#E9EAEB] border-dashed">
+            <Card className="bg-white shadow-sm border-[#E5E3E0] border-dashed">
               <CardContent className="p-8 text-center">
                 <div className="text-muted-foreground space-y-2">
                   <Trophy className="h-8 w-8 mx-auto opacity-30" />

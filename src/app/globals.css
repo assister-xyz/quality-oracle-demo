@@ -7,7 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-dm-sans);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -45,47 +47,52 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  --color-brand-orange: #F66824;
+  --color-brand: #E2754D;
+  --color-brand-dark: #C63B1E;
+  --color-brand-orange: #E2754D;
   --color-brand-pink: #DB5F94;
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
 }
 
-/* ---- Light Theme (Assisterr Style) ---- */
+/* ---- Laureum Design System ---- */
 :root {
-  --radius: 0.5rem;
-  --background: hsl(0 0% 96.9%);
-  --foreground: hsl(240 10% 3.9%);
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(240 10% 3.9%);
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(240 10% 3.9%);
-  --primary: hsl(240 5.9% 10%);
-  --primary-foreground: hsl(0 0% 98%);
-  --secondary: hsl(240 4.8% 95.9%);
-  --secondary-foreground: hsl(240 5.9% 10%);
-  --muted: hsl(240 4.8% 95.9%);
-  --muted-foreground: hsl(240 3.8% 46.1%);
-  --accent: hsl(240 4.8% 95.9%);
-  --accent-foreground: hsl(240 5.9% 10%);
+  --radius: 0.375rem;
+  --background: #F5F5F3;
+  --foreground: #151515;
+  --card: #FFFFFF;
+  --card-foreground: #151515;
+  --popover: #FFFFFF;
+  --popover-foreground: #151515;
+  --primary: #0E0E0C;
+  --primary-foreground: #F5F5F3;
+  --secondary: #F1EFED;
+  --secondary-foreground: #151515;
+  --muted: #F1EFED;
+  --muted-foreground: #535862;
+  --accent: #F1EFED;
+  --accent-foreground: #151515;
   --destructive: hsl(0 84.2% 60.2%);
-  --border: hsl(240 5.9% 90%);
-  --input: hsl(240 5.9% 90%);
-  --ring: hsl(240 10% 3.9%);
-  --chart-1: #F66824;
+  --border: #E5E3E0;
+  --input: #E5E3E0;
+  --ring: #151515;
+  --chart-1: #E2754D;
   --chart-2: #DB5F94;
   --chart-3: #10b981;
   --chart-4: #f59e0b;
   --chart-5: #3b82f6;
-  --sidebar: hsl(0 0% 100%);
-  --sidebar-foreground: hsl(240 10% 3.9%);
-  --sidebar-primary: hsl(240 5.9% 10%);
-  --sidebar-primary-foreground: hsl(0 0% 98%);
-  --sidebar-accent: hsl(240 4.8% 95.9%);
-  --sidebar-accent-foreground: hsl(240 5.9% 10%);
-  --sidebar-border: hsl(240 5.9% 90%);
-  --sidebar-ring: hsl(240 10% 3.9%);
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #151515;
+  --sidebar-primary: #0E0E0C;
+  --sidebar-primary-foreground: #F5F5F3;
+  --sidebar-accent: #F1EFED;
+  --sidebar-accent-foreground: #151515;
+  --sidebar-border: #E5E3E0;
+  --sidebar-ring: #151515;
+
+  /* Custom easing */
+  --ease: cubic-bezier(0.45, 0.02, 0.09, 0.98);
 }
 
 @layer base {
@@ -95,38 +102,53 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Premium heading styles */
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+  }
+  h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
 }
 
-/* Custom scrollbar (Assisterr style) */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #aaaaaa;
-  border-radius: 5px;
+  background: #B3B0AD;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #535862;
 }
 
-/* Brand gradient utility */
+/* Brand utilities */
 .brand-gradient {
-  background: linear-gradient(to right, #F66824, #DB5F94);
+  background: linear-gradient(to right, #E2754D, #DB5F94);
 }
 .brand-gradient-text {
-  background: linear-gradient(to right, #F66824, #DB5F94);
+  background: linear-gradient(to right, #E2754D, #DB5F94);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.brand-gradient-border {
-  background: radial-gradient(100% 73.68% at 50.45% 13.16%,
-    rgba(246, 104, 36, 0.12) 0%,
-    rgba(219, 95, 148, 0.06) 100%);
+
+/* Section utilities */
+.section-dark {
+  background-color: #0E0E0C;
+  color: #F5F5F3;
+}
+.section-warm {
+  background-color: #F1EFED;
 }
 
 /* Score gauge animation */
@@ -135,12 +157,12 @@
 }
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(24px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-up {
-  animation: fade-up 0.5s ease-out forwards;
+  animation: fade-up 0.6s var(--ease) forwards;
 }
 
 /* Pulse for live indicators */
@@ -152,10 +174,31 @@
   animation: status-pulse 2s ease-in-out infinite;
 }
 
-/* Subtle card hover shadow */
+/* Card hover — border only, no shadow */
 .card-hover {
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: border-color 0.3s var(--ease);
 }
 .card-hover:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-color: #B3B0AD;
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Label style — uppercase tracking for section labels */
+.label-xs {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
 }

@@ -96,7 +96,7 @@ function StepIcon({ status }: { status: EvalStep["status"] }) {
     case "done":
       return <CheckCircle2 className="h-4 w-4 text-[#10b981]" />;
     case "running":
-      return <Loader2 className="h-4 w-4 text-[#F66824] animate-spin" />;
+      return <Loader2 className="h-4 w-4 text-[#E2754D] animate-spin" />;
     case "error":
       return <XCircle className="h-4 w-4 text-[#ef4444]" />;
     default:
@@ -328,7 +328,7 @@ function EvaluateContent() {
       </div>
 
       {/* URL Input */}
-      <Card className="bg-white shadow-sm border-[#E9EAEB]">
+      <Card className="bg-white shadow-sm border-[#E5E3E0]">
         <CardContent className="p-6">
           <div className="flex gap-3">
             <div className="relative flex-1">
@@ -338,14 +338,14 @@ function EvaluateContent() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && startEvaluation()}
-                className="pl-9 h-12 text-base border-[#E9EAEB] focus:border-[#181D27]"
+                className="pl-9 h-12 text-base border-[#E5E3E0] focus:border-[#0E0E0C]"
                 disabled={isEvaluating}
               />
             </div>
             <Button
               onClick={startEvaluation}
               disabled={isEvaluating || !url.trim()}
-              className="h-12 px-6 bg-[#181D27] text-white font-semibold hover:bg-[#6941C6]"
+              className="h-12 px-6 bg-[#0E0E0C] text-white font-semibold hover:bg-[#6941C6]"
             >
               {isEvaluating ? (
                 <>
@@ -360,9 +360,9 @@ function EvaluateContent() {
 
           {/* In-progress banner */}
           {isEvaluating && (
-            <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-md bg-[#F66824]/5 border border-[#F66824]/20">
-              <Loader2 className="h-3 w-3 animate-spin text-[#F66824]" />
-              <span className="text-xs text-[#F66824]">Evaluation in progress — scroll down to see progress</span>
+            <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-md bg-[#E2754D]/5 border border-[#E2754D]/20">
+              <Loader2 className="h-3 w-3 animate-spin text-[#E2754D]" />
+              <span className="text-xs text-[#E2754D]">Evaluation in progress — scroll down to see progress</span>
             </div>
           )}
 
@@ -401,19 +401,19 @@ function EvaluateContent() {
                     disabled={isEvaluating}
                     className={`relative rounded-lg p-3 text-left transition-all disabled:opacity-50 cursor-pointer border-[1.5px] ${
                       isActive
-                        ? "bg-[#F66824]/[0.07] border-[#F66824]"
-                        : "bg-muted/30 border-[#E9EAEB] hover:border-[#F66824]/40"
+                        ? "bg-[#E2754D]/[0.07] border-[#E2754D]"
+                        : "bg-muted/30 border-[#E5E3E0] hover:border-[#E2754D]/40"
                     }`}
                     style={isActive ? { boxShadow: "0 0 0 1px rgba(246,104,36,0.2)" } : undefined}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <Icon className={`h-4.5 w-4.5 ${isActive ? "text-[#F66824]" : "text-[#181D27]/60"}`} />
-                      <span className={`text-sm font-semibold ${isActive ? "text-[#181D27]" : "text-[#181D27]/70"}`}>{label}</span>
+                      <Icon className={`h-4.5 w-4.5 ${isActive ? "text-[#E2754D]" : "text-[#0E0E0C]/60"}`} />
+                      <span className={`text-sm font-semibold ${isActive ? "text-[#0E0E0C]" : "text-[#0E0E0C]/70"}`}>{label}</span>
                     </div>
-                    <p className={`text-[10px] font-medium ${isActive ? "text-[#F66824]" : "text-muted-foreground"}`}>{analogy}</p>
+                    <p className={`text-[10px] font-medium ${isActive ? "text-[#E2754D]" : "text-muted-foreground"}`}>{analogy}</p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">{desc}</p>
                     {isActive && (
-                      <div className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#F66824]" />
+                      <div className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#E2754D]" />
                     )}
                   </button>
                 );
@@ -464,17 +464,17 @@ function EvaluateContent() {
 
       {/* Reconnecting banner */}
       {reconnecting && (
-        <Card className="border-[#F66824]/30 bg-[#F66824]/5">
+        <Card className="border-[#E2754D]/30 bg-[#E2754D]/5">
           <CardContent className="p-4 flex items-center gap-3">
-            <RefreshCw className="h-4 w-4 text-[#F66824] animate-spin" />
-            <span className="text-sm text-[#F66824]">Reconnecting to evaluation...</span>
+            <RefreshCw className="h-4 w-4 text-[#E2754D] animate-spin" />
+            <span className="text-sm text-[#E2754D]">Reconnecting to evaluation...</span>
           </CardContent>
         </Card>
       )}
 
       {/* Loading result from URL param */}
       {loadingResult && (
-        <Card className="bg-white shadow-sm border-[#E9EAEB]">
+        <Card className="bg-white shadow-sm border-[#E5E3E0]">
           <CardContent className="p-6 space-y-4">
             <Skeleton className="h-6 w-48" />
             <Skeleton className="h-4 w-full" />
@@ -485,10 +485,10 @@ function EvaluateContent() {
 
       {/* Evaluation Progress */}
       {steps.length > 0 && !result && !error && (
-        <Card className="bg-white shadow-sm border-[#E9EAEB]">
+        <Card className="bg-white shadow-sm border-[#E5E3E0]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-[#F66824]" />
+              <Loader2 className="h-4 w-4 animate-spin text-[#E2754D]" />
               Evaluation in Progress
               <TrustLevelBadge level={evalMode} />
               {isEvaluating && <ElapsedTimer />}
@@ -504,7 +504,7 @@ function EvaluateContent() {
                     }`}
                   >
                     <StepIcon status={step.status} />
-                    <span className={step.status === "running" ? "text-[#F66824] font-medium" : ""}>{step.name}</span>
+                    <span className={step.status === "running" ? "text-[#E2754D] font-medium" : ""}>{step.name}</span>
                   </div>
                   {/* Adversarial sub-steps */}
                   {step.children && (step.status === "running" || step.status === "done") && (
@@ -517,7 +517,7 @@ function EvaluateContent() {
                           }`}
                         >
                           <StepIcon status={child.status} />
-                          <span className={child.status === "running" ? "text-[#F66824]" : "text-muted-foreground"}>
+                          <span className={child.status === "running" ? "text-[#E2754D]" : "text-muted-foreground"}>
                             {child.name}
                           </span>
                         </div>
@@ -540,7 +540,7 @@ function EvaluateContent() {
       {result && (
         <div className="space-y-6 animate-fade-up">
           {/* Summary Header */}
-          <Card className="bg-white shadow-sm border-[#E9EAEB]">
+          <Card className="bg-white shadow-sm border-[#E5E3E0]">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-2">
@@ -593,7 +593,7 @@ function EvaluateContent() {
           {/* 6-Axis Radar + Dimension Bars */}
           {(result.dimensions.accuracy > 0 || result.dimensions.safety > 0) && (
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-white shadow-sm border-[#E9EAEB]">
+              <Card className="bg-white shadow-sm border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">6-Axis Quality Profile</CardTitle>
                 </CardHeader>
@@ -602,7 +602,7 @@ function EvaluateContent() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white shadow-sm border-[#E9EAEB]">
+              <Card className="bg-white shadow-sm border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Dimension Breakdown</CardTitle>
                 </CardHeader>
@@ -617,7 +617,7 @@ function EvaluateContent() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Tool Scores */}
             {Object.keys(result.tool_scores).length > 0 && (
-              <Card className="bg-white shadow-sm border-[#E9EAEB]">
+              <Card className="bg-white shadow-sm border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     Tool Scores ({Object.keys(result.tool_scores).length} tools)
@@ -635,7 +635,7 @@ function EvaluateContent() {
                         </div>
                         <div className="h-1.5 rounded-full bg-muted/50 overflow-hidden">
                           <div
-                            className="h-full rounded-full bg-[#F66824] transition-all duration-700"
+                            className="h-full rounded-full bg-[#E2754D] transition-all duration-700"
                             style={{ width: `${scores.score}%` }}
                           />
                         </div>
@@ -649,7 +649,7 @@ function EvaluateContent() {
 
             {/* Safety Probes */}
             {result.safety_probes.length > 0 && (
-              <Card className="bg-white shadow-sm border-[#E9EAEB]">
+              <Card className="bg-white shadow-sm border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Shield className="h-4 w-4" />
@@ -692,7 +692,7 @@ function EvaluateContent() {
 
           {/* Judge Responses */}
           {result.judge_responses.length > 0 && (
-            <Card className="bg-white shadow-sm border-[#E9EAEB]">
+            <Card className="bg-white shadow-sm border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Judge Consensus Responses
@@ -728,7 +728,7 @@ function EvaluateContent() {
           )}
 
           {/* Badge & Attestation */}
-          <Card className="bg-white shadow-sm border-[#E9EAEB]">
+          <Card className="bg-white shadow-sm border-[#E5E3E0]">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Badge & Attestation</CardTitle>
             </CardHeader>

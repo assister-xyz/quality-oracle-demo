@@ -87,15 +87,15 @@ const TIER_CONFIG: Record<QualityTier, { color: string; bg: string; border: stri
 export { TIER_CONFIG };
 
 const TRUST_LEVEL_CONFIG: Record<TrustLevel, { color: string; bg: string; border: string; label: string; description: string }> = {
-  verified:  { color: "#F66824", bg: "rgba(246,104,36,0.08)", border: "rgba(246,104,36,0.3)", label: "Verified",  description: "Spot check — Domain Validated" },
-  certified: { color: "#F66824", bg: "rgba(246,104,36,0.08)", border: "rgba(246,104,36,0.3)", label: "Certified", description: "Full test suite — Org Validated" },
-  audited:   { color: "#F66824", bg: "rgba(246,104,36,0.08)", border: "rgba(246,104,36,0.3)", label: "Audited",   description: "Comprehensive audit — Extended Validation" },
+  verified:  { color: "#E2754D", bg: "rgba(246,104,36,0.08)", border: "rgba(246,104,36,0.3)", label: "Verified",  description: "Spot check — Domain Validated" },
+  certified: { color: "#E2754D", bg: "rgba(246,104,36,0.08)", border: "rgba(246,104,36,0.3)", label: "Certified", description: "Full test suite — Org Validated" },
+  audited:   { color: "#E2754D", bg: "rgba(246,104,36,0.08)", border: "rgba(246,104,36,0.3)", label: "Audited",   description: "Comprehensive audit — Extended Validation" },
 };
 
 export { TRUST_LEVEL_CONFIG };
 
 const DIMENSION_CONFIG: Record<keyof Dimensions, { label: string; weight: number; color: string }> = {
-  accuracy: { label: "Accuracy", weight: 0.35, color: "#F66824" },
+  accuracy: { label: "Accuracy", weight: 0.35, color: "#E2754D" },
   safety: { label: "Safety", weight: 0.20, color: "#DB5F94" },
   reliability: { label: "Reliability", weight: 0.15, color: "#3b82f6" },
   latency: { label: "Latency", weight: 0.10, color: "#10b981" },
