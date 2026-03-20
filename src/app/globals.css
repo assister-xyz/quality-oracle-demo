@@ -58,7 +58,7 @@
 
 /* ---- Laureum Design System ---- */
 :root {
-  --radius: 0.375rem;
+  --radius: 0.25rem;
   --background: #F5F5F3;
   --foreground: #151515;
   --card: #FFFFFF;
@@ -91,8 +91,9 @@
   --sidebar-border: #E5E3E0;
   --sidebar-ring: #151515;
 
-  /* Custom easing */
+  /* Custom easing — matched to buildinamsterdam.com */
   --ease: cubic-bezier(0.45, 0.02, 0.09, 0.98);
+  --ease-expo: cubic-bezier(0.86, 0, 0.07, 1);
 }
 
 @layer base {
@@ -176,10 +177,11 @@
 
 /* Card hover — border only, no shadow */
 .card-hover {
-  transition: border-color 0.3s var(--ease);
+  transition: border-color 0.4s var(--ease), transform 0.4s var(--ease);
 }
 .card-hover:hover {
   border-color: #B3B0AD;
+  transform: translateY(-1px);
 }
 
 /* Scroll reveal */
@@ -201,4 +203,22 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--muted-foreground);
+}
+
+/* Premium link underline — reverse shrink on hover (appart.agency pattern) */
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  transition: background-size 0.5s var(--ease);
+}
+.link-underline:hover {
+  background-size: 0% 1px;
+}
+
+/* Selection highlight (appart.agency pattern) */
+::selection {
+  color: #E2754D;
+  background: #151515;
 }

@@ -49,7 +49,7 @@ function ServerSelector({
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg border bg-white transition-colors" 
+        className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-sm border bg-white transition-colors" 
         style={{
           borderColor: selected ? `${color}40` : undefined,
         }}
@@ -85,7 +85,7 @@ function ServerSelector({
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-white shadow-xl max-h-64 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full rounded-sm border border-border bg-white max-h-64 overflow-y-auto">
           {loading ? (
             <div className="p-4 space-y-2">
               {[1, 2, 3].map((i) => (

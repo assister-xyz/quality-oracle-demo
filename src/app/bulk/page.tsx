@@ -308,7 +308,7 @@ export default function BulkPage() {
               placeholder="Paste MCP server URLs (one per line or comma-separated)&#10;https://mcp.example.com/mcp&#10;https://another-server.com/sse"
               value={urlText}
               onChange={(e) => setUrlText(e.target.value)}
-              className="flex-1 min-h-[100px] rounded-lg border border-border bg-background px-4 py-3 text-sm font-mono resize-y focus:outline-none focus:border-[#0E0E0C] placeholder:text-muted-foreground/50"
+              className="flex-1 min-h-[100px] rounded-sm border border-border bg-background px-4 py-3 text-sm font-mono resize-y focus:outline-none focus:border-[#0E0E0C] placeholder:text-muted-foreground/50"
               disabled={isRunning}
             />
             <div className="flex flex-col gap-2">

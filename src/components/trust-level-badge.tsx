@@ -1,12 +1,6 @@
-import { Shield, ShieldCheck, ShieldPlus } from "lucide-react";
 import { TRUST_LEVEL_CONFIG, type TrustLevel } from "@/lib/mock-data";
+import { LaurelIcon } from "@/components/laurel-icon";
 import { cn } from "@/lib/utils";
-
-const ICONS: Record<TrustLevel, React.ElementType> = {
-  verified: Shield,
-  certified: ShieldCheck,
-  audited: ShieldPlus,
-};
 
 interface TrustLevelBadgeProps {
   level: TrustLevel;
@@ -16,7 +10,6 @@ interface TrustLevelBadgeProps {
 
 export function TrustLevelBadge({ level, className, showIcon = true }: TrustLevelBadgeProps) {
   const config = TRUST_LEVEL_CONFIG[level];
-  const Icon = ICONS[level];
   return (
     <span
       className={cn(
@@ -30,7 +23,7 @@ export function TrustLevelBadge({ level, className, showIcon = true }: TrustLeve
       }}
       title={config.description}
     >
-      {showIcon && <Icon className="h-3 w-3" />}
+      {showIcon && <LaurelIcon tier={level} size={14} />}
       {config.label}
     </span>
   );

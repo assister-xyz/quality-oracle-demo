@@ -88,7 +88,7 @@ export default function DashboardPage() {
       {/* Hero */}
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0E0E0C]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-[#0E0E0C]">
             <LaurelLogo size={22} className="text-[#F5F5F3]" />
           </div>
           <h1 className="text-4xl font-bold text-foreground" style={{ letterSpacing: "-0.04em", lineHeight: "0.95" }}>
@@ -211,7 +211,7 @@ export default function DashboardPage() {
                 { label: "Anti-Gaming", detail: "Question paraphrasing, canaries, production correlation", icon: Zap },
               ].map((item) => (
                 <div key={item.label} className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-[#F1EFED] border border-[#E5E3E0]/60">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0E0E0C] shrink-0">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#0E0E0C] shrink-0">
                     <item.icon className="h-3.5 w-3.5 text-white" />
                   </div>
                   <div className="min-w-0">
@@ -297,23 +297,23 @@ export default function DashboardPage() {
       {/* Recent Battles */}
       <RecentBattles />
 
-      {/* How it works — dark section */}
-      <div className="rounded-lg bg-[#0E0E0C] p-8">
-        <p className="text-center text-[11px] font-medium uppercase tracking-[0.15em] text-[#717069] mb-6">
+      {/* How it works — dark section (full-bleed) */}
+      <div className="rounded-sm bg-[#0E0E0C] p-8 md:p-10">
+        <p className="text-center text-[11px] font-medium uppercase tracking-[0.2em] text-[#717069] mb-8">
           How Laureum Works
         </p>
         <div className="grid md:grid-cols-4 gap-8">
           {[
-            { step: "1", title: "Connect", desc: "Paste any MCP server URL. We auto-detect SSE or Streamable HTTP transport." },
-            { step: "2", title: "Discover", desc: "Automatically list all tools, validate manifest schema, check documentation quality." },
-            { step: "3", title: "Evaluate", desc: "Run functional tests per tool. Multiple LLM judges score responses independently." },
-            { step: "4", title: "Attest", desc: "Generate 6-axis quality score, tier badge, and Ed25519-signed AQVC attestation." },
+            { step: "01", title: "Connect", desc: "Paste any MCP server URL. We auto-detect SSE or Streamable HTTP transport." },
+            { step: "02", title: "Discover", desc: "Automatically list all tools, validate manifest schema, check documentation quality." },
+            { step: "03", title: "Evaluate", desc: "Run functional tests per tool. Multiple LLM judges score responses independently." },
+            { step: "04", title: "Attest", desc: "Generate 6-axis quality score, tier badge, and Ed25519-signed AQVC attestation." },
           ].map((item) => (
             <div key={item.step} className="text-center space-y-3">
-              <div className="mx-auto w-10 h-10 rounded-full border border-[#E2754D]/40 flex items-center justify-center">
-                <span className="text-sm font-bold text-[#E2754D]">{item.step}</span>
+              <div className="mx-auto w-10 h-10 border border-[#E2754D]/30 flex items-center justify-center" style={{ borderRadius: "2px" }}>
+                <span className="text-xs font-mono font-bold text-[#E2754D] tracking-wider">{item.step}</span>
               </div>
-              <div className="text-sm font-semibold text-[#F5F5F3]">{item.title}</div>
+              <div className="text-sm font-semibold text-[#F5F5F3] tracking-tight">{item.title}</div>
               <p className="text-xs text-[#717069] leading-relaxed">{item.desc}</p>
             </div>
           ))}

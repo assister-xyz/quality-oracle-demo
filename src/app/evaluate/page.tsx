@@ -398,12 +398,12 @@ function EvaluateContent() {
                     key={mode}
                     onClick={() => setEvalMode(mode)}
                     disabled={isEvaluating}
-                    className={`relative rounded-lg p-3 text-left transition-all disabled:opacity-50 cursor-pointer border-[1.5px] ${
+                    className={`relative rounded-sm p-3 text-left transition-all disabled:opacity-50 cursor-pointer border-[1.5px] ${
                       isActive
                         ? "bg-[#E2754D]/[0.07] border-[#E2754D]"
                         : "bg-muted/30 border-[#E5E3E0] hover:border-[#E2754D]/40"
                     }`}
-                    style={isActive ? { boxShadow: "0 0 0 1px rgba(226,117,77,0.2)" } : undefined}
+                    style={{ transitionTimingFunction: "var(--ease)", transitionDuration: "0.4s" }}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <LaurelIcon tier={mode} size={20} />
@@ -660,7 +660,7 @@ function EvaluateContent() {
                     {result.safety_probes.map((probe, idx) => (
                       <div
                         key={`${probe.probe_type}-${idx}`}
-                        className="flex items-start gap-3 p-2 rounded-lg bg-muted/30"
+                        className="flex items-start gap-3 p-2 rounded-sm bg-muted/30"
                       >
                         <ProbeIcon passed={probe.passed} />
                         <div className="flex-1 min-w-0">
@@ -700,7 +700,7 @@ function EvaluateContent() {
               <CardContent>
                 <div className="space-y-3">
                   {result.judge_responses.map((jr, i) => (
-                    <div key={i} className="p-3 rounded-lg bg-muted/30 space-y-2">
+                    <div key={i} className="p-3 rounded-sm bg-muted/30 space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <code className="text-xs font-mono bg-muted/50 px-1.5 py-0.5 rounded">{jr.tool}</code>
@@ -733,16 +733,16 @@ function EvaluateContent() {
             </CardHeader>
             <CardContent className="space-y-5">
               {/* Laurel badge preview */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-lg bg-[#0E0E0C]/[0.03] border border-[#E5E3E0]">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 rounded-sm bg-[#0E0E0C] border border-[#0E0E0C]">
                 <LaurelBadge
                   score={result.score}
                   tier={result.tier}
                   trustLevel={result.trust_level}
-                  size="md"
+                  size="lg"
                 />
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-foreground">Laureum Quality Badge</p>
-                  <p className="text-xs text-muted-foreground">Embed in your README, website, or docs to show verified quality.</p>
+                <div className="space-y-1.5">
+                  <p className="text-sm font-semibold text-[#F5F5F3]">Laureum Quality Badge</p>
+                  <p className="text-xs text-[#717069]">Embed in your README, website, or docs to show verified quality.</p>
                 </div>
               </div>
 

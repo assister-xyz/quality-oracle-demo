@@ -80,18 +80,18 @@ export default function LadderPage() {
           <p className="mt-3 text-sm text-muted-foreground">Loading ladder...</p>
         </div>
       ) : ladderError ? (
-        <div className="rounded-lg border border-[#E5E3E0] bg-white p-8 text-center">
+        <div className="rounded-sm border border-[#E5E3E0] bg-white p-8 text-center">
           <AlertCircle className="h-8 w-8 text-[#f59e0b] mx-auto mb-3" />
           <p className="text-muted-foreground">No ladder data available. Seed the ladder first via the API.</p>
         </div>
       ) : data && data.items.length === 0 ? (
-        <div className="rounded-lg border border-[#E5E3E0] bg-white p-8 text-center">
+        <div className="rounded-sm border border-[#E5E3E0] bg-white p-8 text-center">
           <Crown className="h-8 w-8 text-[#f59e0b] mx-auto mb-3" />
           <h3 className="text-lg font-semibold text-foreground mb-2">Ladder is Empty</h3>
           <p className="text-muted-foreground text-sm">No agents on the ladder yet. Seed from existing scores via <code>POST /v1/arena/seed</code>.</p>
         </div>
       ) : (
-        <div className="rounded-lg border border-[#E5E3E0] bg-white overflow-hidden">
+        <div className="rounded-sm border border-[#E5E3E0] bg-white overflow-hidden">
           <table className="w-full table-fixed">
             <colgroup>
               <col className="w-[60px]" />
@@ -149,7 +149,7 @@ export default function LadderPage() {
                   <td className="px-4 py-4 text-right">
                     <button
                       onClick={() => setChallengeTarget(entry)}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#E5E3E0] px-3 py-1.5 text-xs font-medium text-foreground hover:bg-[#0E0E0C] hover:text-white transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-sm border border-[#E5E3E0] px-3 py-1.5 text-xs font-medium text-foreground hover:bg-[#0E0E0C] hover:text-white transition-colors"
                     >
                       <Swords className="h-3.5 w-3.5" />
                       Challenge
@@ -165,7 +165,7 @@ export default function LadderPage() {
       {/* Challenge Modal */}
       {challengeTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setChallengeTarget(null)}>
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-md rounded-sm bg-white p-6 border border-[#E5E3E0]" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-bold text-foreground mb-1">Challenge {challengeTarget.name || challengeTarget.target_id.slice(0, 12)}</h3>
             <p className="text-sm text-muted-foreground mb-4">Position #{challengeTarget.position} on the ladder</p>
 

@@ -108,7 +108,7 @@ function BattleContent() {
           </p>
         </div>
 
-        <div className="rounded-lg border border-[#E5E3E0] bg-white p-8">
+        <div className="rounded-sm border border-[#E5E3E0] bg-white p-8">
           <div className="grid grid-cols-1 md:grid-cols-[1fr,auto,1fr] gap-6 items-end">
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">Agent A</label>
@@ -230,7 +230,7 @@ function BattleContent() {
 
     return (
       <div className="mx-auto max-w-2xl px-4 pt-24 pb-16">
-        <div className="rounded-lg border border-[#E5E3E0] bg-white p-8 text-center">
+        <div className="rounded-sm border border-[#E5E3E0] bg-white p-8 text-center">
           <Loader2 className="h-12 w-12 text-[#E2754D] animate-spin mx-auto mb-4" />
           <h2 className="text-xl font-bold text-foreground mb-2">Battle in Progress</h2>
           <p className="text-sm text-muted-foreground mb-4">{statusText}</p>
@@ -287,7 +287,7 @@ function BattleContent() {
         {/* Score Cards */}
         <div className="grid grid-cols-[1fr,auto,1fr] gap-4 mb-8">
           {/* Agent A */}
-          <div className={`rounded-lg border-2 p-6 text-center ${
+          <div className={`rounded-sm border-2 p-6 text-center ${
             isAWinner ? "border-[#10b981] bg-[#10b981]/5" : "border-[#E5E3E0] bg-white"
           }`}>
             {isAWinner && <Trophy className="h-6 w-6 text-[#10b981] mx-auto mb-2" />}
@@ -304,7 +304,7 @@ function BattleContent() {
           </div>
 
           {/* Agent B */}
-          <div className={`rounded-lg border-2 p-6 text-center ${
+          <div className={`rounded-sm border-2 p-6 text-center ${
             isBWinner ? "border-[#10b981] bg-[#10b981]/5" : "border-[#E5E3E0] bg-white"
           }`}>
             {isBWinner && <Trophy className="h-6 w-6 text-[#10b981] mx-auto mb-2" />}
@@ -317,7 +317,7 @@ function BattleContent() {
         </div>
 
         {/* 6-Axis Comparison Bars */}
-        <div className="rounded-lg border border-[#E5E3E0] bg-white p-6 mb-6">
+        <div className="rounded-sm border border-[#E5E3E0] bg-white p-6 mb-6">
           <h3 className="text-sm font-semibold text-foreground mb-4">Score Breakdown</h3>
           <div className="space-y-4">
             {AXES.map(({ key, label, color }) => {
