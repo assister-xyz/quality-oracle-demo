@@ -1,4 +1,4 @@
-# AgentTrust Demo (Quality Oracle Frontend)
+# Laureum Demo (Quality Oracle Frontend)
 
 > Part of **assisterr-workflow**. See `../assisterr-workflow/CLAUDE.md` for full workflow, sizing, spec lifecycle, memory entities, and agent routing.
 

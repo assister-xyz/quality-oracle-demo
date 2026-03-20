@@ -38,6 +38,8 @@ import {
   AlertTriangle,
   RefreshCw,
 } from "lucide-react";
+import { LaurelBadge } from "@/components/laurel-badge";
+import { LaurelIcon } from "@/components/laurel-icon";
 
 const EXAMPLE_URLS = [
   { name: "GitMCP", url: "https://gitmcp.io/anthropics/anthropic-cookbook" },
@@ -304,8 +306,8 @@ function EvaluateContent() {
 
   const badgeBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
   const badgeSvgUrl = result ? `${badgeBaseUrl}/v1/badge/${encodeURIComponent(result.url)}.svg` : "";
-  const badgeMarkdown = result ? `![AgentTrust Quality](${badgeSvgUrl})` : "";
-  const badgeHtml = result ? `<a href="${badgeBaseUrl}/v1/score/${encodeURIComponent(result.url)}"><img src="${badgeSvgUrl}" alt="AgentTrust Quality Score" /></a>` : "";
+  const badgeMarkdown = result ? `![Laureum Quality](${badgeSvgUrl})` : "";
+  const badgeHtml = result ? `<a href="${badgeBaseUrl}/v1/score/${encodeURIComponent(result.url)}"><img src="${badgeSvgUrl}" alt="Laureum Quality Score" /></a>` : "";
 
   const [copiedField, setCopiedField] = useState<"markdown" | "html" | null>(null);
 
@@ -328,7 +330,7 @@ function EvaluateContent() {
       </div>
 
       {/* URL Input */}
-      <Card className="bg-white shadow-sm border-[#E5E3E0]">
+      <Card className="bg-white border-[#E5E3E0]">
         <CardContent className="p-6">
           <div className="flex gap-3">
             <div className="relative flex-1">
@@ -366,33 +368,30 @@ function EvaluateContent() {
             </div>
           )}
 
-          {/* Eval mode selector — SSL-style trust levels, unified Assisterr brand */}
+          {/* Eval mode selector — trust levels with laurel badge icons */}
           <div className="mt-4">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Trust Level</p>
+            <p className="label-xs mb-2">Trust Level</p>
             <div className="grid grid-cols-3 gap-2">
               {([
                 {
                   mode: "verified" as const,
-                  icon: Shield,
                   label: "Verified",
                   analogy: "Domain Validated (DV)",
                   desc: "~30s \u00b7 spot check \u00b7 1 judge",
                 },
                 {
                   mode: "certified" as const,
-                  icon: ShieldCheck,
                   label: "Certified",
                   analogy: "Org Validated (OV)",
                   desc: "~90s \u00b7 full suite \u00b7 safety probes",
                 },
                 {
                   mode: "audited" as const,
-                  icon: ShieldAlert,
                   label: "Audited",
                   analogy: "Extended Validation (EV)",
                   desc: "~3min \u00b7 full audit \u00b7 2-3 judges",
                 },
-              ]).map(({ mode, icon: Icon, label, analogy, desc }) => {
+              ]).map(({ mode, label, analogy, desc }) => {
                 const isActive = evalMode === mode;
                 return (
                   <button
@@ -404,10 +403,10 @@ function EvaluateContent() {
                         ? "bg-[#E2754D]/[0.07] border-[#E2754D]"
                         : "bg-muted/30 border-[#E5E3E0] hover:border-[#E2754D]/40"
                     }`}
-                    style={isActive ? { boxShadow: "0 0 0 1px rgba(246,104,36,0.2)" } : undefined}
+                    style={isActive ? { boxShadow: "0 0 0 1px rgba(226,117,77,0.2)" } : undefined}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <Icon className={`h-4.5 w-4.5 ${isActive ? "text-[#E2754D]" : "text-[#0E0E0C]/60"}`} />
+                      <LaurelIcon tier={mode} size={20} />
                       <span className={`text-sm font-semibold ${isActive ? "text-[#0E0E0C]" : "text-[#0E0E0C]/70"}`}>{label}</span>
                     </div>
                     <p className={`text-[10px] font-medium ${isActive ? "text-[#E2754D]" : "text-muted-foreground"}`}>{analogy}</p>
@@ -474,7 +473,7 @@ function EvaluateContent() {
 
       {/* Loading result from URL param */}
       {loadingResult && (
-        <Card className="bg-white shadow-sm border-[#E5E3E0]">
+        <Card className="bg-white border-[#E5E3E0]">
           <CardContent className="p-6 space-y-4">
             <Skeleton className="h-6 w-48" />
             <Skeleton className="h-4 w-full" />
@@ -485,7 +484,7 @@ function EvaluateContent() {
 
       {/* Evaluation Progress */}
       {steps.length > 0 && !result && !error && (
-        <Card className="bg-white shadow-sm border-[#E5E3E0]">
+        <Card className="bg-white border-[#E5E3E0]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin text-[#E2754D]" />
@@ -540,7 +539,7 @@ function EvaluateContent() {
       {result && (
         <div className="space-y-6 animate-fade-up">
           {/* Summary Header */}
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-2">
@@ -593,7 +592,7 @@ function EvaluateContent() {
           {/* 6-Axis Radar + Dimension Bars */}
           {(result.dimensions.accuracy > 0 || result.dimensions.safety > 0) && (
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-white shadow-sm border-[#E5E3E0]">
+              <Card className="bg-white border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">6-Axis Quality Profile</CardTitle>
                 </CardHeader>
@@ -602,7 +601,7 @@ function EvaluateContent() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white shadow-sm border-[#E5E3E0]">
+              <Card className="bg-white border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Dimension Breakdown</CardTitle>
                 </CardHeader>
@@ -617,7 +616,7 @@ function EvaluateContent() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Tool Scores */}
             {Object.keys(result.tool_scores).length > 0 && (
-              <Card className="bg-white shadow-sm border-[#E5E3E0]">
+              <Card className="bg-white border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     Tool Scores ({Object.keys(result.tool_scores).length} tools)
@@ -649,7 +648,7 @@ function EvaluateContent() {
 
             {/* Safety Probes */}
             {result.safety_probes.length > 0 && (
-              <Card className="bg-white shadow-sm border-[#E5E3E0]">
+              <Card className="bg-white border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Shield className="h-4 w-4" />
@@ -692,7 +691,7 @@ function EvaluateContent() {
 
           {/* Judge Responses */}
           {result.judge_responses.length > 0 && (
-            <Card className="bg-white shadow-sm border-[#E5E3E0]">
+            <Card className="bg-white border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Judge Consensus Responses
@@ -728,54 +727,71 @@ function EvaluateContent() {
           )}
 
           {/* Badge & Attestation */}
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Badge & Attestation</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Live badge preview */}
-              <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/30 border border-border/50">
+            <CardContent className="space-y-5">
+              {/* Laurel badge preview */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-lg bg-[#0E0E0C]/[0.03] border border-[#E5E3E0]">
+                <LaurelBadge
+                  score={result.score}
+                  tier={result.tier}
+                  trustLevel={result.trust_level}
+                  size="md"
+                />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-foreground">Laureum Quality Badge</p>
+                  <p className="text-xs text-muted-foreground">Embed in your README, website, or docs to show verified quality.</p>
+                </div>
+              </div>
+
+              {/* Live SVG badge (from backend) */}
+              <div className="flex items-center gap-3 px-3 py-2 rounded-md bg-muted/30 border border-border/50">
                 <div className="shrink-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={badgeSvgUrl}
-                    alt="AgentTrust Quality Badge"
+                    alt="Laureum Quality Badge"
                     className="h-5"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">Live quality badge — embed in your README or docs</p>
+                <p className="text-[11px] text-muted-foreground">Live badge (hotlinked, always up-to-date)</p>
               </div>
 
               {/* Embed snippets */}
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-medium text-muted-foreground">Markdown</p>
-                  <div className="flex items-center gap-2">
-                    <code className="text-[10px] font-mono bg-muted/50 px-2.5 py-1.5 rounded border border-border/50 flex-1 truncate">
-                      {badgeMarkdown}
-                    </code>
-                    <Button variant="outline" size="sm" onClick={() => handleCopy(badgeMarkdown, "markdown")} className="shrink-0 h-7 w-7 p-0">
-                      {copiedField === "markdown" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                    </Button>
+              <div>
+                <p className="label-xs mb-2">Embed Code</p>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <p className="text-[11px] font-medium text-muted-foreground">Markdown</p>
+                    <div className="flex items-center gap-2">
+                      <code className="text-[10px] font-mono bg-muted/50 px-2.5 py-1.5 rounded border border-border/50 flex-1 truncate">
+                        {badgeMarkdown}
+                      </code>
+                      <Button variant="outline" size="sm" onClick={() => handleCopy(badgeMarkdown, "markdown")} className="shrink-0 h-7 w-7 p-0">
+                        {copiedField === "markdown" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-medium text-muted-foreground">HTML</p>
-                  <div className="flex items-center gap-2">
-                    <code className="text-[10px] font-mono bg-muted/50 px-2.5 py-1.5 rounded border border-border/50 flex-1 truncate">
-                      {badgeHtml}
-                    </code>
-                    <Button variant="outline" size="sm" onClick={() => handleCopy(badgeHtml, "html")} className="shrink-0 h-7 w-7 p-0">
-                      {copiedField === "html" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                    </Button>
+                  <div className="space-y-1.5">
+                    <p className="text-[11px] font-medium text-muted-foreground">HTML</p>
+                    <div className="flex items-center gap-2">
+                      <code className="text-[10px] font-mono bg-muted/50 px-2.5 py-1.5 rounded border border-border/50 flex-1 truncate">
+                        {badgeHtml}
+                      </code>
+                      <Button variant="outline" size="sm" onClick={() => handleCopy(badgeHtml, "html")} className="shrink-0 h-7 w-7 p-0">
+                        {copiedField === "html" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Attestation */}
-              <div className="pt-2 border-t border-border/50">
-                <p className="text-xs text-muted-foreground mb-1.5">Attestation (AQVC v1.0, Ed25519):</p>
+              <div className="pt-3 border-t border-border/50">
+                <p className="label-xs mb-1.5">Attestation (AQVC v1.0, Ed25519)</p>
                 <Badge variant="outline" className="text-[10px] font-mono">
                   JWT: eyJhbGciOiJFZERTQSJ9...
                 </Badge>

@@ -190,7 +190,7 @@ export default function LeaderboardPage() {
 
       <div className="grid lg:grid-cols-[1fr_380px] gap-6">
         {/* Table */}
-        <Card className="bg-white shadow-sm border-[#E5E3E0] overflow-hidden">
+        <Card className="bg-white border-[#E5E3E0] overflow-hidden">
           <div className="overflow-x-auto">
             {loading ? (
               <div className="p-4 space-y-3">
@@ -327,7 +327,7 @@ export default function LeaderboardPage() {
         <div className="space-y-4">
           {displayServer ? (
             <>
-              <Card className="bg-white shadow-sm border-[#E5E3E0] sticky top-20">
+              <Card className="bg-white border-[#E5E3E0] sticky top-20">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base text-foreground">{displayServer.name}</CardTitle>
@@ -425,7 +425,7 @@ export default function LeaderboardPage() {
               </Card>
             </>
           ) : (
-            <Card className="bg-white shadow-sm border-[#E5E3E0] border-dashed">
+            <Card className="bg-white border-[#E5E3E0] border-dashed">
               <CardContent className="p-8 text-center">
                 <div className="text-muted-foreground space-y-2">
                   <Trophy className="h-8 w-8 mx-auto opacity-30" />

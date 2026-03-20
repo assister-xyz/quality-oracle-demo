@@ -49,7 +49,7 @@ function ServerSelector({
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg border bg-white transition-colors shadow-sm"
+        className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg border bg-white transition-colors" 
         style={{
           borderColor: selected ? `${color}40` : undefined,
         }}
@@ -253,7 +253,7 @@ export default function ComparePage() {
       </div>
 
       {!hasComparison && (
-        <Card className="bg-white shadow-sm border-[#E5E3E0] border-dashed">
+        <Card className="bg-white border-[#E5E3E0] border-dashed">
           <CardContent className="p-12 text-center">
             <GitCompareArrows className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
             <p className="text-sm text-muted-foreground">
@@ -268,7 +268,7 @@ export default function ComparePage() {
       {hasComparison && (
         <div className="space-y-6 animate-fade-up">
           {/* Score Comparison Header */}
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-6">
               <div className="grid grid-cols-[1fr_auto_1fr] gap-6 items-center">
                 {/* Server A */}
@@ -348,7 +348,7 @@ export default function ComparePage() {
 
           {/* Radar + Dimensions */}
           <div className="grid md:grid-cols-2 gap-6">
-            <Card className="bg-white shadow-sm border-[#E5E3E0]">
+            <Card className="bg-white border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Quality Profile Overlay
@@ -373,7 +373,7 @@ export default function ComparePage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-sm border-[#E5E3E0]">
+            <Card className="bg-white border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Dimension Comparison
@@ -433,7 +433,7 @@ export default function ComparePage() {
 
           {/* Tool Scores Comparison */}
           {allTools.length > 0 && (
-            <Card className="bg-white shadow-sm border-[#E5E3E0]">
+            <Card className="bg-white border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Wrench className="h-4 w-4" />
@@ -497,7 +497,7 @@ export default function ComparePage() {
 
           {/* Safety Probes Comparison */}
           {serverA.safety_probes.length > 0 && serverB.safety_probes.length > 0 && (
-            <Card className="bg-white shadow-sm border-[#E5E3E0]">
+            <Card className="bg-white border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Shield className="h-4 w-4" />
@@ -583,7 +583,7 @@ export default function ComparePage() {
           )}
 
           {/* Quick Verdict */}
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-6">
               <div className="text-center space-y-2">
                 <h3 className="text-sm font-medium text-muted-foreground">

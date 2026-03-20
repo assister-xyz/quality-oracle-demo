@@ -1,4 +1,4 @@
-// Realistic mock data based on actual AgentTrust scan reports
+// Realistic mock data based on actual Laureum scan reports
 // and API response schemas
 
 export type QualityTier = "expert" | "proficient" | "basic" | "failed";
