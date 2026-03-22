@@ -178,21 +178,14 @@ export default function LandingPage() {
         <div className="hero-glow absolute inset-0 pointer-events-none" />
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-          {/* Animated wreath — real brand image */}
+          {/* Animated wreath — detailed SVG laurel */}
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 0.8, scale: 1 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.4, ease }}
-            className="mx-auto mb-6 w-[180px] h-[240px] md:w-[200px] md:h-[265px] relative"
+            className="mx-auto mb-8"
           >
-            <Image
-              src="/wreaths/hero-logo.png"
-              alt="Laureum"
-              fill
-              className="object-contain"
-              priority
-              unoptimized
-            />
+            <LaurelWreath size={180} className="text-[#E2754D] mx-auto" />
           </motion.div>
 
           {/* Eyebrow */}
