@@ -1,24 +1,30 @@
 import { type QualityTier, type TrustLevel } from "@/lib/mock-data";
+import Image from "next/image";
 
-/* Color mapping aligned with wreath reference images:
-   Verified = Bronze, Certified = Silver, Audited = Gold */
-const LEVEL_COLORS: Record<string, { primary: string; secondary: string; glow: string }> = {
-  verified: { primary: "#C38133", secondary: "#8B5E2B", glow: "rgba(195,129,51,0.15)" },
-  certified: { primary: "#A8A8A8", secondary: "#707070", glow: "rgba(168,168,168,0.12)" },
-  audited: { primary: "#D4AF37", secondary: "#9A7B2C", glow: "rgba(212,175,55,0.15)" },
+/* Color mapping: Verified=Bronze, Certified=Silver, Audited=Gold */
+const LEVEL_COLORS: Record<string, { primary: string; secondary: string }> = {
+  verified: { primary: "#C38133", secondary: "#8B5E2B" },
+  certified: { primary: "#A8A8A8", secondary: "#707070" },
+  audited: { primary: "#D4AF37", secondary: "#9A7B2C" },
 };
 
-const TIER_FALLBACK: Record<string, { primary: string; secondary: string; glow: string }> = {
-  expert: { primary: "#D4AF37", secondary: "#9A7B2C", glow: "rgba(212,175,55,0.15)" },
-  proficient: { primary: "#A8A8A8", secondary: "#707070", glow: "rgba(168,168,168,0.12)" },
-  basic: { primary: "#C38133", secondary: "#8B5E2B", glow: "rgba(195,129,51,0.15)" },
-  failed: { primary: "#535862", secondary: "#3a3d44", glow: "rgba(83,88,98,0.1)" },
+const TIER_FALLBACK: Record<string, { primary: string; secondary: string }> = {
+  expert: { primary: "#D4AF37", secondary: "#9A7B2C" },
+  proficient: { primary: "#A8A8A8", secondary: "#707070" },
+  basic: { primary: "#C38133", secondary: "#8B5E2B" },
+  failed: { primary: "#535862", secondary: "#3a3d44" },
 };
 
 const LEVEL_LABELS: Record<TrustLevel, string> = {
   verified: "VERIFIED",
   certified: "CERTIFIED",
   audited: "AUDITED",
+};
+
+const WREATH_IMAGES: Record<string, string> = {
+  verified: "/wreaths/verified.png",
+  certified: "/wreaths/certified.png",
+  audited: "/wreaths/audited.png",
 };
 
 interface LaurelBadgeProps {
@@ -31,115 +37,90 @@ interface LaurelBadgeProps {
 export function LaurelBadge({ score, tier, trustLevel, size = "md" }: LaurelBadgeProps) {
   const colors = trustLevel ? LEVEL_COLORS[trustLevel] : TIER_FALLBACK[tier] || TIER_FALLBACK.basic;
   const label = trustLevel ? LEVEL_LABELS[trustLevel] : tier.toUpperCase();
+  const wreathSrc = trustLevel ? WREATH_IMAGES[trustLevel] : WREATH_IMAGES.verified;
 
-  const scale = size === "sm" ? 0.7 : size === "lg" ? 1.4 : 1;
-  const w = Math.round(420 * scale);
-  const h = Math.round(120 * scale);
+  const scale = size === "sm" ? 0.65 : size === "lg" ? 1.2 : 1;
+  const height = Math.round(140 * scale);
+  const wreathSize = Math.round(120 * scale);
 
   return (
-    <svg
-      width={w}
-      height={h}
-      viewBox="0 0 420 120"
-      xmlns="http://www.w3.org/2000/svg"
-      className="shrink-0"
+    <div
+      className="inline-flex items-center rounded-sm overflow-hidden"
+      style={{
+        backgroundColor: "#0E0E0C",
+        border: `1px solid ${colors.primary}30`,
+        height: `${height}px`,
+      }}
     >
-      <defs>
-        <radialGradient id={`glow-${tier}`} cx="15%" cy="50%" r="40%">
-          <stop offset="0%" stopColor={colors.glow} />
-          <stop offset="100%" stopColor="transparent" />
-        </radialGradient>
-      </defs>
-
-      {/* Background with subtle gradient */}
-      <rect width="420" height="120" rx="4" fill="#0E0E0C" />
-      <rect width="420" height="120" rx="4" fill="none" stroke={colors.primary} strokeWidth="1" opacity="0.25" />
-
       {/* Left accent stripe */}
-      <rect x="0" y="0" width="4" height="120" rx="2" fill={colors.primary} opacity="0.7" />
+      <div
+        className="w-1 self-stretch shrink-0"
+        style={{ backgroundColor: colors.primary, opacity: 0.7 }}
+      />
 
-      {/* Glow behind score */}
-      <rect x="0" y="0" width="420" height="120" rx="4" fill={`url(#glow-${tier})`} />
+      {/* Wreath + Score area */}
+      <div className="relative flex items-center justify-center shrink-0" style={{ width: `${wreathSize}px`, height: `${height}px` }}>
+        {/* Real wreath image */}
+        <Image
+          src={wreathSrc}
+          alt=""
+          width={wreathSize}
+          height={wreathSize}
+          className="absolute inset-0 w-full h-full object-contain opacity-60"
+          style={{ filter: "brightness(0.9)" }}
+          unoptimized
+        />
+        {/* Score overlay */}
+        <span
+          className="relative z-10 font-mono font-black tabular-nums"
+          style={{
+            color: colors.primary,
+            fontSize: `${Math.round(32 * scale)}px`,
+            textShadow: `0 0 20px ${colors.primary}40`,
+          }}
+        >
+          {score}
+        </span>
+      </div>
 
-      {/* Score wreath area — larger wreath behind score */}
-      <g transform="translate(58, 60)">
-        {/* Left branch */}
-        <path d="M-2 28 C-8 20, -10 8, -4 -4" stroke={colors.primary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.4" />
-        <ellipse cx="-8" cy="22" rx="5" ry="2.5" transform="rotate(-15 -8 22)" fill={colors.primary} opacity="0.5" />
-        <ellipse cx="-10" cy="14" rx="4.5" ry="2.2" transform="rotate(-30 -10 14)" fill={colors.primary} opacity="0.4" />
-        <ellipse cx="-9" cy="6" rx="4" ry="2" transform="rotate(-45 -9 6)" fill={colors.primary} opacity="0.3" />
-        <ellipse cx="-6" cy="-1" rx="3.5" ry="1.8" transform="rotate(-60 -6 -1)" fill={colors.primary} opacity="0.2" />
+      {/* Divider */}
+      <div className="w-px self-stretch mx-1" style={{ backgroundColor: `${colors.primary}25` }} />
 
-        {/* Right branch */}
-        <path d="M2 28 C8 20, 10 8, 4 -4" stroke={colors.primary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.4" />
-        <ellipse cx="8" cy="22" rx="5" ry="2.5" transform="rotate(15 8 22)" fill={colors.primary} opacity="0.5" />
-        <ellipse cx="10" cy="14" rx="4.5" ry="2.2" transform="rotate(30 10 14)" fill={colors.primary} opacity="0.4" />
-        <ellipse cx="9" cy="6" rx="4" ry="2" transform="rotate(45 9 6)" fill={colors.primary} opacity="0.3" />
-        <ellipse cx="6" cy="-1" rx="3.5" ry="1.8" transform="rotate(60 6 -1)" fill={colors.primary} opacity="0.2" />
-      </g>
-
-      {/* Score — large, bold, tier-colored */}
-      <text
-        x="58" y="58"
-        textAnchor="middle"
-        dominantBaseline="central"
-        fill={colors.primary}
-        fontSize="36"
-        fontWeight="900"
-        fontFamily="ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace"
-      >
-        {score}
-      </text>
-
-      {/* Vertical divider */}
-      <line x1="110" y1="24" x2="110" y2="96" stroke={colors.primary} strokeWidth="1" opacity="0.2" />
-
-      {/* Label — trust level or tier */}
-      <text
-        x="128" y="42"
-        fill="#F5F5F3"
-        fontSize="22"
-        fontWeight="800"
-        fontFamily="system-ui, -apple-system, sans-serif"
-        letterSpacing="0.06em"
-      >
-        {label}
-      </text>
-
-      {/* Score / Tier detail */}
-      <text
-        x="128" y="66"
-        fill={colors.primary}
-        fontSize="13"
-        fontWeight="600"
-        fontFamily="ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace"
-        letterSpacing="0.06em"
-      >
-        {score}/100  ·  {tier.toUpperCase()} TIER
-      </text>
-
-      {/* Brand */}
-      <text
-        x="128" y="90"
-        fill="#535862"
-        fontSize="10"
-        fontWeight="600"
-        fontFamily="system-ui, -apple-system, sans-serif"
-        letterSpacing="0.2em"
-      >
-        VERIFIED BY LAUREUM.AI
-      </text>
-
-      {/* Right — laurel mark (larger, more visible) */}
-      <g transform="translate(382, 60)" opacity="0.2">
-        <path d="M-10 18 C-14 10, -12 0, -4 -8" stroke={colors.primary} strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        <path d="M10 18 C14 10, 12 0, 4 -8" stroke={colors.primary} strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        <ellipse cx="-8" cy="12" rx="4" ry="2" transform="rotate(-20 -8 12)" fill={colors.primary} />
-        <ellipse cx="-10" cy="4" rx="3.5" ry="1.8" transform="rotate(-40 -10 4)" fill={colors.primary} />
-        <ellipse cx="8" cy="12" rx="4" ry="2" transform="rotate(20 8 12)" fill={colors.primary} />
-        <ellipse cx="10" cy="4" rx="3.5" ry="1.8" transform="rotate(40 10 4)" fill={colors.primary} />
-        <circle cx="0" cy="-10" r="2.5" fill={colors.primary} />
-      </g>
-    </svg>
+      {/* Text section */}
+      <div className="pr-6 pl-2 py-3 flex flex-col justify-center min-w-0">
+        <span
+          className="font-bold tracking-wider"
+          style={{
+            color: "#F5F5F3",
+            fontSize: `${Math.round(18 * scale)}px`,
+            letterSpacing: "0.06em",
+          }}
+        >
+          {label}
+        </span>
+        <span
+          className="font-mono font-semibold"
+          style={{
+            color: colors.primary,
+            fontSize: `${Math.round(12 * scale)}px`,
+            letterSpacing: "0.06em",
+            marginTop: "2px",
+          }}
+        >
+          {score}/100 · {tier.toUpperCase()} TIER
+        </span>
+        <span
+          className="font-semibold"
+          style={{
+            color: "#535862",
+            fontSize: `${Math.round(9 * scale)}px`,
+            letterSpacing: "0.2em",
+            marginTop: "4px",
+          }}
+        >
+          VERIFIED BY LAUREUM.AI
+        </span>
+      </div>
+    </div>
   );
 }
