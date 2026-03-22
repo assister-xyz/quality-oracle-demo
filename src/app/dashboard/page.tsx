@@ -23,6 +23,7 @@ import {
   WifiOff,
   Swords,
 } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
 
 function computeKPIs(servers: ServerEvaluation[]) {
   const completed = servers.filter((s) => s.status === "completed");
@@ -84,30 +85,28 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 pt-24 space-y-8">
-      {/* Header */}
-      <div className="space-y-4">
-        <h1 className="text-4xl font-bold text-foreground" style={{ letterSpacing: "-0.04em", lineHeight: "0.95" }}>
-          Laureum{" "}
-          <span className="text-[#E2754D]">Dashboard</span>
-        </h1>
-        <p className="text-muted-foreground max-w-2xl">
-          Operational overview of all evaluations, scores, and agent quality metrics.
-        </p>
-        <div className="flex gap-3 pt-1">
-          <Link href="/evaluate">
-            <Button className="bg-[#0E0E0C] text-white font-semibold hover:bg-[#0E0E0C]/80 transition-colors">
-              <Search className="h-4 w-4 mr-2" />
-              Evaluate Agent
-            </Button>
-          </Link>
-          <Link href="/leaderboard">
-            <Button variant="outline" className="transition-colors">
-              <Trophy className="h-4 w-4 mr-2" />
-              Leaderboard
-            </Button>
-          </Link>
-        </div>
+    <div>
+      <PageHeader
+        eyebrow="Dashboard"
+        title="Laureum"
+        accent="Dashboard"
+        description="Operational overview of all evaluations, scores, and agent quality metrics."
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Quick actions */}
+      <div className="flex gap-3">
+        <Link href="/evaluate">
+          <Button className="bg-[#0E0E0C] text-white font-semibold hover:bg-[#0E0E0C]/80 transition-colors">
+            <Search className="h-4 w-4 mr-2" />
+            Evaluate Agent
+          </Button>
+        </Link>
+        <Link href="/leaderboard">
+          <Button variant="outline" className="transition-colors">
+            <Trophy className="h-4 w-4 mr-2" />
+            Leaderboard
+          </Button>
+        </Link>
       </div>
 
       {/* Backend offline warning */}
@@ -299,6 +298,7 @@ export default function DashboardPage() {
             Assisterr
           </a>
         </p>
+      </div>
       </div>
     </div>
   );

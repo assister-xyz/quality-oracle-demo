@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScoreGauge } from "@/components/score-gauge";
@@ -288,17 +289,14 @@ export default function BulkPage() {
   ).length;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-8 space-y-8">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Bulk <span className="text-[#E2754D]">Evaluation</span>
-        </h1>
-        <p className="text-muted-foreground">
-          Evaluate multiple MCP servers in parallel. Paste URLs, upload a list,
-          or use a preset.
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        eyebrow="Bulk"
+        title="Batch"
+        accent="Evaluation"
+        description="Evaluate multiple MCP servers in parallel. Paste URLs, upload a list, or use a preset."
+      />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
       {/* URL Input */}
       <Card className="bg-white border-[#E5E3E0]">
@@ -661,6 +659,7 @@ export default function BulkPage() {
           </CardContent>
         </Card>
       )}
+      </div>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -135,16 +136,14 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-8 space-y-6">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          MCP Server <span className="text-[#E2754D]">Leaderboard</span>
-        </h1>
-        <p className="text-muted-foreground">
-          {loading ? "Loading..." : `${servers.length} servers evaluated with multi-judge consensus scoring.`}
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        eyebrow="Leaderboard"
+        title="MCP Server"
+        accent="Rankings"
+        description={loading ? "Loading..." : `${servers.length} servers evaluated with multi-judge consensus scoring.`}
+      />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -435,6 +434,7 @@ export default function LeaderboardPage() {
             </Card>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

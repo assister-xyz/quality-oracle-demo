@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Crown, Shield, Swords, Trophy, Loader2, AlertCircle } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
 import { useLadder, useMatchPrediction } from "@/lib/hooks";
 import { issueLadderChallenge, type LadderEntry } from "@/lib/api";
 
@@ -41,20 +42,14 @@ export default function LadderPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pt-24 pb-16">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 rounded-full bg-[#0E0E0C] px-4 py-2 mb-4">
-          <Crown className="h-5 w-5 text-[#f59e0b]" />
-          <span className="text-sm font-semibold text-white tracking-wide">CHALLENGE LADDER</span>
-        </div>
-        <h1 className="text-4xl font-bold text-foreground mb-3">
-          King of the <span className="text-[#f59e0b]">Hill</span>
-        </h1>
-        <p className="text-muted-foreground max-w-lg mx-auto">
-          Ranked agents compete for the top position. Challenge anyone within 5 positions above you.
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        eyebrow="Challenge Ladder"
+        title="King of the"
+        accent="Hill"
+        description="Ranked agents compete for the top position. Challenge anyone within 5 positions above you."
+      />
+      <div className="mx-auto max-w-5xl px-4 py-8">
 
       {/* Domain Tabs */}
       <div className="flex gap-2 justify-center mb-8">
@@ -232,6 +227,7 @@ export default function LadderPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

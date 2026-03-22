@@ -21,6 +21,7 @@ import {
 } from "@/lib/mock-data";
 import { submitEvaluation, getEvaluationStatus, ApiError } from "@/lib/api";
 import { transformEvalStatus } from "@/lib/transform";
+import { PageHeader } from "@/components/page-header";
 import {
   Search,
   Loader2,
@@ -318,16 +319,14 @@ function EvaluateContent() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-8 space-y-8">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Evaluate <span className="text-[#E2754D]">Agent Quality</span>
-        </h1>
-        <p className="text-muted-foreground">
-          Paste any MCP server URL to run a comprehensive quality evaluation with multi-judge consensus.
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        eyebrow="Evaluate"
+        title="Agent Quality"
+        accent="Verification"
+        description="Paste any MCP server URL to run a comprehensive quality evaluation with multi-judge consensus."
+      />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
       {/* URL Input */}
       <Card className="bg-white border-[#E5E3E0]">
@@ -800,6 +799,7 @@ function EvaluateContent() {
           </Card>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Swords, Zap, Trophy, Copy, Image, Clock, AlertCircle, Loader2 } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
 import { createBattle, getBattle, getMatchPrediction, type BattleResult, type MatchPrediction } from "@/lib/api";
 import { useBattleStatus } from "@/lib/hooks";
 
@@ -94,19 +95,14 @@ function BattleContent() {
   // ── INPUT PHASE ──
   if (phase === "input") {
     return (
-      <div className="mx-auto max-w-3xl px-4 pt-24 pb-16">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[#0E0E0C] px-4 py-2 mb-4">
-            <Swords className="h-5 w-5 text-[#E2754D]" />
-            <span className="text-sm font-semibold text-white tracking-wide">BATTLE ARENA</span>
-          </div>
-          <h1 className="text-4xl font-bold text-foreground mb-3">
-            Head-to-Head <span className="text-[#E2754D]">Battle</span>
-          </h1>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            Pit two AI agents against each other with identical challenges. See who comes out on top.
-          </p>
-        </div>
+      <div>
+        <PageHeader
+          eyebrow="Battle Arena"
+          title="Head-to-Head"
+          accent="Battle"
+          description="Pit two AI agents against each other with identical challenges. See who comes out on top."
+        />
+        <div className="mx-auto max-w-3xl px-4 py-8">
 
         <div className="rounded-sm border border-[#E5E3E0] bg-white p-8">
           <div className="grid grid-cols-1 md:grid-cols-[1fr,auto,1fr] gap-6 items-end">
@@ -197,6 +193,7 @@ function BattleContent() {
               Start Battle
             </button>
           </div>
+        </div>
         </div>
       </div>
     );
