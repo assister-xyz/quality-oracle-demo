@@ -3,26 +3,41 @@ interface LaurelLogoProps {
   className?: string;
 }
 
-/* Small logo for navbar — simple, bold, works at 20px */
+/* Small logo for navbar — same leaf style as hero wreath, scaled to work at 20px */
 export function LaurelLogo({ size = 24, className }: LaurelLogoProps) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 32 32"
+      viewBox="0 0 200 200"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      <path d="M8 27 C4 22, 5 14, 12 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
-      <path d="M24 27 C28 22, 27 14, 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
-      <ellipse cx="6.5" cy="23" rx="3.2" ry="1.6" transform="rotate(-15 6.5 23)" fill="currentColor" />
-      <ellipse cx="5.5" cy="17.5" rx="3" ry="1.5" transform="rotate(-35 5.5 17.5)" fill="currentColor" />
-      <ellipse cx="8" cy="12" rx="2.8" ry="1.4" transform="rotate(-55 8 12)" fill="currentColor" />
-      <ellipse cx="25.5" cy="23" rx="3.2" ry="1.6" transform="rotate(15 25.5 23)" fill="currentColor" />
-      <ellipse cx="26.5" cy="17.5" rx="3" ry="1.5" transform="rotate(35 26.5 17.5)" fill="currentColor" />
-      <ellipse cx="24" cy="12" rx="2.8" ry="1.4" transform="rotate(55 24 12)" fill="currentColor" />
-      <circle cx="16" cy="6" r="1.8" fill="currentColor" />
+      {/* Left stem */}
+      <path d="M82 178 C40 155, 22 110, 55 42" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.3" />
+      {/* Left outer leaves */}
+      <path d="M78 172 C68 168, 56 174, 52 180 C60 180, 72 176, 78 172Z" fill="currentColor" opacity="0.9" />
+      <path d="M68 160 C56 158, 42 166, 38 174 C48 172, 62 164, 68 160Z" fill="currentColor" opacity="0.85" />
+      <path d="M56 146 C44 146, 30 156, 26 164 C36 160, 50 150, 56 146Z" fill="currentColor" opacity="0.8" />
+      <path d="M46 130 C34 132, 20 144, 18 152 C28 146, 40 136, 46 130Z" fill="currentColor" opacity="0.7" />
+      <path d="M38 114 C28 118, 16 132, 14 140 C24 132, 34 120, 38 114Z" fill="currentColor" opacity="0.6" />
+      <path d="M34 98 C24 104, 16 118, 16 126 C24 118, 30 104, 34 98Z" fill="currentColor" opacity="0.5" />
+      <path d="M38 66 C32 72, 28 86, 30 94 C34 86, 36 72, 38 66Z" fill="currentColor" opacity="0.35" />
+      <path d="M55 42 C50 46, 48 56, 50 64 C54 56, 54 46, 55 42Z" fill="currentColor" opacity="0.25" />
+      {/* Right stem */}
+      <path d="M118 178 C160 155, 178 110, 145 42" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.3" />
+      {/* Right outer leaves */}
+      <path d="M122 172 C132 168, 144 174, 148 180 C140 180, 128 176, 122 172Z" fill="currentColor" opacity="0.9" />
+      <path d="M132 160 C144 158, 158 166, 162 174 C152 172, 138 164, 132 160Z" fill="currentColor" opacity="0.85" />
+      <path d="M144 146 C156 146, 170 156, 174 164 C164 160, 150 150, 144 146Z" fill="currentColor" opacity="0.8" />
+      <path d="M154 130 C166 132, 180 144, 182 152 C172 146, 160 136, 154 130Z" fill="currentColor" opacity="0.7" />
+      <path d="M162 114 C172 118, 184 132, 186 140 C176 132, 166 120, 162 114Z" fill="currentColor" opacity="0.6" />
+      <path d="M166 98 C176 104, 184 118, 184 126 C176 118, 170 104, 166 98Z" fill="currentColor" opacity="0.5" />
+      <path d="M162 66 C168 72, 172 86, 170 94 C166 86, 164 72, 162 66Z" fill="currentColor" opacity="0.35" />
+      <path d="M145 42 C150 46, 152 56, 150 64 C146 56, 146 46, 145 42Z" fill="currentColor" opacity="0.25" />
+      {/* Bottom join */}
+      <ellipse cx="100" cy="186" rx="5" ry="3" fill="currentColor" opacity="0.5" />
     </svg>
   );
 }
