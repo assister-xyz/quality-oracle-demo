@@ -86,72 +86,69 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <PageHeader
-        eyebrow="Dashboard"
-        title="Laureum"
-        accent="Dashboard"
-        description="Operational overview of all evaluations, scores, and agent quality metrics."
-      />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Quick actions */}
-      <div className="flex gap-3">
-        <Link href="/evaluate">
-          <Button className="bg-[#0E0E0C] text-white font-semibold hover:bg-[#0E0E0C]/80 transition-colors">
-            <Search className="h-4 w-4 mr-2" />
-            Evaluate Agent
-          </Button>
-        </Link>
-        <Link href="/leaderboard">
-          <Button variant="outline" className="transition-colors">
-            <Trophy className="h-4 w-4 mr-2" />
-            Leaderboard
-          </Button>
-        </Link>
+      {/* Dark header with KPIs integrated */}
+      <div className="bg-[#0E0E0C] pt-24 pb-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="uppercase tracking-[0.2em] text-[#717069] text-xs font-medium mb-3">Dashboard</p>
+          <div className="flex items-end justify-between mb-8">
+            <h1 className="text-3xl md:text-4xl font-display font-700 text-[#F5F5F3] tracking-tight">
+              Overview
+            </h1>
+            <div className="flex gap-3">
+              <Link href="/evaluate">
+                <Button className="bg-[#E2754D] text-white font-semibold hover:bg-[#c9633f] transition-colors rounded-sm text-xs uppercase tracking-wider">
+                  <Search className="h-3.5 w-3.5 mr-2" />
+                  Evaluate
+                </Button>
+              </Link>
+              <Link href="/leaderboard">
+                <Button variant="outline" className="transition-colors rounded-sm text-xs uppercase tracking-wider border-[#2a2a28] text-[#A0A09C] hover:text-[#F5F5F3] hover:border-[#535862] hover:bg-transparent">
+                  <Trophy className="h-3.5 w-3.5 mr-2" />
+                  Leaderboard
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* KPIs — flat, no cards, dark bg */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {kpiCards.map((kpi) => (
+              <div key={kpi.label}>
+                <div className="text-[11px] uppercase tracking-[0.15em] text-[#535862] font-medium mb-2">
+                  {kpi.label}
+                </div>
+                {loading ? (
+                  <div className="h-8 w-16 bg-[#1a1a18] rounded-sm animate-pulse" />
+                ) : (
+                  <div className="text-2xl font-bold font-mono tabular-nums text-[#F5F5F3]">
+                    {kpi.value}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
       {/* Backend offline warning */}
       {isLive === false && (
-        <Card className="border-[#f59e0b]/30 bg-[#f59e0b]/5">
-          <CardContent className="p-4 flex items-center gap-3">
-            <WifiOff className="h-5 w-5 text-[#f59e0b] shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-[#f59e0b]">Backend Offline</p>
-              <p className="text-xs text-muted-foreground">
-                Cannot connect to Laureum backend at {process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002"}.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="rounded-sm bg-[#0E0E0C] border border-[#2a2a28] p-4 flex items-center gap-3">
+          <WifiOff className="h-5 w-5 text-[#E2754D] shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-[#F5F5F3]">Backend Offline</p>
+            <p className="text-xs text-[#535862]">
+              Cannot connect to Laureum backend at {process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002"}.
+            </p>
+          </div>
+        </div>
       )}
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {kpiCards.map((kpi) => (
-          <Card key={kpi.label} className="bg-white border-[#E5E3E0] card-hover">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <kpi.icon className="h-3.5 w-3.5" style={{ color: kpi.color }} />
-                <span className="label-xs">{kpi.label}</span>
-              </div>
-              {loading ? (
-                <Skeleton className="h-8 w-16" />
-              ) : (
-                <div className="text-2xl font-bold font-mono tabular-nums text-foreground">
-                  {kpi.value}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
       {/* Tier Distribution + Evaluation Standards */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card className="bg-white border-[#E5E3E0]">
-          <CardHeader className="pb-3">
-            <CardTitle className="label-xs">Tier Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
+      <div className="grid md:grid-cols-2 gap-8">
+        <div>
+          <p className="label-xs mb-4">Tier Distribution</p>
             {loading ? (
               <div className="space-y-3">
                 {[1, 2, 3, 4].map((i) => (
@@ -186,100 +183,80 @@ export default function DashboardPage() {
                 })}
               </div>
             )}
-          </CardContent>
-        </Card>
+        </div>
 
-        <Card className="bg-white border-[#E5E3E0]">
-          <CardHeader className="pb-3">
-            <CardTitle className="label-xs">Evaluation Standards</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-2">
-              {[
-                { label: "Multi-Judge Consensus", detail: "2-3 parallel LLM judges with agreement threshold", icon: Shield },
-                { label: "6-Axis Scoring", detail: "Accuracy, Safety, Reliability, Latency, Process, Schema", icon: BarChart3 },
-                { label: "Adversarial Probes", detail: "Injection, extraction, PII, hallucination, overflow", icon: Shield },
-                { label: "AQVC Attestation", detail: "Ed25519-signed JWT with W3C VC compatibility", icon: Award },
-                { label: "Anti-Gaming", detail: "Question paraphrasing, canaries, production correlation", icon: Zap },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center gap-3 rounded-sm px-3 py-2.5 bg-[#F1EFED] border border-[#E5E3E0]/60">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#0E0E0C] shrink-0">
-                    <item.icon className="h-3.5 w-3.5 text-white" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium text-foreground">{item.label}</div>
-                    <div className="text-[11px] text-muted-foreground truncate">{item.detail}</div>
-                  </div>
+        <div>
+          <p className="label-xs mb-4">Evaluation Standards</p>
+          <div className="space-y-2">
+            {[
+              { label: "Multi-Judge Consensus", detail: "2-3 parallel LLM judges", icon: Shield },
+              { label: "6-Axis Scoring", detail: "Accuracy, Safety, Reliability, Latency, Process, Schema", icon: BarChart3 },
+              { label: "Adversarial Probes", detail: "Injection, extraction, PII, hallucination", icon: Shield },
+              { label: "AQVC Attestation", detail: "Ed25519-signed W3C VC credential", icon: Award },
+              { label: "Anti-Gaming", detail: "Question paraphrasing, production correlation", icon: Zap },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-3 py-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-sm bg-[#0E0E0C] shrink-0">
+                  <item.icon className="h-3.5 w-3.5 text-[#E2754D]" />
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <div className="min-w-0">
+                  <div className="text-sm font-medium text-foreground">{item.label}</div>
+                  <div className="text-[11px] text-[#717069]">{item.detail}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Recent Evaluations */}
+      {/* Recent Evaluations — clean list, no cards */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Recent Evaluations</h2>
-          <Link href="/leaderboard" className="text-sm text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1">
+          <p className="label-xs">Recent Evaluations</p>
+          <Link href="/leaderboard" className="text-xs text-[#717069] hover:text-foreground flex items-center gap-1 link-underline">
             View all <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
         {loading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="bg-white border-[#E5E3E0]">
-                <CardContent className="p-4 space-y-3">
-                  <Skeleton className="h-5 w-32" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-24" />
-                </CardContent>
-              </Card>
+              <div key={i} className="h-16 bg-[#F1EFED] rounded-sm animate-pulse" />
             ))}
           </div>
         ) : recentEvals.length === 0 ? (
-          <Card className="bg-white border-[#E5E3E0] border-dashed">
-            <CardContent className="p-8 text-center">
-              <Search className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
-              <p className="text-sm text-muted-foreground">
-                No evaluations yet.{" "}
-                <Link href="/evaluate" className="text-foreground font-medium hover:underline">
-                  Run your first evaluation
-                </Link>
-              </p>
-            </CardContent>
-          </Card>
+          <div className="text-center py-12 border border-dashed border-[#E5E3E0] rounded-sm">
+            <p className="text-sm text-muted-foreground">
+              No evaluations yet.{" "}
+              <Link href="/evaluate" className="text-[#E2754D] hover:underline">
+                Run your first evaluation
+              </Link>
+            </p>
+          </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="border border-[#E5E3E0] rounded-sm overflow-hidden divide-y divide-[#E5E3E0]">
             {recentEvals.map((server) => (
               <Link key={server.id} href={`/evaluate?result=${server.id}`}>
-                <Card className="bg-white border-[#E5E3E0] transition-all cursor-pointer group card-hover">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <div className="font-medium group-hover:text-foreground transition-colors">{server.name}</div>
-                        <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">
-                            {server.transport === "sse" ? "SSE" : "HTTP"}
-                          </Badge>
-                          {server.tools_count} tools
-                        </div>
+                <div className="flex items-center justify-between px-5 py-4 hover:bg-[#F1EFED] transition-colors group cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <ScoreGauge score={server.score} tier={server.tier} size={40} strokeWidth={3} showLabel={false} />
+                    <div>
+                      <span className="text-sm font-display font-600 text-foreground group-hover:text-[#E2754D] transition-colors">
+                        {server.name}
+                      </span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] text-[#717069] font-mono uppercase">{server.transport === "sse" ? "SSE" : "HTTP"}</span>
+                        <span className="text-[10px] text-[#717069]">{server.tools_count} tools</span>
+                        {server.duration_ms > 0 && (
+                          <span className="text-[10px] text-[#717069]">{formatDuration(server.duration_ms)}</span>
+                        )}
                       </div>
-                      <ScoreGauge score={server.score} tier={server.tier} size={56} strokeWidth={4} showLabel={false} />
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <TierBadge tier={server.tier} />
-                        {server.trust_level && <TrustLevelBadge level={server.trust_level} showIcon={false} />}
-                      </div>
-                      {server.duration_ms > 0 && (
-                        <span className="text-[10px] text-muted-foreground">
-                          {formatDuration(server.duration_ms)}
-                        </span>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TierBadge tier={server.tier} />
+                    {server.trust_level && <TrustLevelBadge level={server.trust_level} showIcon={false} />}
+                  </div>
+                </div>
               </Link>
             ))}
           </div>
