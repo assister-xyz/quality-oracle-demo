@@ -320,33 +320,36 @@ function EvaluateContent() {
 
   return (
     <div>
-      <PageHeader
-        eyebrow="Evaluate"
-        title="Agent Quality"
-        accent="Verification"
-        description="Paste any MCP server URL to run a comprehensive quality evaluation with multi-judge consensus."
-      />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Dark hero with the input as the dominant element */}
+      <div className="bg-[#0E0E0C] pt-24 pb-16 md:pb-20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="uppercase tracking-[0.2em] text-[#717069] text-xs font-medium mb-3">
+            Evaluate
+          </p>
+          <h1 className="text-3xl md:text-5xl font-display font-700 text-[#F5F5F3] tracking-tight mb-3">
+            Verify any <span className="text-[#E2754D]">AI agent</span>
+          </h1>
+          <p className="text-[#A0A09C] mb-8 max-w-xl">
+            Paste an agent URL, MCP server, or API endpoint. We test every tool, score 6 quality dimensions, and sign an attestation.
+          </p>
 
-      {/* URL Input */}
-      <Card className="bg-white border-[#E5E3E0]">
-        <CardContent className="p-6">
+          {/* Hero-level input — not in a card */}
           <div className="flex gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#535862]" />
               <Input
-                placeholder="https://mcp.example.com/sse or /mcp"
+                placeholder="https://agent.example.com/mcp or /sse"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && startEvaluation()}
-                className="pl-9 h-12 text-base border-[#E5E3E0] focus:border-[#0E0E0C]"
+                className="pl-11 h-14 text-base bg-[#1a1a18] border-[#2a2a28] text-[#F5F5F3] placeholder:text-[#535862] focus:border-[#E2754D] rounded-sm"
                 disabled={isEvaluating}
               />
             </div>
             <Button
               onClick={startEvaluation}
               disabled={isEvaluating || !url.trim()}
-              className="h-12 px-6 bg-[#0E0E0C] text-white font-semibold hover:bg-[#6941C6]"
+              className="h-14 px-8 bg-[#E2754D] text-white font-semibold hover:bg-[#c9633f] rounded-sm text-sm uppercase tracking-wider"
             >
               {isEvaluating ? (
                 <>
@@ -361,80 +364,79 @@ function EvaluateContent() {
 
           {/* In-progress banner */}
           {isEvaluating && (
-            <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-md bg-[#E2754D]/5 border border-[#E2754D]/20">
+            <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-sm bg-[#E2754D]/10 border border-[#E2754D]/20">
               <Loader2 className="h-3 w-3 animate-spin text-[#E2754D]" />
-              <span className="text-xs text-[#E2754D]">Evaluation in progress — scroll down to see progress</span>
+              <span className="text-xs text-[#E2754D]">Evaluation in progress — scroll down to see live steps</span>
             </div>
           )}
 
-          {/* Eval mode selector — trust levels with laurel badge icons */}
-          <div className="mt-4">
-            <p className="label-xs mb-2">Trust Level</p>
-            <div className="grid grid-cols-3 gap-2">
+          {/* Depth selector — renamed from trust levels */}
+          <div className="mt-6">
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[#535862] font-medium mb-3">Evaluation Depth</p>
+            <div className="grid grid-cols-3 gap-3">
               {([
                 {
                   mode: "verified" as const,
-                  label: "Verified",
-                  analogy: "Domain Validated (DV)",
-                  desc: "~30s \u00b7 spot check \u00b7 1 judge",
+                  label: "Quick Scan",
+                  desc: "~30s",
+                  detail: "Spot check with 1 judge",
                 },
                 {
                   mode: "certified" as const,
-                  label: "Certified",
-                  analogy: "Org Validated (OV)",
-                  desc: "~90s \u00b7 full suite \u00b7 safety probes",
+                  label: "Standard",
+                  desc: "~90s",
+                  detail: "Full suite + safety probes",
                 },
                 {
                   mode: "audited" as const,
-                  label: "Audited",
-                  analogy: "Extended Validation (EV)",
-                  desc: "~3min \u00b7 full audit \u00b7 2-3 judges",
+                  label: "Deep Audit",
+                  desc: "~3 min",
+                  detail: "Full audit with 2-3 judges",
                 },
-              ]).map(({ mode, label, analogy, desc }) => {
+              ]).map(({ mode, label, desc, detail }) => {
                 const isActive = evalMode === mode;
                 return (
                   <button
                     key={mode}
                     onClick={() => setEvalMode(mode)}
                     disabled={isEvaluating}
-                    className={`relative rounded-sm p-3 text-left transition-all disabled:opacity-50 cursor-pointer border-[1.5px] ${
+                    className={`rounded-sm p-4 text-left transition-all disabled:opacity-50 cursor-pointer border ${
                       isActive
-                        ? "bg-[#E2754D]/[0.07] border-[#E2754D]"
-                        : "bg-muted/30 border-[#E5E3E0] hover:border-[#E2754D]/40"
+                        ? "bg-[#E2754D]/10 border-[#E2754D]/60"
+                        : "bg-[#1a1a18] border-[#2a2a28] hover:border-[#535862]"
                     }`}
-                    style={{ transitionTimingFunction: "var(--ease)", transitionDuration: "0.4s" }}
+                    style={{ transitionTimingFunction: "var(--ease)", transitionDuration: "0.3s" }}
                   >
-                    <div className="flex items-center gap-2 mb-1">
-                      <LaurelIcon tier={mode} size={20} />
-                      <span className={`text-sm font-semibold ${isActive ? "text-[#0E0E0C]" : "text-[#0E0E0C]/70"}`}>{label}</span>
+                    <div className="flex items-baseline justify-between mb-1">
+                      <span className={`text-sm font-display font-600 ${isActive ? "text-[#F5F5F3]" : "text-[#A0A09C]"}`}>{label}</span>
+                      <span className={`text-xs font-mono ${isActive ? "text-[#E2754D]" : "text-[#535862]"}`}>{desc}</span>
                     </div>
-                    <p className={`text-[10px] font-medium ${isActive ? "text-[#E2754D]" : "text-muted-foreground"}`}>{analogy}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{desc}</p>
-                    {isActive && (
-                      <div className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#E2754D]" />
-                    )}
+                    <p className="text-[11px] text-[#535862]">{detail}</p>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Quick examples */}
-          <div className="flex flex-wrap gap-2 mt-3">
-            <span className="text-xs text-muted-foreground">Try:</span>
+          {/* Quick-try examples — prominent on dark bg */}
+          <div className="flex flex-wrap items-center gap-2 mt-6">
+            <span className="text-[11px] uppercase tracking-wider text-[#535862] font-medium">Try:</span>
             {EXAMPLE_URLS.map((ex) => (
               <button
                 key={ex.name}
                 onClick={() => setUrl(ex.url)}
-                className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline transition-colors"
+                className="text-xs text-[#717069] hover:text-[#E2754D] border border-[#2a2a28] hover:border-[#E2754D]/30 px-2.5 py-1 rounded-sm transition-all"
                 disabled={isEvaluating}
+                style={{ transitionTimingFunction: "var(--ease)" }}
               >
                 {ex.name}
               </button>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
       {/* Error Banner */}
       {error && (
