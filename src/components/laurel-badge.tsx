@@ -28,8 +28,8 @@ interface LaurelBadgeProps {
 }
 
 export function LaurelBadge({ score, tier, trustLevel, size = "md" }: LaurelBadgeProps) {
-  // Use trustLevel if provided, otherwise map tier to a level
-  const level = trustLevel || TIER_FALLBACK_LEVEL[tier] || "verified";
+  // Wreath always matches score quality: expert=gold, proficient=silver, basic=bronze
+  const level = TIER_FALLBACK_LEVEL[tier] || "verified";
   const color = LEVEL_COLORS[level];
   const wreathSrc = WREATH_IMAGES[level];
 
