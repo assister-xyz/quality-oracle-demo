@@ -501,15 +501,12 @@ export default function LandingPage() {
             </Reveal>
           </div>
 
-          {/* Badge preview */}
+          {/* Badge previews — all 3 tiers */}
           <Reveal delay={0.3}>
-            <div className="mt-16 flex justify-center">
-              <div className="hidden md:block">
-                <LaurelBadge score={93} tier="expert" trustLevel="verified" size="lg" />
-              </div>
-              <div className="md:hidden">
-                <LaurelBadge score={93} tier="expert" trustLevel="verified" size="md" />
-              </div>
+            <div className="mt-16 flex flex-col md:flex-row items-center justify-center gap-4">
+              <LaurelBadge score={82} tier="proficient" trustLevel="verified" size="md" />
+              <LaurelBadge score={89} tier="expert" trustLevel="certified" size="md" />
+              <LaurelBadge score={95} tier="expert" trustLevel="audited" size="md" />
             </div>
           </Reveal>
         </div>
