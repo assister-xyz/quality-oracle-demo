@@ -452,61 +452,20 @@ export default function LandingPage() {
             <p className="text-center uppercase tracking-[0.2em] text-[#717069] text-xs font-medium mb-4">
               What You Get
             </p>
-            <h2 className="text-3xl md:text-5xl font-display font-700 text-foreground text-center tracking-tight mb-16">
-              Proof your agent is trustworthy
+            <h2 className="text-3xl md:text-5xl font-display font-700 text-foreground text-center tracking-tight mb-4">
+              Embeddable trust badges
             </h2>
+            <p className="text-center text-[#717069] text-sm mb-12 max-w-lg mx-auto">
+              Every evaluation generates a signed badge with your score. Embed in README, docs, or agent marketplaces.
+            </p>
           </Reveal>
 
-          <div className="grid md:grid-cols-3 gap-12">
-            <Reveal delay={0}>
-              <div className="text-center">
-                <div className="mb-6 flex justify-center">
-                  <div className="w-20 h-20 flex items-center justify-center bg-[#0E0E0C] rounded-sm">
-                    <Award className="h-9 w-9 text-[#E2754D]" />
-                  </div>
-                </div>
-                <h3 className="font-display font-700 text-lg mb-2">Embeddable Badge</h3>
-                <p className="text-sm text-[#717069] leading-relaxed">
-                  SVG badge with your score and tier. Embed in README, docs, or marketplace listings.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-              <div className="text-center">
-                <div className="mb-6 flex justify-center">
-                  <div className="w-20 h-20 flex items-center justify-center bg-[#0E0E0C] rounded-sm">
-                    <Fingerprint className="h-9 w-9 text-[#E2754D]" />
-                  </div>
-                </div>
-                <h3 className="font-display font-700 text-lg mb-2">Signed Attestation</h3>
-                <p className="text-sm text-[#717069] leading-relaxed">
-                  Ed25519-signed JWT in W3C Verifiable Credential format. Cryptographic proof of quality.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.2}>
-              <div className="text-center">
-                <div className="mb-6 flex justify-center">
-                  <div className="w-20 h-20 flex items-center justify-center bg-[#0E0E0C] rounded-sm">
-                    <Shield className="h-9 w-9 text-[#E2754D]" />
-                  </div>
-                </div>
-                <h3 className="font-display font-700 text-lg mb-2">Tier Classification</h3>
-                <p className="text-sm text-[#717069] leading-relaxed">
-                  Expert, Proficient, Basic, or Failed. Clear quality signals for agent marketplaces.
-                </p>
-              </div>
-            </Reveal>
-          </div>
-
-          {/* Badge previews — all 3 tiers */}
-          <Reveal delay={0.3}>
-            <div className="mt-16 flex flex-col md:flex-row items-center justify-center gap-4">
-              <LaurelBadge score={82} tier="proficient" trustLevel="verified" size="md" />
-              <LaurelBadge score={89} tier="expert" trustLevel="certified" size="md" />
-              <LaurelBadge score={95} tier="expert" trustLevel="audited" size="md" />
+          {/* Badge previews — all 3 tiers as the visual anchor */}
+          <Reveal delay={0.1}>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-5">
+              <LaurelBadge score={72} tier="basic" size="md" />
+              <LaurelBadge score={85} tier="proficient" size="md" />
+              <LaurelBadge score={95} tier="expert" size="md" />
             </div>
           </Reveal>
         </div>
