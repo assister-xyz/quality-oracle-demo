@@ -78,10 +78,10 @@ function getTier(score: number): QualityTier {
 }
 
 const TIER_CONFIG: Record<QualityTier, { color: string; bg: string; border: string; label: string }> = {
-  expert: { color: "#10b981", bg: "rgba(16,185,129,0.1)", border: "rgba(16,185,129,0.4)", label: "Expert" },
-  proficient: { color: "#3b82f6", bg: "rgba(59,130,246,0.1)", border: "rgba(59,130,246,0.4)", label: "Proficient" },
-  basic: { color: "#f59e0b", bg: "rgba(245,158,11,0.1)", border: "rgba(245,158,11,0.4)", label: "Basic" },
-  failed: { color: "#ef4444", bg: "rgba(239,68,68,0.1)", border: "rgba(239,68,68,0.4)", label: "Failed" },
+  expert: { color: "#0E0E0C", bg: "rgba(14,14,12,0.06)", border: "rgba(14,14,12,0.2)", label: "Expert" },
+  proficient: { color: "#535862", bg: "rgba(83,88,98,0.08)", border: "rgba(83,88,98,0.2)", label: "Proficient" },
+  basic: { color: "#717069", bg: "rgba(113,112,105,0.08)", border: "rgba(113,112,105,0.2)", label: "Basic" },
+  failed: { color: "#9e3b3b", bg: "rgba(158,59,59,0.08)", border: "rgba(158,59,59,0.2)", label: "Failed" },
 };
 
 export { TIER_CONFIG };
@@ -96,11 +96,11 @@ export { TRUST_LEVEL_CONFIG };
 
 const DIMENSION_CONFIG: Record<keyof Dimensions, { label: string; weight: number; color: string }> = {
   accuracy: { label: "Accuracy", weight: 0.35, color: "#E2754D" },
-  safety: { label: "Safety", weight: 0.20, color: "#DB5F94" },
-  reliability: { label: "Reliability", weight: 0.15, color: "#3b82f6" },
-  latency: { label: "Latency", weight: 0.10, color: "#10b981" },
-  process_quality: { label: "Process Quality", weight: 0.10, color: "#f59e0b" },
-  schema_quality: { label: "Schema Quality", weight: 0.10, color: "#6941C6" },
+  safety: { label: "Safety", weight: 0.20, color: "#C4614A" },
+  reliability: { label: "Reliability", weight: 0.15, color: "#A85343" },
+  latency: { label: "Latency", weight: 0.10, color: "#8C453C" },
+  process_quality: { label: "Process Quality", weight: 0.10, color: "#703735" },
+  schema_quality: { label: "Schema Quality", weight: 0.10, color: "#54292E" },
 };
 
 export { DIMENSION_CONFIG };

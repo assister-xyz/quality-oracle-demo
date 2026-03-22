@@ -1,5 +1,4 @@
 import { TRUST_LEVEL_CONFIG, type TrustLevel } from "@/lib/mock-data";
-import { LaurelIcon } from "@/components/laurel-icon";
 import { cn } from "@/lib/utils";
 
 interface TrustLevelBadgeProps {
@@ -13,17 +12,11 @@ export function TrustLevelBadge({ level, className, showIcon = true }: TrustLeve
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold border",
+        "inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider border border-[#E2754D]/20 bg-[#E2754D]/5 text-[#E2754D]",
         className
       )}
-      style={{
-        backgroundColor: config.bg,
-        borderColor: config.border,
-        color: config.color,
-      }}
       title={config.description}
     >
-      {showIcon && <LaurelIcon tier={level} size={14} />}
       {config.label}
     </span>
   );

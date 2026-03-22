@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TIER_CONFIG, type QualityTier } from "@/lib/mock-data";
+import { type QualityTier } from "@/lib/mock-data";
 
 interface ScoreGaugeProps {
   score: number;
@@ -13,10 +13,13 @@ interface ScoreGaugeProps {
 
 export function ScoreGauge({ score, tier, size = 80, strokeWidth = 6, showLabel = true }: ScoreGaugeProps) {
   const [animatedScore, setAnimatedScore] = useState(0);
-  const config = TIER_CONFIG[tier];
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (animatedScore / 100) * circumference;
+
+  // Single brand color for all scores — monochrome, not rainbow
+  const strokeColor = "#E2754D";
+  const textColor = "#0E0E0C";
 
   useEffect(() => {
     const timer = setTimeout(() => setAnimatedScore(score), 100);
@@ -32,36 +35,31 @@ export function ScoreGauge({ score, tier, size = 80, strokeWidth = 6, showLabel 
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="currentColor"
+            stroke="#E5E3E0"
             strokeWidth={strokeWidth}
-            className="text-muted/30"
           />
           <circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke={config.color}
+            stroke={strokeColor}
             strokeWidth={strokeWidth}
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
             className="transition-all duration-1000 ease-out"
-            style={{ filter: `drop-shadow(0 0 4px ${config.color}30)` }}
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-lg font-bold font-mono tabular-nums" style={{ color: config.color }}>
+          <span className="text-lg font-bold font-mono tabular-nums" style={{ color: textColor }}>
             {animatedScore}
           </span>
         </div>
       </div>
       {showLabel && (
-        <span
-          className="text-[10px] font-semibold uppercase tracking-wider"
-          style={{ color: config.color }}
-        >
-          {config.label}
+        <span className="text-[10px] font-medium uppercase tracking-wider text-[#717069]">
+          {tier}
         </span>
       )}
     </div>
