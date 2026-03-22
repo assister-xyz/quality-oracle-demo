@@ -97,13 +97,13 @@ function progressToSteps(pct: number): EvalStep[] {
 function StepIcon({ status }: { status: EvalStep["status"] }) {
   switch (status) {
     case "done":
-      return <CheckCircle2 className="h-4 w-4 text-[#10b981]" />;
+      return <CheckCircle2 className="h-4 w-4 text-[#E2754D]" />;
     case "running":
       return <Loader2 className="h-4 w-4 text-[#E2754D] animate-spin" />;
     case "error":
-      return <XCircle className="h-4 w-4 text-[#ef4444]" />;
+      return <XCircle className="h-4 w-4 text-[#9e3b3b]" />;
     default:
-      return <Circle className="h-4 w-4 text-muted-foreground/30" />;
+      return <Circle className="h-4 w-4 text-[#2a2a28]" />;
   }
 }
 
@@ -125,9 +125,9 @@ function ElapsedTimer() {
 
 function ProbeIcon({ passed }: { passed: boolean }) {
   return passed ? (
-    <ShieldCheck className="h-4 w-4 text-[#10b981]" />
+    <ShieldCheck className="h-4 w-4 text-[#E2754D]" />
   ) : (
-    <ShieldAlert className="h-4 w-4 text-[#ef4444]" />
+    <ShieldAlert className="h-4 w-4 text-[#9e3b3b]" />
   );
 }
 
@@ -505,41 +505,58 @@ function EvaluateContent() {
         </Card>
       )}
 
-      {/* Evaluation Progress */}
+      {/* Evaluation Progress — dark branded timeline */}
       {steps.length > 0 && !result && !error && (
-        <Card className="bg-white border-[#E5E3E0]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-[#E2754D]" />
-              Evaluation in Progress
-              <TrustLevelBadge level={evalMode} />
-              {isEvaluating && <ElapsedTimer />}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2.5">
-              {steps.map((step, i) => (
+        <div className="rounded-sm bg-[#0E0E0C] p-6 md:p-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Loader2 className="h-5 w-5 animate-spin text-[#E2754D]" />
+              <h3 className="text-base font-display font-600 text-[#F5F5F3]">Evaluating</h3>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#E2754D] border border-[#E2754D]/20 px-2 py-0.5 rounded-sm bg-[#E2754D]/5">
+                {evalMode === "verified" ? "Quick Scan" : evalMode === "certified" ? "Standard" : "Deep Audit"}
+              </span>
+            </div>
+            {isEvaluating && (
+              <span className="text-sm text-[#717069] font-mono tabular-nums">
+                <ElapsedTimer />
+              </span>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            {steps.map((step, i) => {
+              const doneCount = steps.filter(s => s.status === "done").length;
+              const totalCount = steps.length;
+              return (
                 <div key={i}>
                   <div
-                    className={`flex items-center gap-3 text-sm transition-opacity ${
-                      step.status === "pending" ? "opacity-40" : "opacity-100"
+                    className={`flex items-center gap-3 py-2 text-sm transition-all duration-300 ${
+                      step.status === "pending" ? "opacity-30" : "opacity-100"
                     }`}
                   >
                     <StepIcon status={step.status} />
-                    <span className={step.status === "running" ? "text-[#E2754D] font-medium" : ""}>{step.name}</span>
+                    <span className={`${
+                      step.status === "running" ? "text-[#E2754D] font-display font-600" :
+                      step.status === "done" ? "text-[#A0A09C]" : "text-[#535862]"
+                    }`}>
+                      {step.name}
+                    </span>
+                    {i === 0 && step.status === "done" && (
+                      <span className="ml-auto text-[10px] text-[#535862] font-mono">{doneCount}/{totalCount}</span>
+                    )}
                   </div>
                   {/* Adversarial sub-steps */}
                   {step.children && (step.status === "running" || step.status === "done") && (
-                    <div className="ml-7 mt-1.5 mb-1 space-y-1.5 border-l-2 border-border/40 pl-3">
+                    <div className="ml-7 mt-1 mb-2 space-y-1 border-l border-[#2a2a28] pl-4">
                       {step.children.map((child, ci) => (
                         <div
                           key={ci}
-                          className={`flex items-center gap-2 text-xs transition-opacity ${
-                            child.status === "pending" ? "opacity-30" : "opacity-100"
+                          className={`flex items-center gap-2 text-xs transition-all duration-300 ${
+                            child.status === "pending" ? "opacity-20" : "opacity-100"
                           }`}
                         >
                           <StepIcon status={child.status} />
-                          <span className={child.status === "running" ? "text-[#E2754D]" : "text-muted-foreground"}>
+                          <span className={child.status === "running" ? "text-[#E2754D]" : "text-[#535862]"}>
                             {child.name}
                           </span>
                         </div>
@@ -547,15 +564,26 @@ function EvaluateContent() {
                     </div>
                   )}
                 </div>
-              ))}
+              );
+            })}
+          </div>
+
+          {/* Progress bar */}
+          <div className="mt-6 pt-4 border-t border-[#2a2a28]">
+            <div className="h-1 rounded-full bg-[#1a1a18] overflow-hidden">
+              <div
+                className="h-full bg-[#E2754D] rounded-full transition-all duration-700 ease-out"
+                style={{ width: `${(steps.filter(s => s.status === "done").length / steps.length) * 100}%` }}
+              />
             </div>
-            {evaluationId && (
-              <p className="mt-3 text-[10px] text-muted-foreground/50 font-mono">
-                ID: {evaluationId}
-              </p>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+
+          {evaluationId && (
+            <p className="mt-3 text-[10px] text-[#2a2a28] font-mono">
+              {evaluationId}
+            </p>
+          )}
+        </div>
       )}
 
       {/* Results */}
