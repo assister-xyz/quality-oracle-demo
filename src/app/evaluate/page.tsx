@@ -322,7 +322,7 @@ function EvaluateContent() {
     <div>
       {/* Dark hero — fills viewport when idle */}
       <div className={`bg-[#0E0E0C] pt-24 ${result || isEvaluating || steps.length > 0 ? "pb-16" : "min-h-svh pb-20"}`}>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="uppercase tracking-[0.2em] text-[#717069] text-xs font-medium mb-3">
             Evaluate
           </p>
