@@ -117,7 +117,7 @@ function BattleContent() {
                 value={urlA}
                 onChange={(e) => setUrlA(e.target.value)}
                 placeholder="https://agent-a.example.com/mcp"
-                className="w-full rounded-xl border border-[#E5E3E0] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E2754D]/20 focus:border-[#E2754D]"
+                className="w-full rounded-sm border border-[#E5E3E0] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E2754D]/20 focus:border-[#E2754D]"
               />
             </div>
             <div className="flex items-center justify-center">
@@ -132,14 +132,14 @@ function BattleContent() {
                 value={urlB}
                 onChange={(e) => setUrlB(e.target.value)}
                 placeholder="https://agent-b.example.com/mcp"
-                className="w-full rounded-xl border border-[#E5E3E0] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E2754D]/20 focus:border-[#E2754D]"
+                className="w-full rounded-sm border border-[#E5E3E0] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E2754D]/20 focus:border-[#E2754D]"
               />
             </div>
           </div>
 
           {/* Prediction */}
           {prediction && (
-            <div className="mt-6 rounded-xl border border-[#E5E3E0] bg-[#F1EFED] p-4">
+            <div className="mt-6 rounded-sm border border-[#E5E3E0] bg-[#F1EFED] p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-foreground">Match Prediction</span>
                 <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
@@ -182,7 +182,7 @@ function BattleContent() {
               <button
                 onClick={handlePredict}
                 disabled={!urlA || !urlB || predicting}
-                className="rounded-xl border border-[#E5E3E0] px-6 py-3 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors disabled:opacity-40"
+                className="rounded-sm border border-[#E5E3E0] px-6 py-3 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors disabled:opacity-40"
               >
                 {predicting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4 inline mr-2" />}
                 Predict Match
@@ -191,7 +191,7 @@ function BattleContent() {
             <button
               onClick={handleStartBattle}
               disabled={!urlA || !urlB || starting}
-              className="rounded-xl bg-[#0E0E0C] px-8 py-3 text-sm font-semibold text-white hover:bg-[#0E0E0C]/90 transition-colors disabled:opacity-40"
+              className="rounded-sm bg-[#0E0E0C] px-8 py-3 text-sm font-semibold text-white hover:bg-[#0E0E0C]/90 transition-colors disabled:opacity-40"
             >
               {starting ? <Loader2 className="h-4 w-4 animate-spin inline mr-2" /> : <Swords className="h-4 w-4 inline mr-2" />}
               Start Battle
@@ -342,15 +342,15 @@ function BattleContent() {
 
         {/* Match Info */}
         <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="rounded-xl border border-[#E5E3E0] bg-white p-4 text-center">
+          <div className="rounded-sm border border-[#E5E3E0] bg-white p-4 text-center">
             <div className="text-sm text-muted-foreground">Match Quality</div>
             <div className="text-xl font-bold text-foreground">{Math.round(battle.match_quality * 100)}%</div>
           </div>
-          <div className="rounded-xl border border-[#E5E3E0] bg-white p-4 text-center">
+          <div className="rounded-sm border border-[#E5E3E0] bg-white p-4 text-center">
             <div className="text-sm text-muted-foreground">Margin</div>
             <div className="text-xl font-bold text-foreground">{battle.margin} pts</div>
           </div>
-          <div className="rounded-xl border border-[#E5E3E0] bg-white p-4 text-center">
+          <div className="rounded-sm border border-[#E5E3E0] bg-white p-4 text-center">
             <div className="text-sm text-muted-foreground">Duration</div>
             <div className="text-xl font-bold text-foreground flex items-center justify-center gap-1">
               <Clock className="h-4 w-4" />
@@ -363,7 +363,7 @@ function BattleContent() {
         <div className="flex gap-3 justify-center">
           <button
             onClick={handleCopyLink}
-            className="flex items-center gap-2 rounded-xl border border-[#E5E3E0] px-5 py-2.5 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors"
+            className="flex items-center gap-2 rounded-sm border border-[#E5E3E0] px-5 py-2.5 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors"
           >
             <Copy className="h-4 w-4" />
             {copied ? "Copied!" : "Copy Link"}
@@ -372,7 +372,7 @@ function BattleContent() {
             href={`${API_URL}/v1/battle/${battleId}/card.svg`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-xl border border-[#E5E3E0] px-5 py-2.5 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors"
+            className="flex items-center gap-2 rounded-sm border border-[#E5E3E0] px-5 py-2.5 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors"
           >
             <Image className="h-4 w-4" />
             SVG Card

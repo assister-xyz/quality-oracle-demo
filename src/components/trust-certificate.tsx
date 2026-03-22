@@ -55,7 +55,7 @@ export function TrustCertificate({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl border p-5 bg-gradient-to-br from-[#E2754D]/[0.04] to-white",
+        "relative overflow-hidden rounded-sm border p-5 bg-gradient-to-br from-[#E2754D]/[0.04] to-white",
         className
       )}
       style={{
@@ -73,7 +73,7 @@ export function TrustCertificate({
 
       <div className="flex items-start gap-4">
         {/* Shield icon */}
-        <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-xl bg-[#E2754D]/[0.08]">
+        <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-sm bg-[#E2754D]/[0.08]">
           <Icon className="h-6 w-6 text-[#E2754D]" />
         </div>
 

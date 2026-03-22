@@ -1,393 +1,604 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { motion, useInView } from "framer-motion";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useScoresList, useBackendHealth } from "@/lib/hooks";
 import { ScoreGauge } from "@/components/score-gauge";
 import { TierBadge } from "@/components/tier-badge";
-import { TrustLevelBadge } from "@/components/trust-level-badge";
-import { LaurelLogo } from "@/components/laurel-logo";
-import { TIER_CONFIG, type QualityTier, type ServerEvaluation } from "@/lib/mock-data";
-import { useScoresList, useBackendHealth, useBattleList } from "@/lib/hooks";
+import { LaurelWreath, LaurelLogo } from "@/components/laurel-logo";
+import { LaurelBadge } from "@/components/laurel-badge";
 import {
-  BarChart3,
-  Shield,
-  Zap,
-  Award,
-  Clock,
-  Wrench,
   ArrowRight,
-  Search,
-  Trophy,
+  Shield,
+  Layers,
+  Award,
+  Zap,
+  Fingerprint,
   ExternalLink,
-  WifiOff,
-  Swords,
+  Timer,
 } from "lucide-react";
 
-function computeKPIs(servers: ServerEvaluation[]) {
-  const completed = servers.filter((s) => s.status === "completed");
-  if (completed.length === 0) {
-    return {
-      totalEvaluations: 0,
-      averageScore: 0,
-      passRate: 0,
-      expertCount: 0,
-      avgLatencyMs: 0,
-      totalToolsTested: 0,
-      tierDistribution: { expert: 0, proficient: 0, basic: 0, failed: 0 },
-    };
-  }
-  const avgScore = Math.round(completed.reduce((sum, s) => sum + s.score, 0) / completed.length);
-  const passRate = Math.round((completed.filter((s) => s.score >= 50).length / completed.length) * 100);
-  const expertCount = completed.filter((s) => s.tier === "expert").length;
-  const withDuration = completed.filter((s) => s.duration_ms > 0);
-  const avgLatency = withDuration.length > 0
-    ? Math.round(withDuration.reduce((sum, s) => sum + s.duration_ms, 0) / withDuration.length)
-    : 0;
-  const totalTools = completed.reduce((sum, s) => sum + s.tools_count, 0);
+const ease = [0.45, 0.02, 0.09, 0.98] as const;
 
-  return {
-    totalEvaluations: completed.length,
-    averageScore: avgScore,
-    passRate,
-    expertCount,
-    avgLatencyMs: avgLatency,
-    totalToolsTested: totalTools,
-    tierDistribution: {
-      expert: completed.filter((s) => s.tier === "expert").length,
-      proficient: completed.filter((s) => s.tier === "proficient").length,
-      basic: completed.filter((s) => s.tier === "basic").length,
-      failed: completed.filter((s) => s.tier === "failed").length,
-    },
-  };
+/* ── Text Scramble Effect ── */
+const SCRAMBLE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&";
+const WORDS = ["Verify", "Benchmark", "Certify", "Trust"];
+
+function useTextScramble(words: string[], interval = 3000) {
+  const [display, setDisplay] = useState(words[0]);
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % words.length);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [words, interval]);
+
+  useEffect(() => {
+    const target = words[index];
+    const maxLen = Math.max(display.length, target.length);
+    let frame = 0;
+    const totalFrames = 12;
+
+    const scramble = () => {
+      frame++;
+      const progress = frame / totalFrames;
+      let result = "";
+      for (let i = 0; i < maxLen; i++) {
+        if (i < target.length) {
+          if (progress > (i + 1) / maxLen) {
+            result += target[i];
+          } else {
+            result += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+          }
+        }
+      }
+      setDisplay(result);
+      if (frame < totalFrames) {
+        requestAnimationFrame(scramble);
+      } else {
+        setDisplay(target);
+      }
+    };
+    requestAnimationFrame(scramble);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index]);
+
+  return display;
 }
 
-export default function DashboardPage() {
-  const { isLive } = useBackendHealth();
-  const { servers, loading, error } = useScoresList({ limit: 100, sort: "score" });
-  const kpis = computeKPIs(servers);
-  const recentEvals = servers.slice(0, 6);
+/* ── Count-up animation ── */
+function CountUp({ target, suffix = "" }: { target: number | string; suffix?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true });
+  const [value, setValue] = useState(0);
 
-  const kpiCards = [
-    { label: "Total Evaluations", value: kpis.totalEvaluations, icon: BarChart3, color: "#E2754D" },
-    { label: "Average Score", value: kpis.averageScore > 0 ? `${kpis.averageScore}/100` : "--", icon: Award, color: "#10b981" },
-    { label: "Pass Rate", value: kpis.passRate > 0 ? `${kpis.passRate}%` : "--", icon: Shield, color: "#DB5F94" },
-    { label: "Expert Agents", value: kpis.expertCount, icon: Zap, color: "#f59e0b" },
-    { label: "Avg Eval Time", value: kpis.avgLatencyMs > 0
-      ? kpis.avgLatencyMs >= 60000
-        ? `${(kpis.avgLatencyMs / 60000).toFixed(1)}m`
-        : `${(kpis.avgLatencyMs / 1000).toFixed(0)}s`
-      : "--", icon: Clock, color: "#3b82f6" },
-    { label: "Tools Tested", value: kpis.totalToolsTested, icon: Wrench, color: "#6941C6" },
+  useEffect(() => {
+    if (!inView || typeof target !== "number" || target === 0) return;
+    const duration = 1200;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      setValue(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [inView, target]);
+
+  const displayed = typeof target === "number" && target > 0 ? `${value}${suffix}` : "—";
+
+  return <div ref={ref}>{displayed}</div>;
+}
+
+/* ── Reveal wrapper ── */
+function Reveal({
+  children,
+  className,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.7, ease, delay }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ── Ticker strip ── */
+function TickerStrip() {
+  const items = [
+    "Multi-Judge Consensus",
+    "6-Axis Scoring",
+    "Adversarial Probes",
+    "AQVC Attestation",
+    "Anti-Gaming Detection",
+    "Ed25519 Signatures",
+    "IRT Adaptive Testing",
+    "MCP Protocol Native",
   ];
+  const repeated = [...items, ...items];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Hero */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-[#0E0E0C]">
-            <LaurelLogo size={22} className="text-[#F5F5F3]" />
-          </div>
-          <h1 className="text-4xl font-bold text-foreground" style={{ letterSpacing: "-0.04em", lineHeight: "0.95" }}>
-            Laureum{" "}
-            <span className="brand-gradient-text">Dashboard</span>
-          </h1>
-        </div>
-        <p className="text-muted-foreground max-w-2xl">
-          Pre-payment quality verification for AI agents, MCP servers, and skills.
-          Multi-judge consensus scoring across 6 dimensions.
-        </p>
-        <div className="flex gap-3 pt-1">
-          <Link href="/evaluate">
-            <Button className="bg-[#0E0E0C] text-white font-semibold hover:bg-[#0E0E0C]/80 transition-colors" style={{ transitionTimingFunction: "var(--ease)" }}>
-              <Search className="h-4 w-4 mr-2" />
-              Evaluate Agent
-            </Button>
-          </Link>
-          <Link href="/leaderboard">
-            <Button variant="outline" className="transition-colors" style={{ transitionTimingFunction: "var(--ease)" }}>
-              <Trophy className="h-4 w-4 mr-2" />
-              Leaderboard
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      {/* Backend offline warning */}
-      {isLive === false && (
-        <Card className="border-[#f59e0b]/30 bg-[#f59e0b]/5">
-          <CardContent className="p-4 flex items-center gap-3">
-            <WifiOff className="h-5 w-5 text-[#f59e0b] shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-[#f59e0b]">Backend Offline</p>
-              <p className="text-xs text-muted-foreground">
-                Cannot connect to Laureum backend at {process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002"}.
-                Start the backend to see real data.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {kpiCards.map((kpi) => (
-          <Card key={kpi.label} className="bg-white border-[#E5E3E0] card-hover">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <kpi.icon className="h-3.5 w-3.5" style={{ color: kpi.color }} />
-                <span className="label-xs">{kpi.label}</span>
-              </div>
-              {loading ? (
-                <Skeleton className="h-8 w-16" />
-              ) : (
-                <div className="text-2xl font-bold font-mono tabular-nums text-foreground">
-                  {kpi.value}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+    <div className="overflow-hidden bg-[#151515] py-4 border-y border-[#2a2a28] ticker-wrap">
+      <div className="ticker-track flex gap-12 whitespace-nowrap">
+        {repeated.map((item, i) => (
+          <span
+            key={i}
+            className="text-[13px] font-display font-600 uppercase tracking-[0.2em] text-[#535862]"
+          >
+            {item}
+            <span className="mx-6 text-[#E2754D]">·</span>
+          </span>
         ))}
-      </div>
-
-      {/* Tier Distribution + Evaluation Standards */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card className="bg-white border-[#E5E3E0]">
-          <CardHeader className="pb-3">
-            <CardTitle className="label-xs">Tier Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <Skeleton key={i} className="h-6 w-full" />
-                ))}
-              </div>
-            ) : kpis.totalEvaluations === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                No evaluations yet. Run your first evaluation to see tier distribution.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {(Object.entries(kpis.tierDistribution) as [QualityTier, number][]).map(([tier, count]) => {
-                  const config = TIER_CONFIG[tier];
-                  const pct = kpis.totalEvaluations > 0 ? Math.round((count / kpis.totalEvaluations) * 100) : 0;
-                  return (
-                    <div key={tier} className="flex items-center gap-3">
-                      <div className="w-20">
-                        <TierBadge tier={tier} />
-                      </div>
-                      <div className="flex-1 h-2 rounded-full bg-muted/50 overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-700"
-                          style={{ width: `${pct}%`, backgroundColor: config.color }}
-                        />
-                      </div>
-                      <span className="text-sm font-mono tabular-nums text-muted-foreground w-12 text-right">
-                        {count} ({pct}%)
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border-[#E5E3E0]">
-          <CardHeader className="pb-3">
-            <CardTitle className="label-xs">Evaluation Standards</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-2">
-              {[
-                { label: "Multi-Judge Consensus", detail: "2-3 parallel LLM judges with agreement threshold", icon: Shield },
-                { label: "6-Axis Scoring", detail: "Accuracy, Safety, Reliability, Latency, Process, Schema", icon: BarChart3 },
-                { label: "Adversarial Probes", detail: "Injection, extraction, PII, hallucination, overflow", icon: Shield },
-                { label: "AQVC Attestation", detail: "Ed25519-signed JWT with W3C VC compatibility (Laureum Verified)", icon: Award },
-                { label: "Anti-Gaming", detail: "Question paraphrasing, canaries, production correlation", icon: Zap },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center gap-3 rounded-xl px-3 py-2.5 bg-[#F1EFED] border border-[#E5E3E0]/60">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#0E0E0C] shrink-0">
-                    <item.icon className="h-3.5 w-3.5 text-white" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium text-foreground">{item.label}</div>
-                    <div className="text-[11px] text-muted-foreground truncate">{item.detail}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Evaluations */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Recent Evaluations</h2>
-          <Link href="/leaderboard" className="text-sm text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1">
-            View all <ArrowRight className="h-3 w-3" />
-          </Link>
-        </div>
-        {loading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="bg-white border-[#E5E3E0]">
-                <CardContent className="p-4 space-y-3">
-                  <Skeleton className="h-5 w-32" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-24" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : recentEvals.length === 0 ? (
-          <Card className="bg-white border-[#E5E3E0] border-dashed">
-            <CardContent className="p-8 text-center">
-              <Search className="h-8 w-8 mx-auto text-muted-foreground/30 mb-2" />
-              <p className="text-sm text-muted-foreground">
-                No evaluations yet.{" "}
-                <Link href="/evaluate" className="text-foreground font-medium hover:underline">
-                  Run your first evaluation
-                </Link>
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {recentEvals.map((server) => (
-              <Link key={server.id} href={`/evaluate?result=${server.id}`}>
-                <Card className="bg-white border-[#E5E3E0] transition-all cursor-pointer group card-hover">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <div className="font-medium group-hover:text-foreground transition-colors">{server.name}</div>
-                        <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">
-                            {server.transport === "sse" ? "SSE" : "HTTP"}
-                          </Badge>
-                          {server.tools_count} tools
-                        </div>
-                      </div>
-                      <ScoreGauge score={server.score} tier={server.tier} size={56} strokeWidth={4} showLabel={false} />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <TierBadge tier={server.tier} />
-                        {server.trust_level && <TrustLevelBadge level={server.trust_level} showIcon={false} />}
-                      </div>
-                      {server.duration_ms > 0 && (
-                        <span className="text-[10px] text-muted-foreground">
-                          {(server.duration_ms / 1000).toFixed(1)}s
-                        </span>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Recent Battles */}
-      <RecentBattles />
-
-      {/* How it works — dark section (full-bleed) */}
-      <div className="rounded-sm bg-[#0E0E0C] p-8 md:p-10">
-        <p className="text-center text-[11px] font-medium uppercase tracking-[0.2em] text-[#717069] mb-8">
-          How Laureum Works
-        </p>
-        <div className="grid md:grid-cols-4 gap-8">
-          {[
-            { step: "01", title: "Connect", desc: "Paste any MCP server URL. We auto-detect SSE or Streamable HTTP transport." },
-            { step: "02", title: "Discover", desc: "Automatically list all tools, validate manifest schema, check documentation quality." },
-            { step: "03", title: "Evaluate", desc: "Run functional tests per tool. Multiple LLM judges score responses independently." },
-            { step: "04", title: "Attest", desc: "Generate 6-axis quality score, tier badge, and Ed25519-signed AQVC attestation." },
-          ].map((item) => (
-            <div key={item.step} className="text-center space-y-3">
-              <div className="mx-auto w-10 h-10 border border-[#E2754D]/30 flex items-center justify-center" style={{ borderRadius: "2px" }}>
-                <span className="text-xs font-mono font-bold text-[#E2754D] tracking-wider">{item.step}</span>
-              </div>
-              <div className="text-sm font-semibold text-[#F5F5F3] tracking-tight">{item.title}</div>
-              <p className="text-xs text-[#717069] leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="text-center text-xs text-muted-foreground pt-4 pb-8 space-y-1">
-        <p>Laureum v1.0 — AI Agent Quality Verification</p>
-        <p>
-          Built by{" "}
-          <a href="https://assisterr.ai" target="_blank" rel="noopener" className="text-foreground font-medium hover:underline inline-flex items-center gap-0.5">
-            Assisterr <ExternalLink className="h-2.5 w-2.5" />
-          </a>
-        </p>
       </div>
     </div>
   );
 }
 
-function RecentBattles() {
-  const { data, loading } = useBattleList(1, 5);
+/* ── Page ── */
+export default function LandingPage() {
+  const { servers } = useScoresList({ limit: 5, sort: "score" });
+  const completed = servers.filter((s) => s.status === "completed");
+  const totalEvals = completed.length;
+  const avgScore =
+    totalEvals > 0
+      ? Math.round(completed.reduce((sum, s) => sum + s.score, 0) / totalEvals)
+      : 0;
+  const passRate =
+    totalEvals > 0
+      ? Math.round(
+          (completed.filter((s) => s.score >= 50).length / totalEvals) * 100
+        )
+      : 0;
+  const expertCount = completed.filter((s) => s.tier === "expert").length;
 
-  if (loading) return null;
-  if (!data || data.items.length === 0) return null;
+  const scrambledWord = useTextScramble(WORDS, 3000);
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-          <Swords className="h-4 w-4" />
-          Recent Battles
-        </h2>
-        <Link href="/battle" className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
-          View all <ArrowRight className="h-3 w-3" />
-        </Link>
-      </div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data.items.slice(0, 6).map((battle) => (
-          <Link key={battle.battle_id} href={`/battle?id=${battle.battle_id}`}>
-            <Card className="bg-white border-[#E5E3E0] transition-all cursor-pointer card-hover">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-sm font-medium text-foreground">
-                    {battle.agent_a.name || "Agent A"}
+    <div className="overflow-hidden">
+      {/* ═══════════════════════════════════════
+          SECTION 1 — HERO (full-bleed, dark, 100svh)
+          ═══════════════════════════════════════ */}
+      <section className="relative min-h-svh flex flex-col items-center justify-center bg-[#0E0E0C] noise-overlay">
+        {/* Radial glow */}
+        <div className="hero-glow absolute inset-0 pointer-events-none" />
+
+        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+          {/* Animated wreath — more visible */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.4, ease }}
+            className="mx-auto mb-10"
+          >
+            <LaurelWreath size={160} className="text-[#E2754D]/50 mx-auto" />
+          </motion.div>
+
+          {/* Eyebrow */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="uppercase tracking-[0.3em] text-[#717069] text-xs font-medium mb-6"
+          >
+            AI Agent Quality Verification
+          </motion.p>
+
+          {/* Brand — hero-level signal */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8, ease }}
+            className="font-display text-7xl md:text-[120px] font-800 text-[#F5F5F3] tracking-tight"
+            style={{ letterSpacing: "-0.05em", lineHeight: "0.85" }}
+          >
+            LAUREUM
+          </motion.h1>
+
+          {/* Tagline with text scramble */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.6, ease }}
+            className="text-xl md:text-2xl text-[#A0A09C] mt-8 font-light leading-relaxed"
+          >
+            <span className="inline-block min-w-[140px] text-[#E2754D] font-display font-600">
+              {scrambledWord}
+            </span>{" "}
+            AI agents before you pay.
+          </motion.p>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1, duration: 0.6, ease }}
+            className="mt-10"
+          >
+            <Link href="/evaluate">
+              <button className="group bg-[#E2754D] hover:bg-[#d4623d] text-white px-10 py-4 text-sm font-semibold uppercase tracking-[0.15em] transition-all duration-300 rounded-sm inline-flex items-center gap-3 hover:gap-4 hover:shadow-[0_0_40px_rgba(226,117,77,0.3)]">
+                Evaluate an Agent
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </button>
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Scroll hint */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.6, duration: 0.8 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <div className="w-5 h-8 rounded-full border-2 border-[#535862]/40 flex items-start justify-center pt-1.5">
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              className="w-1 h-1.5 rounded-full bg-[#535862]"
+            />
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Ticker */}
+      <TickerStrip />
+
+      {/* ═══════════════════════════════════════
+          SECTION 2 — STATS BAR (light)
+          ═══════════════════════════════════════ */}
+      <section className="py-20 md:py-28 bg-[#F5F5F3] section-border-top">
+        <div className="max-w-5xl mx-auto px-6">
+          <Reveal>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+              {[
+                { label: "Agents Evaluated", value: totalEvals, suffix: "" },
+                { label: "Average Score", value: avgScore, suffix: "/100" },
+                { label: "Pass Rate", value: passRate, suffix: "%" },
+                { label: "Expert Tier", value: expertCount, suffix: "" },
+              ].map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <div className="text-4xl md:text-5xl font-mono font-bold tabular-nums text-foreground">
+                    <CountUp target={stat.value} suffix={stat.suffix} />
                   </div>
-                  <div className="text-xs font-black text-[#ef4444]">VS</div>
-                  <div className="text-sm font-medium text-foreground text-right">
-                    {battle.agent_b.name || "Agent B"}
+                  <div className="mt-2 text-xs uppercase tracking-[0.15em] text-[#717069] font-medium">
+                    {stat.label}
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-lg font-bold">
-                  <span className={battle.winner === "a" ? "text-[#10b981]" : "text-muted-foreground"}>
-                    {battle.agent_a.overall_score}
-                  </span>
-                  <span className={battle.winner === "b" ? "text-[#10b981]" : "text-muted-foreground"}>
-                    {battle.agent_b.overall_score}
-                  </span>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          SECTION 3 — WHAT WE DO (dark, no cards)
+          ═══════════════════════════════════════ */}
+      <section className="py-24 md:py-32 bg-[#0E0E0C]">
+        <div className="max-w-5xl mx-auto px-6">
+          <Reveal>
+            <p className="text-center uppercase tracking-[0.2em] text-[#717069] text-xs font-medium mb-4">
+              What Laureum Does
+            </p>
+            <h2 className="text-3xl md:text-5xl font-display font-700 text-[#F5F5F3] text-center tracking-tight mb-16">
+              Six dimensions of trust
+            </h2>
+          </Reveal>
+
+          <div className="grid md:grid-cols-3 gap-x-12 gap-y-14">
+            {[
+              { icon: Shield, title: "Accuracy", desc: "Functional correctness of every tool response, validated by multiple LLM judges.", weight: "35%" },
+              { icon: Fingerprint, title: "Safety", desc: "Adversarial probe resistance — injection, extraction, PII leakage, hallucination.", weight: "20%" },
+              { icon: Zap, title: "Reliability", desc: "Consistent results across repeated evaluations and varied inputs.", weight: "15%" },
+              { icon: Layers, title: "Process Quality", desc: "Error handling, input validation, response structure — the engineering dimension.", weight: "10%" },
+              { icon: Award, title: "Schema Quality", desc: "Tool manifest completeness, documentation quality, type annotations.", weight: "10%" },
+              { icon: Timer, title: "Latency", desc: "Response time under load, measured against tier-specific thresholds.", weight: "10%" },
+            ].map((dim, i) => (
+              <Reveal key={dim.title} delay={i * 0.08}>
+                <div className="group">
+                  <div className="flex items-center gap-3 mb-3">
+                    <dim.icon className="h-5 w-5 text-[#E2754D]" />
+                    <span className="text-[11px] font-mono text-[#535862] uppercase tracking-wider">{dim.weight}</span>
+                  </div>
+                  <h3 className="text-lg font-display font-600 text-[#F5F5F3] mb-2">{dim.title}</h3>
+                  <p className="text-sm text-[#717069] leading-relaxed">{dim.desc}</p>
                 </div>
-                <div className="mt-2 text-center">
-                  {battle.winner ? (
-                    <Badge variant="outline" className="text-[10px] border-[#10b981]/30 text-[#10b981]">
-                      <Trophy className="h-3 w-3 mr-1" />
-                      {battle.winner === "a" ? battle.agent_a.name : battle.agent_b.name} wins
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-[10px] border-[#3b82f6]/30 text-[#3b82f6]">Draw</Badge>
-                  )}
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          SECTION 4 — HOW IT WORKS (light)
+          ═══════════════════════════════════════ */}
+      <section className="py-24 md:py-32 bg-[#F5F5F3]">
+        <div className="max-w-5xl mx-auto px-6">
+          <Reveal>
+            <p className="text-center uppercase tracking-[0.2em] text-[#717069] text-xs font-medium mb-4">
+              How It Works
+            </p>
+            <h2 className="text-3xl md:text-5xl font-display font-700 text-foreground text-center tracking-tight mb-16">
+              Four steps to verified trust
+            </h2>
+          </Reveal>
+
+          <div className="grid md:grid-cols-4 gap-8 md:gap-6">
+            {[
+              { step: "01", title: "Connect", desc: "Paste any MCP server URL. We auto-detect SSE or Streamable HTTP." },
+              { step: "02", title: "Discover", desc: "List all tools, validate schema, check documentation quality." },
+              { step: "03", title: "Evaluate", desc: "Run functional tests per tool. Multiple LLM judges score independently." },
+              { step: "04", title: "Attest", desc: "Generate 6-axis score, tier badge, and Ed25519-signed AQVC attestation." },
+            ].map((item, i) => (
+              <Reveal key={item.step} delay={i * 0.1}>
+                <div>
+                  <span className="text-5xl md:text-6xl font-display font-800 text-[#E5E3E0]" style={{ lineHeight: 1 }}>
+                    {item.step}
+                  </span>
+                  <h3 className="text-lg font-display font-700 text-foreground mt-4 mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-[#717069] leading-relaxed">
+                    {item.desc}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Connecting line */}
+          <Reveal>
+            <div className="hidden md:block mt-8">
+              <div className="h-px bg-gradient-to-r from-transparent via-[#E5E3E0] to-transparent" />
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          SECTION 5 — LEADERBOARD PREVIEW (dark)
+          ═══════════════════════════════════════ */}
+      <section className="py-24 md:py-32 bg-[#0E0E0C]">
+        <div className="max-w-4xl mx-auto px-6">
+          <Reveal>
+            <p className="text-center uppercase tracking-[0.2em] text-[#717069] text-xs font-medium mb-4">
+              Leaderboard
+            </p>
+            <h2 className="text-3xl md:text-5xl font-display font-700 text-[#F5F5F3] text-center tracking-tight mb-4">
+              Top evaluated agents
+            </h2>
+            <p className="text-center text-[#717069] text-sm mb-12">
+              {totalEvals > 0
+                ? `${totalEvals} agents scored with multi-judge consensus.`
+                : "Evaluate your first agent to appear here."}
+            </p>
+          </Reveal>
+
+          {completed.length > 0 ? (
+            <Reveal delay={0.1}>
+              <div className="space-y-1">
+                {completed.slice(0, 5).map((server, i) => (
+                  <Link key={server.id} href={`/evaluate?result=${server.id}`}>
+                    <div className="flex items-center justify-between py-4 px-4 rounded-sm hover:bg-[#1a1a18] transition-colors duration-300 group cursor-pointer border-b border-[#1a1a18] last:border-0">
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm font-mono text-[#535862] w-6">
+                          {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}
+                        </span>
+                        <div>
+                          <span className="text-sm font-medium text-[#F5F5F3] group-hover:text-[#E2754D] transition-colors">
+                            {server.name}
+                          </span>
+                          <span className="text-xs text-[#535862] ml-3">
+                            {server.tools_count} tools
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <TierBadge tier={server.tier} />
+                        <ScoreGauge score={server.score} tier={server.tier} size={40} strokeWidth={3} showLabel={false} />
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </Reveal>
+          ) : (
+            <Reveal delay={0.1}>
+              <div className="text-center py-12 border border-[#2a2a28] rounded-sm">
+                <p className="text-sm text-[#535862]">
+                  No evaluations yet.{" "}
+                  <Link href="/evaluate" className="text-[#E2754D] hover:underline">
+                    Run your first evaluation
+                  </Link>
+                </p>
+              </div>
+            </Reveal>
+          )}
+
+          <Reveal delay={0.2}>
+            <div className="text-center mt-8">
+              <Link
+                href="/leaderboard"
+                className="inline-flex items-center gap-2 text-sm text-[#717069] hover:text-[#F5F5F3] transition-colors link-underline"
+              >
+                View full leaderboard <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          SECTION 6 — WHAT YOU GET (light)
+          ═══════════════════════════════════════ */}
+      <section className="py-24 md:py-32 bg-[#F5F5F3]">
+        <div className="max-w-5xl mx-auto px-6">
+          <Reveal>
+            <p className="text-center uppercase tracking-[0.2em] text-[#717069] text-xs font-medium mb-4">
+              What You Get
+            </p>
+            <h2 className="text-3xl md:text-5xl font-display font-700 text-foreground text-center tracking-tight mb-16">
+              Proof your agent is trustworthy
+            </h2>
+          </Reveal>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            <Reveal delay={0}>
+              <div className="text-center">
+                <div className="mb-6 flex justify-center">
+                  <div className="w-20 h-20 flex items-center justify-center bg-[#0E0E0C] rounded-sm">
+                    <Award className="h-9 w-9 text-[#E2754D]" />
+                  </div>
+                </div>
+                <h3 className="font-display font-700 text-lg mb-2">Embeddable Badge</h3>
+                <p className="text-sm text-[#717069] leading-relaxed">
+                  SVG badge with your score and tier. Embed in README, docs, or marketplace listings.
+                </p>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.1}>
+              <div className="text-center">
+                <div className="mb-6 flex justify-center">
+                  <div className="w-20 h-20 flex items-center justify-center bg-[#0E0E0C] rounded-sm">
+                    <Fingerprint className="h-9 w-9 text-[#E2754D]" />
+                  </div>
+                </div>
+                <h3 className="font-display font-700 text-lg mb-2">Signed Attestation</h3>
+                <p className="text-sm text-[#717069] leading-relaxed">
+                  Ed25519-signed JWT in W3C Verifiable Credential format. Cryptographic proof of quality.
+                </p>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.2}>
+              <div className="text-center">
+                <div className="mb-6 flex justify-center">
+                  <div className="w-20 h-20 flex items-center justify-center bg-[#0E0E0C] rounded-sm">
+                    <Shield className="h-9 w-9 text-[#E2754D]" />
+                  </div>
+                </div>
+                <h3 className="font-display font-700 text-lg mb-2">Tier Classification</h3>
+                <p className="text-sm text-[#717069] leading-relaxed">
+                  Expert, Proficient, Basic, or Failed. Clear quality signals for agent marketplaces.
+                </p>
+              </div>
+            </Reveal>
+          </div>
+
+          {/* Badge preview */}
+          <Reveal delay={0.3}>
+            <div className="mt-16 flex justify-center">
+              <div className="hidden md:block">
+                <LaurelBadge score={93} tier="expert" trustLevel="verified" size="lg" />
+              </div>
+              <div className="md:hidden">
+                <LaurelBadge score={93} tier="expert" trustLevel="verified" size="md" />
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          SECTION 7 — CTA (brand accent)
+          ═══════════════════════════════════════ */}
+      <section className="py-20 md:py-28 bg-[#E2754D] relative overflow-hidden">
+        {/* Decorative wreath watermark */}
+        <div className="absolute right-[-40px] top-1/2 -translate-y-1/2 opacity-10 pointer-events-none">
+          <LaurelWreath size={300} className="text-white" />
+        </div>
+        <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
+          <Reveal>
+            <h2 className="text-3xl md:text-5xl font-display font-800 text-white tracking-tight mb-6">
+              Ready to verify your agent?
+            </h2>
+            <p className="text-lg text-white/70 mb-10">
+              Free evaluation. Results in under 3 minutes.
+            </p>
+            <Link href="/evaluate">
+              <button className="group bg-[#0E0E0C] text-white px-10 py-4 text-sm font-semibold uppercase tracking-[0.15em] hover:bg-[#1a1a18] transition-all duration-300 rounded-sm inline-flex items-center gap-3 hover:gap-4 hover:shadow-[0_0_40px_rgba(0,0,0,0.3)]">
+                Start Evaluation
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </button>
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          FOOTER (dark)
+          ═══════════════════════════════════════ */}
+      <footer className="py-16 bg-[#0E0E0C] border-t border-[#1a1a18]">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-start justify-between gap-8">
+            <div>
+              <Link href="/" className="flex items-center gap-2.5 mb-4">
+                <LaurelLogo size={24} className="text-[#E2754D]" />
+                <span className="font-display text-lg font-bold tracking-tight text-[#F5F5F3]">
+                  Laureum
+                </span>
+              </Link>
+              <p className="text-sm text-[#535862] max-w-xs">
+                Pre-payment quality verification for AI agents.
+              </p>
+            </div>
+
+            <div className="flex gap-12">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.15em] text-[#535862] font-medium mb-3">Product</p>
+                <div className="flex flex-col gap-2">
+                  <Link href="/evaluate" className="text-sm text-[#717069] hover:text-[#F5F5F3] transition-colors">Evaluate</Link>
+                  <Link href="/leaderboard" className="text-sm text-[#717069] hover:text-[#F5F5F3] transition-colors">Leaderboard</Link>
+                  <Link href="/battle" className="text-sm text-[#717069] hover:text-[#F5F5F3] transition-colors">Battle Arena</Link>
+                  <Link href="/dashboard" className="text-sm text-[#717069] hover:text-[#F5F5F3] transition-colors">Dashboard</Link>
+                </div>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.15em] text-[#535862] font-medium mb-3">Links</p>
+                <div className="flex flex-col gap-2">
+                  <a href="https://pypi.org/project/mcp-agenttrust/" target="_blank" rel="noopener" className="text-sm text-[#717069] hover:text-[#F5F5F3] transition-colors inline-flex items-center gap-1">
+                    PyPI <ExternalLink className="h-3 w-3" />
+                  </a>
+                  <a href="https://github.com/assister-xyz/quality-oracle" target="_blank" rel="noopener" className="text-sm text-[#717069] hover:text-[#F5F5F3] transition-colors inline-flex items-center gap-1">
+                    GitHub <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 pt-8 border-t border-[#1a1a18] flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-[#535862]">
+              Laureum v1.0 — AI Agent Quality Verification
+            </p>
+            <p className="text-xs text-[#535862]">
+              Built by{" "}
+              <a
+                href="https://assisterr.ai"
+                target="_blank"
+                rel="noopener"
+                className="text-[#717069] hover:text-[#F5F5F3] transition-colors"
+              >
+                Assisterr
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 import { type QualityTier, type TrustLevel } from "@/lib/mock-data";
 
-const TIER_COLORS: Record<string, string> = {
-  expert: "#FFD700",
-  proficient: "#C0C0C0",
-  basic: "#C38133",
-  failed: "#717069",
+const TIER_COLORS: Record<string, { primary: string; secondary: string }> = {
+  expert: { primary: "#FFD700", secondary: "#B8860B" },
+  proficient: { primary: "#C0C0C0", secondary: "#808080" },
+  basic: { primary: "#C38133", secondary: "#8B5E2B" },
+  failed: { primary: "#717069", secondary: "#535862" },
 };
 
 const LEVEL_LABELS: Record<TrustLevel, string> = {
@@ -21,51 +21,51 @@ interface LaurelBadgeProps {
 }
 
 export function LaurelBadge({ score, tier, trustLevel, size = "md" }: LaurelBadgeProps) {
-  const color = TIER_COLORS[tier] || TIER_COLORS.basic;
+  const colors = TIER_COLORS[tier] || TIER_COLORS.basic;
   const label = trustLevel ? LEVEL_LABELS[trustLevel] : tier.toUpperCase();
 
-  const scale = size === "sm" ? 0.65 : size === "lg" ? 1.3 : 1;
-  const w = Math.round(300 * scale);
-  const h = Math.round(88 * scale);
+  const scale = size === "sm" ? 0.7 : size === "lg" ? 1.4 : 1;
+  const w = Math.round(360 * scale);
+  const h = Math.round(100 * scale);
 
   return (
     <svg
       width={w}
       height={h}
-      viewBox="0 0 300 88"
+      viewBox="0 0 360 100"
       xmlns="http://www.w3.org/2000/svg"
       className="shrink-0"
     >
-      {/* Background with subtle border */}
-      <rect width="300" height="88" rx="4" fill="#0E0E0C" />
-      <rect width="300" height="88" rx="4" fill="none" stroke={color} strokeWidth="0.5" opacity="0.2" />
+      {/* Background */}
+      <rect width="360" height="100" rx="3" fill="#0E0E0C" />
+      <rect width="360" height="100" rx="3" fill="none" stroke={colors.primary} strokeWidth="0.5" opacity="0.15" />
 
-      {/* Left laurel branch */}
-      <g transform="translate(44, 44)">
-        <path d="M-1 20 C-3 14, -7 9, -13 5" stroke={color} strokeWidth="1.2" fill="none" strokeLinecap="round" />
-        <ellipse cx="-5" cy="16" rx="2.5" ry="5.5" transform="rotate(-20 -5 16)" fill={color} opacity="0.85" />
-        <ellipse cx="-8" cy="10" rx="2.2" ry="5" transform="rotate(-35 -8 10)" fill={color} opacity="0.7" />
-        <ellipse cx="-11" cy="4" rx="2" ry="4.5" transform="rotate(-50 -11 4)" fill={color} opacity="0.55" />
-        <ellipse cx="-13" cy="-3" rx="1.6" ry="3.8" transform="rotate(-62 -13 -3)" fill={color} opacity="0.4" />
+      {/* Left accent stripe */}
+      <rect x="0" y="0" width="3" height="100" rx="1.5" fill={colors.primary} opacity="0.6" />
+
+      {/* Laurel wreath — left branch */}
+      <g transform="translate(46, 50)">
+        <path d="M0 22 C-2 16, -4 8, -2 0" stroke={colors.primary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.5" />
+        <ellipse cx="-5" cy="18" rx="4" ry="2" transform="rotate(-20 -5 18)" fill={colors.primary} opacity="0.7" />
+        <ellipse cx="-6" cy="11" rx="3.5" ry="1.8" transform="rotate(-35 -6 11)" fill={colors.primary} opacity="0.55" />
+        <ellipse cx="-5" cy="4" rx="3" ry="1.5" transform="rotate(-50 -5 4)" fill={colors.primary} opacity="0.4" />
       </g>
 
-      {/* Right laurel branch */}
-      <g transform="translate(44, 44)">
-        <path d="M1 20 C3 14, 7 9, 13 5" stroke={color} strokeWidth="1.2" fill="none" strokeLinecap="round" />
-        <ellipse cx="5" cy="16" rx="2.5" ry="5.5" transform="rotate(20 5 16)" fill={color} opacity="0.85" />
-        <ellipse cx="8" cy="10" rx="2.2" ry="5" transform="rotate(35 8 10)" fill={color} opacity="0.7" />
-        <ellipse cx="11" cy="4" rx="2" ry="4.5" transform="rotate(50 11 4)" fill={color} opacity="0.55" />
-        <ellipse cx="13" cy="-3" rx="1.6" ry="3.8" transform="rotate(62 13 -3)" fill={color} opacity="0.4" />
+      {/* Laurel wreath — right branch */}
+      <g transform="translate(46, 50)">
+        <path d="M0 22 C2 16, 4 8, 2 0" stroke={colors.primary} strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.5" />
+        <ellipse cx="5" cy="18" rx="4" ry="2" transform="rotate(20 5 18)" fill={colors.primary} opacity="0.7" />
+        <ellipse cx="6" cy="11" rx="3.5" ry="1.8" transform="rotate(35 6 11)" fill={colors.primary} opacity="0.55" />
+        <ellipse cx="5" cy="4" rx="3" ry="1.5" transform="rotate(50 5 4)" fill={colors.primary} opacity="0.4" />
       </g>
 
-      {/* Score circle with ring */}
-      <circle cx="44" cy="42" r="20" fill="none" stroke={color} strokeWidth="1.5" opacity="0.3" />
-      <circle cx="44" cy="42" r="16" fill="none" stroke={color} strokeWidth="2" />
+      {/* Score */}
       <text
-        x="44" y="48"
+        x="46" y="52"
         textAnchor="middle"
-        fill={color}
-        fontSize="17"
+        dominantBaseline="central"
+        fill={colors.primary}
+        fontSize="24"
         fontWeight="800"
         fontFamily="ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace"
       >
@@ -73,43 +73,50 @@ export function LaurelBadge({ score, tier, trustLevel, size = "md" }: LaurelBadg
       </text>
 
       {/* Divider */}
-      <line x1="78" y1="16" x2="78" y2="72" stroke={color} strokeWidth="0.5" opacity="0.15" />
+      <line x1="88" y1="20" x2="88" y2="80" stroke={colors.primary} strokeWidth="0.5" opacity="0.15" />
 
-      {/* Label — trust level or tier */}
+      {/* Tier label */}
       <text
-        x="92" y="34"
+        x="104" y="36"
         fill="#F5F5F3"
-        fontSize="15"
+        fontSize="18"
         fontWeight="700"
         fontFamily="system-ui, -apple-system, sans-serif"
-        letterSpacing="0.1em"
+        letterSpacing="0.08em"
       >
         {label}
       </text>
 
-      {/* Brand */}
+      {/* Score detail */}
       <text
-        x="92" y="50"
-        fill={color}
-        fontSize="8.5"
-        fontWeight="600"
-        fontFamily="system-ui, -apple-system, sans-serif"
-        letterSpacing="0.2em"
-        opacity="0.6"
-      >
-        LAUREUM.AI
-      </text>
-
-      {/* Score / Tier detail */}
-      <text
-        x="92" y="66"
-        fill="#535862"
-        fontSize="9"
+        x="104" y="55"
+        fill={colors.primary}
+        fontSize="11"
+        fontWeight="500"
         fontFamily="ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace"
         letterSpacing="0.04em"
       >
-        {score}/100 · {tier.toUpperCase()}
+        {score}/100 · {tier.toUpperCase()} TIER
       </text>
+
+      {/* Brand */}
+      <text
+        x="104" y="74"
+        fill="#535862"
+        fontSize="9"
+        fontWeight="600"
+        fontFamily="system-ui, -apple-system, sans-serif"
+        letterSpacing="0.2em"
+      >
+        VERIFIED BY LAUREUM.AI
+      </text>
+
+      {/* Right side — small laurel mark */}
+      <g transform="translate(330, 50)" opacity="0.15">
+        <path d="M-6 10 C-6 4, -3 -2, 0 -6" stroke={colors.primary} strokeWidth="1.5" fill="none" />
+        <path d="M6 10 C6 4, 3 -2, 0 -6" stroke={colors.primary} strokeWidth="1.5" fill="none" />
+        <circle cx="0" cy="-8" r="2" fill={colors.primary} />
+      </g>
     </svg>
   );
 }

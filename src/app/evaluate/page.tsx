@@ -318,11 +318,11 @@ function EvaluateContent() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-8 space-y-8">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Evaluate <span className="brand-gradient-text">Agent Quality</span>
+          Evaluate <span className="text-[#E2754D]">Agent Quality</span>
         </h1>
         <p className="text-muted-foreground">
           Paste any MCP server URL to run a comprehensive quality evaluation with multi-judge consensus.

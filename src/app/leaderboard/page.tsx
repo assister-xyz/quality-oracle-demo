@@ -135,11 +135,11 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-8 space-y-6">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          MCP Server <span className="brand-gradient-text">Leaderboard</span>
+          MCP Server <span className="text-[#E2754D]">Leaderboard</span>
         </h1>
         <p className="text-muted-foreground">
           {loading ? "Loading..." : `${servers.length} servers evaluated with multi-judge consensus scoring.`}
