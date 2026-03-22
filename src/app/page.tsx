@@ -389,16 +389,16 @@ export default function LandingPage() {
 
           {completed.length > 0 ? (
             <Reveal delay={0.1}>
-              <div className="space-y-1">
+              <div className="rounded-sm border border-[#2a2a28] overflow-hidden">
                 {completed.slice(0, 5).map((server, i) => (
                   <Link key={server.id} href={`/evaluate?result=${server.id}`}>
-                    <div className="flex items-center justify-between py-4 px-4 rounded-sm hover:bg-[#1a1a18] transition-colors duration-300 group cursor-pointer border-b border-[#1a1a18] last:border-0">
-                      <div className="flex items-center gap-4">
-                        <span className="text-sm font-mono text-[#535862] w-6">
-                          {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}
+                    <div className="flex items-center justify-between py-5 px-6 hover:bg-[#1a1a18] transition-colors duration-300 group cursor-pointer border-b border-[#1a1a18] last:border-0">
+                      <div className="flex items-center gap-5">
+                        <span className="text-lg font-display font-700 text-[#535862] w-8 text-center">
+                          {i + 1}
                         </span>
                         <div>
-                          <span className="text-sm font-medium text-[#F5F5F3] group-hover:text-[#E2754D] transition-colors">
+                          <span className="text-base font-display font-600 text-[#F5F5F3] group-hover:text-[#E2754D] transition-colors">
                             {server.name}
                           </span>
                           <span className="text-xs text-[#535862] ml-3">
@@ -406,9 +406,11 @@ export default function LandingPage() {
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <TierBadge tier={server.tier} />
-                        <ScoreGauge score={server.score} tier={server.tier} size={40} strokeWidth={3} showLabel={false} />
+                      <div className="flex items-center gap-4">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#535862] border border-[#2a2a28] px-2 py-0.5 rounded-sm">
+                          {server.tier}
+                        </span>
+                        <ScoreGauge score={server.score} tier={server.tier} size={44} strokeWidth={3} showLabel={false} variant="dark" />
                       </div>
                     </div>
                   </Link>

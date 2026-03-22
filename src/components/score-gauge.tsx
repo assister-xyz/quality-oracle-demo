@@ -9,17 +9,27 @@ interface ScoreGaugeProps {
   size?: number;
   strokeWidth?: number;
   showLabel?: boolean;
+  variant?: "light" | "dark";
 }
 
-export function ScoreGauge({ score, tier, size = 80, strokeWidth = 6, showLabel = true }: ScoreGaugeProps) {
+export function ScoreGauge({
+  score,
+  tier,
+  size = 80,
+  strokeWidth = 6,
+  showLabel = true,
+  variant = "light",
+}: ScoreGaugeProps) {
   const [animatedScore, setAnimatedScore] = useState(0);
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (animatedScore / 100) * circumference;
 
-  // Single brand color for all scores — monochrome, not rainbow
+  const isDark = variant === "dark";
   const strokeColor = "#E2754D";
-  const textColor = "#0E0E0C";
+  const trackColor = isDark ? "#2a2a28" : "#E5E3E0";
+  const textColor = isDark ? "#F5F5F3" : "#0E0E0C";
+  const labelColor = isDark ? "#717069" : "#717069";
 
   useEffect(() => {
     const timer = setTimeout(() => setAnimatedScore(score), 100);
@@ -35,7 +45,7 @@ export function ScoreGauge({ score, tier, size = 80, strokeWidth = 6, showLabel 
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="#E5E3E0"
+            stroke={trackColor}
             strokeWidth={strokeWidth}
           />
           <circle
@@ -52,13 +62,22 @@ export function ScoreGauge({ score, tier, size = 80, strokeWidth = 6, showLabel 
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-lg font-bold font-mono tabular-nums" style={{ color: textColor }}>
+          <span
+            className="font-bold font-mono tabular-nums"
+            style={{
+              color: textColor,
+              fontSize: size >= 60 ? "1.125rem" : size >= 40 ? "0.8rem" : "0.65rem",
+            }}
+          >
             {animatedScore}
           </span>
         </div>
       </div>
       {showLabel && (
-        <span className="text-[10px] font-medium uppercase tracking-wider text-[#717069]">
+        <span
+          className="text-[10px] font-medium uppercase tracking-wider"
+          style={{ color: labelColor }}
+        >
           {tier}
         </span>
       )}
