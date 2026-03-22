@@ -1,18 +1,17 @@
 import { type QualityTier, type TrustLevel } from "@/lib/mock-data";
 import Image from "next/image";
 
-/* Color mapping: Verified=Bronze, Certified=Silver, Audited=Gold */
-const LEVEL_COLORS: Record<string, { primary: string; secondary: string }> = {
-  verified: { primary: "#C38133", secondary: "#8B5E2B" },
-  certified: { primary: "#A8A8A8", secondary: "#707070" },
-  audited: { primary: "#D4AF37", secondary: "#9A7B2C" },
+const LEVEL_COLORS: Record<string, { primary: string }> = {
+  verified: { primary: "#C38133" },
+  certified: { primary: "#A8A8A8" },
+  audited: { primary: "#D4AF37" },
 };
 
-const TIER_FALLBACK: Record<string, { primary: string; secondary: string }> = {
-  expert: { primary: "#D4AF37", secondary: "#9A7B2C" },
-  proficient: { primary: "#A8A8A8", secondary: "#707070" },
-  basic: { primary: "#C38133", secondary: "#8B5E2B" },
-  failed: { primary: "#535862", secondary: "#3a3d44" },
+const TIER_FALLBACK: Record<string, { primary: string }> = {
+  expert: { primary: "#D4AF37" },
+  proficient: { primary: "#A8A8A8" },
+  basic: { primary: "#C38133" },
+  failed: { primary: "#535862" },
 };
 
 const LEVEL_LABELS: Record<TrustLevel, string> = {
@@ -40,85 +39,82 @@ export function LaurelBadge({ score, tier, trustLevel, size = "md" }: LaurelBadg
   const wreathSrc = trustLevel ? WREATH_IMAGES[trustLevel] : WREATH_IMAGES.verified;
 
   const scale = size === "sm" ? 0.65 : size === "lg" ? 1.2 : 1;
-  const height = Math.round(140 * scale);
-  const wreathSize = Math.round(120 * scale);
+  const h = Math.round(130 * scale);
+  const wreathW = Math.round(130 * scale);
 
   return (
     <div
-      className="inline-flex items-center rounded-sm overflow-hidden"
+      className="inline-flex items-stretch rounded-sm overflow-hidden"
       style={{
         backgroundColor: "#0E0E0C",
-        border: `1px solid ${colors.primary}30`,
-        height: `${height}px`,
+        border: `1px solid ${colors.primary}25`,
+        height: `${h}px`,
       }}
     >
       {/* Left accent stripe */}
       <div
-        className="w-1 self-stretch shrink-0"
-        style={{ backgroundColor: colors.primary, opacity: 0.7 }}
+        className="w-1 shrink-0"
+        style={{ backgroundColor: colors.primary, opacity: 0.6 }}
       />
 
-      {/* Wreath + Score area */}
-      <div className="relative flex items-center justify-center shrink-0" style={{ width: `${wreathSize}px`, height: `${height}px` }}>
-        {/* Real wreath image */}
+      {/* Wreath image — clean, no score overlay */}
+      <div className="shrink-0 flex items-center justify-center" style={{ width: `${wreathW}px` }}>
         <Image
           src={wreathSrc}
-          alt=""
-          width={wreathSize}
-          height={wreathSize}
-          className="absolute inset-0 w-full h-full object-contain opacity-60"
-          style={{ filter: "brightness(0.9)" }}
+          alt={label}
+          width={wreathW}
+          height={h}
+          className="w-full h-full object-contain"
+          style={{ opacity: 0.85 }}
           unoptimized
         />
-        {/* Score overlay */}
-        <span
-          className="relative z-10 font-mono font-black tabular-nums"
-          style={{
-            color: colors.primary,
-            fontSize: `${Math.round(32 * scale)}px`,
-            textShadow: `0 0 20px ${colors.primary}40`,
-          }}
-        >
-          {score}
-        </span>
       </div>
 
       {/* Divider */}
-      <div className="w-px self-stretch mx-1" style={{ backgroundColor: `${colors.primary}25` }} />
+      <div className="w-px shrink-0" style={{ backgroundColor: `${colors.primary}20` }} />
 
       {/* Text section */}
-      <div className="pr-6 pl-2 py-3 flex flex-col justify-center min-w-0">
+      <div className="flex flex-col justify-center pl-5 pr-8">
         <span
-          className="font-bold tracking-wider"
+          className="font-display font-800 tracking-wider"
           style={{
             color: "#F5F5F3",
-            fontSize: `${Math.round(18 * scale)}px`,
-            letterSpacing: "0.06em",
+            fontSize: `${Math.round(20 * scale)}px`,
+            letterSpacing: "0.08em",
           }}
         >
           {label}
         </span>
+        <div className="flex items-baseline gap-3 mt-1">
+          <span
+            className="font-mono font-bold"
+            style={{
+              color: colors.primary,
+              fontSize: `${Math.round(22 * scale)}px`,
+            }}
+          >
+            {score}
+          </span>
+          <span
+            className="font-medium uppercase tracking-wider"
+            style={{
+              color: "#535862",
+              fontSize: `${Math.round(10 * scale)}px`,
+              letterSpacing: "0.12em",
+            }}
+          >
+            {tier} tier
+          </span>
+        </div>
         <span
-          className="font-mono font-semibold"
+          className="mt-2 font-medium"
           style={{
-            color: colors.primary,
-            fontSize: `${Math.round(12 * scale)}px`,
-            letterSpacing: "0.06em",
-            marginTop: "2px",
-          }}
-        >
-          {score}/100 · {tier.toUpperCase()} TIER
-        </span>
-        <span
-          className="font-semibold"
-          style={{
-            color: "#535862",
-            fontSize: `${Math.round(9 * scale)}px`,
+            color: "#3a3d44",
+            fontSize: `${Math.round(8 * scale)}px`,
             letterSpacing: "0.2em",
-            marginTop: "4px",
           }}
         >
-          VERIFIED BY LAUREUM.AI
+          LAUREUM.AI
         </span>
       </div>
     </div>
