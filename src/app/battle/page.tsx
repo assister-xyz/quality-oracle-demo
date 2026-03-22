@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Swords, Zap, Trophy, Copy, Image, Clock, AlertCircle, Loader2 } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
 import { createBattle, getBattle, getMatchPrediction, type BattleResult, type MatchPrediction } from "@/lib/api";
 import { useBattleStatus } from "@/lib/hooks";
 
@@ -94,21 +95,16 @@ function BattleContent() {
   // ── INPUT PHASE ──
   if (phase === "input") {
     return (
-      <div className="mx-auto max-w-3xl px-4 pt-24 pb-16">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[#0E0E0C] px-4 py-2 mb-4">
-            <Swords className="h-5 w-5 text-[#E2754D]" />
-            <span className="text-sm font-semibold text-white tracking-wide">BATTLE ARENA</span>
-          </div>
-          <h1 className="text-4xl font-bold text-foreground mb-3">
-            Head-to-Head <span className="text-[#E2754D]">Battle</span>
-          </h1>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            Pit two AI agents against each other with identical challenges. See who comes out on top.
-          </p>
-        </div>
+      <div>
+        <PageHeader
+          eyebrow="Battle Arena"
+          title="Head-to-Head"
+          accent="Battle"
+          description="Pit two AI agents against each other with identical challenges. See who comes out on top."
+        />
+        <div className="mx-auto max-w-3xl px-4 py-8">
 
-        <div className="rounded-lg border border-[#E5E3E0] bg-white p-8">
+        <div className="rounded-sm border border-[#E5E3E0] bg-white p-8">
           <div className="grid grid-cols-1 md:grid-cols-[1fr,auto,1fr] gap-6 items-end">
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">Agent A</label>
@@ -117,7 +113,7 @@ function BattleContent() {
                 value={urlA}
                 onChange={(e) => setUrlA(e.target.value)}
                 placeholder="https://agent-a.example.com/mcp"
-                className="w-full rounded-xl border border-[#E5E3E0] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E2754D]/20 focus:border-[#E2754D]"
+                className="w-full rounded-sm border border-[#E5E3E0] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E2754D]/20 focus:border-[#E2754D]"
               />
             </div>
             <div className="flex items-center justify-center">
@@ -132,14 +128,14 @@ function BattleContent() {
                 value={urlB}
                 onChange={(e) => setUrlB(e.target.value)}
                 placeholder="https://agent-b.example.com/mcp"
-                className="w-full rounded-xl border border-[#E5E3E0] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E2754D]/20 focus:border-[#E2754D]"
+                className="w-full rounded-sm border border-[#E5E3E0] bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#E2754D]/20 focus:border-[#E2754D]"
               />
             </div>
           </div>
 
           {/* Prediction */}
           {prediction && (
-            <div className="mt-6 rounded-xl border border-[#E5E3E0] bg-[#F1EFED] p-4">
+            <div className="mt-6 rounded-sm border border-[#E5E3E0] bg-[#F1EFED] p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-foreground">Match Prediction</span>
                 <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
@@ -182,7 +178,7 @@ function BattleContent() {
               <button
                 onClick={handlePredict}
                 disabled={!urlA || !urlB || predicting}
-                className="rounded-xl border border-[#E5E3E0] px-6 py-3 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors disabled:opacity-40"
+                className="rounded-sm border border-[#E5E3E0] px-6 py-3 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors disabled:opacity-40"
               >
                 {predicting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4 inline mr-2" />}
                 Predict Match
@@ -191,12 +187,13 @@ function BattleContent() {
             <button
               onClick={handleStartBattle}
               disabled={!urlA || !urlB || starting}
-              className="rounded-xl bg-[#0E0E0C] px-8 py-3 text-sm font-semibold text-white hover:bg-[#0E0E0C]/90 transition-colors disabled:opacity-40"
+              className="rounded-sm bg-[#0E0E0C] px-8 py-3 text-sm font-semibold text-white hover:bg-[#0E0E0C]/90 transition-colors disabled:opacity-40"
             >
               {starting ? <Loader2 className="h-4 w-4 animate-spin inline mr-2" /> : <Swords className="h-4 w-4 inline mr-2" />}
               Start Battle
             </button>
           </div>
+        </div>
         </div>
       </div>
     );
@@ -222,161 +219,164 @@ function BattleContent() {
     );
   }
 
-  // ── RUNNING PHASE ──
+  // ── RUNNING PHASE ── (dark themed)
   if (phase === "running") {
     const statusText = battle?.status === "pending" ? "Preparing challenges..."
       : battle?.status === "running" ? "Evaluating agents..."
       : "Loading...";
 
     return (
-      <div className="mx-auto max-w-2xl px-4 pt-24 pb-16">
-        <div className="rounded-lg border border-[#E5E3E0] bg-white p-8 text-center">
-          <Loader2 className="h-12 w-12 text-[#E2754D] animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-foreground mb-2">Battle in Progress</h2>
-          <p className="text-sm text-muted-foreground mb-4">{statusText}</p>
-          <div className="flex items-center justify-center gap-8 text-sm">
-            <div>
-              <div className="font-semibold text-foreground">{battle?.agent_a.name || nameFromUrl(urlA)}</div>
-              <div className="text-muted-foreground">Agent A</div>
+      <div>
+        <div className="bg-[#0E0E0C] pt-24 pb-16 min-h-svh flex items-center justify-center">
+          <div className="max-w-md mx-auto px-4 text-center">
+            <Loader2 className="h-10 w-10 text-[#E2754D] animate-spin mx-auto mb-6" />
+            <h2 className="text-2xl font-display font-700 text-[#F5F5F3] mb-2">Battle in Progress</h2>
+            <p className="text-sm text-[#717069] mb-8">{statusText}</p>
+            <div className="flex items-center justify-center gap-8 text-sm">
+              <div>
+                <div className="font-display font-600 text-[#F5F5F3]">{battle?.agent_a.name || nameFromUrl(urlA)}</div>
+                <div className="text-[#535862] text-xs">Agent A</div>
+              </div>
+              <div className="text-lg font-display font-800 text-[#E2754D]">VS</div>
+              <div>
+                <div className="font-display font-600 text-[#F5F5F3]">{battle?.agent_b.name || nameFromUrl(urlB)}</div>
+                <div className="text-[#535862] text-xs">Agent B</div>
+              </div>
             </div>
-            <div className="text-lg font-black text-[#ef4444]">VS</div>
-            <div>
-              <div className="font-semibold text-foreground">{battle?.agent_b.name || nameFromUrl(urlB)}</div>
-              <div className="text-muted-foreground">Agent B</div>
-            </div>
+            {pollError && (
+              <div className="mt-4 text-sm text-[#9e3b3b]">{pollError}</div>
+            )}
           </div>
-          {pollError && (
-            <div className="mt-4 text-sm text-[#ef4444]">{pollError}</div>
-          )}
         </div>
       </div>
     );
   }
 
-  // ── RESULT PHASE ──
+  // ── RESULT PHASE ── (brand-aligned)
   if (phase === "result" && battle) {
-    const winnerColor = "#10b981";
-    const loserColor = "#94a3b8";
     const isAWinner = battle.winner === "a";
     const isBWinner = battle.winner === "b";
     const isDraw = battle.winner === null;
 
     return (
-      <div className="mx-auto max-w-4xl px-4 pt-24 pb-16">
-        {/* Winner Banner */}
-        <div className="text-center mb-8">
-          {isDraw ? (
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#3b82f6]/10 px-6 py-2">
-              <span className="text-lg font-bold text-[#3b82f6]">DRAW</span>
-            </div>
-          ) : battle.photo_finish ? (
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#f59e0b]/10 px-6 py-2">
-              <Zap className="h-5 w-5 text-[#f59e0b]" />
-              <span className="text-lg font-bold text-[#f59e0b]">PHOTO FINISH</span>
-            </div>
-          ) : (
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#10b981]/10 px-6 py-2">
-              <Trophy className="h-5 w-5 text-[#10b981]" />
-              <span className="text-lg font-bold text-[#10b981]">
-                {isAWinner ? battle.agent_a.name : battle.agent_b.name} wins by {battle.margin} pts
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Score Cards */}
-        <div className="grid grid-cols-[1fr,auto,1fr] gap-4 mb-8">
-          {/* Agent A */}
-          <div className={`rounded-lg border-2 p-6 text-center ${
-            isAWinner ? "border-[#10b981] bg-[#10b981]/5" : "border-[#E5E3E0] bg-white"
-          }`}>
-            {isAWinner && <Trophy className="h-6 w-6 text-[#10b981] mx-auto mb-2" />}
-            <div className="text-sm text-muted-foreground mb-1">Agent A</div>
-            <div className="text-lg font-bold text-foreground mb-2">{battle.agent_a.name || "Agent A"}</div>
-            <div className={`text-5xl font-black ${isAWinner ? "text-[#10b981]" : isDraw ? "text-[#3b82f6]" : "text-muted-foreground"}`}>
-              {battle.agent_a.overall_score}
-            </div>
-          </div>
-
-          {/* VS */}
-          <div className="flex items-center justify-center">
-            <div className="text-2xl font-black text-[#ef4444]">VS</div>
-          </div>
-
-          {/* Agent B */}
-          <div className={`rounded-lg border-2 p-6 text-center ${
-            isBWinner ? "border-[#10b981] bg-[#10b981]/5" : "border-[#E5E3E0] bg-white"
-          }`}>
-            {isBWinner && <Trophy className="h-6 w-6 text-[#10b981] mx-auto mb-2" />}
-            <div className="text-sm text-muted-foreground mb-1">Agent B</div>
-            <div className="text-lg font-bold text-foreground mb-2">{battle.agent_b.name || "Agent B"}</div>
-            <div className={`text-5xl font-black ${isBWinner ? "text-[#10b981]" : isDraw ? "text-[#3b82f6]" : "text-muted-foreground"}`}>
-              {battle.agent_b.overall_score}
-            </div>
-          </div>
-        </div>
-
-        {/* 6-Axis Comparison Bars */}
-        <div className="rounded-lg border border-[#E5E3E0] bg-white p-6 mb-6">
-          <h3 className="text-sm font-semibold text-foreground mb-4">Score Breakdown</h3>
-          <div className="space-y-4">
-            {AXES.map(({ key, label, color }) => {
-              const valA = getAxisScore(battle.agent_a.scores, key);
-              const valB = getAxisScore(battle.agent_b.scores, key);
-              return (
-                <div key={key} className="grid grid-cols-[60px,1fr,40px,1fr,60px] gap-2 items-center">
-                  <div className="text-right text-sm font-medium" style={{ color: valA > valB ? winnerColor : valA < valB ? loserColor : "#64748b" }}>{valA}</div>
-                  <div className="h-3 rounded-full bg-[#f1f5f9] overflow-hidden flex justify-end">
-                    <div className="h-full rounded-full" style={{ width: `${valA}%`, backgroundColor: color, opacity: 0.8 }} />
-                  </div>
-                  <div className="text-center text-xs font-semibold text-muted-foreground">{label}</div>
-                  <div className="h-3 rounded-full bg-[#f1f5f9] overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${valB}%`, backgroundColor: color, opacity: 0.8 }} />
-                  </div>
-                  <div className="text-left text-sm font-medium" style={{ color: valB > valA ? winnerColor : valB < valA ? loserColor : "#64748b" }}>{valB}</div>
+      <div>
+        {/* Dark header with result */}
+        <div className="bg-[#0E0E0C] pt-24 pb-12">
+          <div className="max-w-4xl mx-auto px-4">
+            {/* Result banner */}
+            <div className="text-center mb-10">
+              {isDraw ? (
+                <div className="inline-flex items-center gap-2 rounded-sm border border-[#535862]/30 px-6 py-2 bg-[#1a1a18]">
+                  <span className="text-lg font-display font-700 text-[#A0A09C]">DRAW</span>
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              ) : battle.photo_finish ? (
+                <div className="inline-flex items-center gap-2 rounded-sm border border-[#E2754D]/30 px-6 py-2 bg-[#E2754D]/10">
+                  <Zap className="h-5 w-5 text-[#E2754D]" />
+                  <span className="text-lg font-display font-700 text-[#E2754D]">PHOTO FINISH</span>
+                </div>
+              ) : (
+                <div className="inline-flex items-center gap-2 rounded-sm border border-[#E2754D]/30 px-6 py-2 bg-[#E2754D]/10">
+                  <Trophy className="h-5 w-5 text-[#E2754D]" />
+                  <span className="text-lg font-display font-700 text-[#F5F5F3]">
+                    {isAWinner ? battle.agent_a.name : battle.agent_b.name} <span className="text-[#E2754D]">wins</span> by {battle.margin} pts
+                  </span>
+                </div>
+              )}
+            </div>
 
-        {/* Match Info */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="rounded-xl border border-[#E5E3E0] bg-white p-4 text-center">
-            <div className="text-sm text-muted-foreground">Match Quality</div>
-            <div className="text-xl font-bold text-foreground">{Math.round(battle.match_quality * 100)}%</div>
-          </div>
-          <div className="rounded-xl border border-[#E5E3E0] bg-white p-4 text-center">
-            <div className="text-sm text-muted-foreground">Margin</div>
-            <div className="text-xl font-bold text-foreground">{battle.margin} pts</div>
-          </div>
-          <div className="rounded-xl border border-[#E5E3E0] bg-white p-4 text-center">
-            <div className="text-sm text-muted-foreground">Duration</div>
-            <div className="text-xl font-bold text-foreground flex items-center justify-center gap-1">
-              <Clock className="h-4 w-4" />
-              {battle.duration_ms > 60000 ? `${(battle.duration_ms / 60000).toFixed(1)}m` : `${(battle.duration_ms / 1000).toFixed(1)}s`}
+            {/* Score comparison — dark, no cards */}
+            <div className="grid grid-cols-[1fr,auto,1fr] gap-6 items-center">
+              {/* Agent A */}
+              <div className={`text-center py-8 rounded-sm ${isAWinner ? "border border-[#E2754D]/30 bg-[#E2754D]/5" : "border border-[#2a2a28]"}`}>
+                {isAWinner && <Trophy className="h-5 w-5 text-[#E2754D] mx-auto mb-2" />}
+                <div className="text-xs text-[#535862] uppercase tracking-wider mb-1">Agent A</div>
+                <div className="text-base font-display font-600 text-[#F5F5F3] mb-3">{battle.agent_a.name || "Agent A"}</div>
+                <div className={`text-5xl font-mono font-black ${isAWinner ? "text-[#E2754D]" : "text-[#535862]"}`}>
+                  {battle.agent_a.overall_score}
+                </div>
+              </div>
+
+              {/* VS */}
+              <div className="text-xl font-display font-800 text-[#535862]">VS</div>
+
+              {/* Agent B */}
+              <div className={`text-center py-8 rounded-sm ${isBWinner ? "border border-[#E2754D]/30 bg-[#E2754D]/5" : "border border-[#2a2a28]"}`}>
+                {isBWinner && <Trophy className="h-5 w-5 text-[#E2754D] mx-auto mb-2" />}
+                <div className="text-xs text-[#535862] uppercase tracking-wider mb-1">Agent B</div>
+                <div className="text-base font-display font-600 text-[#F5F5F3] mb-3">{battle.agent_b.name || "Agent B"}</div>
+                <div className={`text-5xl font-mono font-black ${isBWinner ? "text-[#E2754D]" : "text-[#535862]"}`}>
+                  {battle.agent_b.overall_score}
+                </div>
+              </div>
+            </div>
+
+            {/* Match stats — inline, no cards */}
+            <div className="flex items-center justify-center gap-8 mt-8 text-sm">
+              <div className="text-center">
+                <div className="text-[#535862] text-xs uppercase tracking-wider">Quality</div>
+                <div className="text-lg font-mono font-bold text-[#F5F5F3]">{Math.round(battle.match_quality * 100)}%</div>
+              </div>
+              <div className="w-px h-8 bg-[#2a2a28]" />
+              <div className="text-center">
+                <div className="text-[#535862] text-xs uppercase tracking-wider">Margin</div>
+                <div className="text-lg font-mono font-bold text-[#F5F5F3]">{battle.margin} pts</div>
+              </div>
+              <div className="w-px h-8 bg-[#2a2a28]" />
+              <div className="text-center">
+                <div className="text-[#535862] text-xs uppercase tracking-wider">Duration</div>
+                <div className="text-lg font-mono font-bold text-[#F5F5F3]">
+                  {battle.duration_ms > 60000 ? `${(battle.duration_ms / 60000).toFixed(1)}m` : `${(battle.duration_ms / 1000).toFixed(1)}s`}
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Share Actions */}
-        <div className="flex gap-3 justify-center">
-          <button
-            onClick={handleCopyLink}
-            className="flex items-center gap-2 rounded-xl border border-[#E5E3E0] px-5 py-2.5 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors"
-          >
-            <Copy className="h-4 w-4" />
-            {copied ? "Copied!" : "Copy Link"}
-          </button>
-          <a
-            href={`${API_URL}/v1/battle/${battleId}/card.svg`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-xl border border-[#E5E3E0] px-5 py-2.5 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors"
-          >
-            <Image className="h-4 w-4" />
-            SVG Card
-          </a>
+        {/* Light section — score breakdown + actions */}
+        <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+          {/* 6-Axis Comparison — brand orange bars */}
+          <div>
+            <p className="label-xs mb-4">Score Breakdown</p>
+            <div className="space-y-3">
+              {AXES.map(({ key, label }) => {
+                const valA = getAxisScore(battle.agent_a.scores, key);
+                const valB = getAxisScore(battle.agent_b.scores, key);
+                return (
+                  <div key={key} className="grid grid-cols-[50px,1fr,60px,1fr,50px] gap-2 items-center">
+                    <div className={`text-right text-sm font-mono font-bold ${valA >= valB ? "text-[#E2754D]" : "text-[#717069]"}`}>{valA}</div>
+                    <div className="h-2 rounded-sm bg-[#F1EFED] overflow-hidden flex justify-end">
+                      <div className="h-full rounded-sm bg-[#E2754D] transition-all duration-700" style={{ width: `${valA}%`, opacity: valA >= valB ? 1 : 0.4 }} />
+                    </div>
+                    <div className="text-center text-[10px] font-medium uppercase tracking-wider text-[#717069]">{label}</div>
+                    <div className="h-2 rounded-sm bg-[#F1EFED] overflow-hidden">
+                      <div className="h-full rounded-sm bg-[#E2754D] transition-all duration-700" style={{ width: `${valB}%`, opacity: valB >= valA ? 1 : 0.4 }} />
+                    </div>
+                    <div className={`text-left text-sm font-mono font-bold ${valB >= valA ? "text-[#E2754D]" : "text-[#717069]"}`}>{valB}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Share Actions */}
+          <div className="flex gap-3 justify-center pt-4">
+            <button
+              onClick={handleCopyLink}
+              className="flex items-center gap-2 rounded-sm border border-[#E5E3E0] px-5 py-2.5 text-sm font-medium text-foreground hover:bg-[#F1EFED] transition-colors"
+            >
+              <Copy className="h-4 w-4" />
+              {copied ? "Copied!" : "Copy Link"}
+            </button>
+            <a
+              href={`${API_URL}/v1/battle/${battleId}/card.svg`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-sm bg-[#0E0E0C] text-[#F5F5F3] px-5 py-2.5 text-sm font-medium hover:bg-[#1a1a18] transition-colors"
+            >
+              <Image className="h-4 w-4" />
+              SVG Card
+            </a>
+          </div>
         </div>
       </div>
     );

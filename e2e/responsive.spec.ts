@@ -5,7 +5,7 @@ test.describe("Responsive Design", () => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { name: /AgentTrust/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Laureum/i })).toBeVisible();
     await expect(page.getByText("Total Evaluations")).toBeVisible();
     await expect(page.getByText("Tier Distribution", { exact: true })).toBeVisible();
   });
@@ -34,7 +34,7 @@ test.describe("Responsive Design", () => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { name: /AgentTrust/i })).toBeVisible();
-    await expect(page.getByText("How AgentTrust Works")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Laureum/i })).toBeVisible();
+    await expect(page.getByText("How Laureum Works")).toBeVisible();
   });
 });

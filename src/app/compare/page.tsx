@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScoreGauge } from "@/components/score-gauge";
@@ -49,7 +50,7 @@ function ServerSelector({
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg border bg-white transition-colors shadow-sm"
+        className="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-sm border bg-white transition-colors" 
         style={{
           borderColor: selected ? `${color}40` : undefined,
         }}
@@ -85,7 +86,7 @@ function ServerSelector({
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-white shadow-xl max-h-64 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full rounded-sm border border-border bg-white max-h-64 overflow-y-auto">
           {loading ? (
             <div className="p-4 space-y-2">
               {[1, 2, 3].map((i) => (
@@ -217,17 +218,14 @@ export default function ComparePage() {
   const allTools = [...new Set([...toolsA, ...toolsB])];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Compare <span className="brand-gradient-text">Servers</span>
-        </h1>
-        <p className="text-muted-foreground">
-          Side-by-side comparison of two MCP server evaluations across all
-          quality dimensions.
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        eyebrow="Compare"
+        title="Side-by-Side"
+        accent="Analysis"
+        description="Compare two MCP server evaluations across all quality dimensions."
+      />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
       {/* Server Selectors */}
       <div className="grid md:grid-cols-[1fr_auto_1fr] gap-4 items-start">
@@ -253,7 +251,7 @@ export default function ComparePage() {
       </div>
 
       {!hasComparison && (
-        <Card className="bg-white shadow-sm border-[#E5E3E0] border-dashed">
+        <Card className="bg-white border-[#E5E3E0] border-dashed">
           <CardContent className="p-12 text-center">
             <GitCompareArrows className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
             <p className="text-sm text-muted-foreground">
@@ -268,7 +266,7 @@ export default function ComparePage() {
       {hasComparison && (
         <div className="space-y-6 animate-fade-up">
           {/* Score Comparison Header */}
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-6">
               <div className="grid grid-cols-[1fr_auto_1fr] gap-6 items-center">
                 {/* Server A */}
@@ -348,7 +346,7 @@ export default function ComparePage() {
 
           {/* Radar + Dimensions */}
           <div className="grid md:grid-cols-2 gap-6">
-            <Card className="bg-white shadow-sm border-[#E5E3E0]">
+            <Card className="bg-white border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Quality Profile Overlay
@@ -373,7 +371,7 @@ export default function ComparePage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-sm border-[#E5E3E0]">
+            <Card className="bg-white border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Dimension Comparison
@@ -433,7 +431,7 @@ export default function ComparePage() {
 
           {/* Tool Scores Comparison */}
           {allTools.length > 0 && (
-            <Card className="bg-white shadow-sm border-[#E5E3E0]">
+            <Card className="bg-white border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Wrench className="h-4 w-4" />
@@ -497,7 +495,7 @@ export default function ComparePage() {
 
           {/* Safety Probes Comparison */}
           {serverA.safety_probes.length > 0 && serverB.safety_probes.length > 0 && (
-            <Card className="bg-white shadow-sm border-[#E5E3E0]">
+            <Card className="bg-white border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Shield className="h-4 w-4" />
@@ -583,7 +581,7 @@ export default function ComparePage() {
           )}
 
           {/* Quick Verdict */}
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-6">
               <div className="text-center space-y-2">
                 <h3 className="text-sm font-medium text-muted-foreground">
@@ -622,6 +620,7 @@ export default function ComparePage() {
           </Card>
         </div>
       )}
+      </div>
     </div>
   );
 }

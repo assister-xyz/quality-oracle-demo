@@ -3,6 +3,7 @@ import { Syne, Inter } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
+import { CustomCursor } from "@/components/custom-cursor";
 
 const syne = Syne({
   variable: "--font-display",
@@ -22,7 +23,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Laureum — AI Agent Quality Verification",
-  description: "Pre-payment quality verification for AI agents, MCP servers, and skills. Multi-judge consensus scoring across 6 dimensions.",
+  description: "Verify AI agents before you pay. Multi-judge consensus scoring across 6 dimensions with signed attestations.",
 };
 
 export default function RootLayout({
@@ -33,12 +34,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${syne.variable} ${inter.variable} ${geistMono.variable} font-body antialiased min-h-screen`}
+        className={`${syne.variable} ${inter.variable} ${geistMono.variable} font-body antialiased`}
       >
+        <CustomCursor />
         <Navbar />
-        <main className="pt-16">
-          {children}
-        </main>
+        {children}
       </body>
     </html>
   );

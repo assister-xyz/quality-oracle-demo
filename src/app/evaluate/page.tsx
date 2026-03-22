@@ -21,6 +21,7 @@ import {
 } from "@/lib/mock-data";
 import { submitEvaluation, getEvaluationStatus, ApiError } from "@/lib/api";
 import { transformEvalStatus } from "@/lib/transform";
+import { PageHeader } from "@/components/page-header";
 import {
   Search,
   Loader2,
@@ -38,6 +39,8 @@ import {
   AlertTriangle,
   RefreshCw,
 } from "lucide-react";
+import { LaurelBadge } from "@/components/laurel-badge";
+import { LaurelIcon } from "@/components/laurel-icon";
 
 const EXAMPLE_URLS = [
   { name: "GitMCP", url: "https://gitmcp.io/anthropics/anthropic-cookbook" },
@@ -94,13 +97,13 @@ function progressToSteps(pct: number): EvalStep[] {
 function StepIcon({ status }: { status: EvalStep["status"] }) {
   switch (status) {
     case "done":
-      return <CheckCircle2 className="h-4 w-4 text-[#10b981]" />;
+      return <CheckCircle2 className="h-4 w-4 text-[#E2754D]" />;
     case "running":
       return <Loader2 className="h-4 w-4 text-[#E2754D] animate-spin" />;
     case "error":
-      return <XCircle className="h-4 w-4 text-[#ef4444]" />;
+      return <XCircle className="h-4 w-4 text-[#9e3b3b]" />;
     default:
-      return <Circle className="h-4 w-4 text-muted-foreground/30" />;
+      return <Circle className="h-4 w-4 text-[#2a2a28]" />;
   }
 }
 
@@ -122,9 +125,9 @@ function ElapsedTimer() {
 
 function ProbeIcon({ passed }: { passed: boolean }) {
   return passed ? (
-    <ShieldCheck className="h-4 w-4 text-[#10b981]" />
+    <ShieldCheck className="h-4 w-4 text-[#E2754D]" />
   ) : (
-    <ShieldAlert className="h-4 w-4 text-[#ef4444]" />
+    <ShieldAlert className="h-4 w-4 text-[#9e3b3b]" />
   );
 }
 
@@ -304,8 +307,8 @@ function EvaluateContent() {
 
   const badgeBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
   const badgeSvgUrl = result ? `${badgeBaseUrl}/v1/badge/${encodeURIComponent(result.url)}.svg` : "";
-  const badgeMarkdown = result ? `![AgentTrust Quality](${badgeSvgUrl})` : "";
-  const badgeHtml = result ? `<a href="${badgeBaseUrl}/v1/score/${encodeURIComponent(result.url)}"><img src="${badgeSvgUrl}" alt="AgentTrust Quality Score" /></a>` : "";
+  const badgeMarkdown = result ? `![Laureum Quality](${badgeSvgUrl})` : "";
+  const badgeHtml = result ? `<a href="${badgeBaseUrl}/v1/score/${encodeURIComponent(result.url)}"><img src="${badgeSvgUrl}" alt="Laureum Quality Score" /></a>` : "";
 
   const [copiedField, setCopiedField] = useState<"markdown" | "html" | null>(null);
 
@@ -316,36 +319,37 @@ function EvaluateContent() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Evaluate <span className="brand-gradient-text">Agent Quality</span>
-        </h1>
-        <p className="text-muted-foreground">
-          Paste any MCP server URL to run a comprehensive quality evaluation with multi-judge consensus.
-        </p>
-      </div>
+    <div>
+      {/* Dark hero — fills viewport when idle */}
+      <div className={`bg-[#0E0E0C] pt-24 ${result || isEvaluating || steps.length > 0 ? "pb-16" : "min-h-svh pb-20"}`}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="uppercase tracking-[0.2em] text-[#717069] text-xs font-medium mb-3">
+            Evaluate
+          </p>
+          <h1 className="text-3xl md:text-5xl font-display font-700 text-[#F5F5F3] tracking-tight mb-3">
+            Verify any <span className="text-[#E2754D]">AI agent</span>
+          </h1>
+          <p className="text-[#A0A09C] mb-8 max-w-xl">
+            Paste an agent URL, MCP server, or API endpoint. We test every tool, score 6 quality dimensions, and sign an attestation.
+          </p>
 
-      {/* URL Input */}
-      <Card className="bg-white shadow-sm border-[#E5E3E0]">
-        <CardContent className="p-6">
+          {/* Hero-level input — not in a card */}
           <div className="flex gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#535862]" />
               <Input
-                placeholder="https://mcp.example.com/sse or /mcp"
+                placeholder="https://agent.example.com/mcp or /sse"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && startEvaluation()}
-                className="pl-9 h-12 text-base border-[#E5E3E0] focus:border-[#0E0E0C]"
+                className="pl-11 h-14 text-base bg-[#1a1a18] border-[#2a2a28] text-[#F5F5F3] placeholder:text-[#535862] focus:border-[#E2754D] rounded-sm"
                 disabled={isEvaluating}
               />
             </div>
             <Button
               onClick={startEvaluation}
               disabled={isEvaluating || !url.trim()}
-              className="h-12 px-6 bg-[#0E0E0C] text-white font-semibold hover:bg-[#6941C6]"
+              className="h-14 px-8 bg-[#E2754D] text-white font-semibold hover:bg-[#c9633f] rounded-sm text-sm uppercase tracking-wider"
             >
               {isEvaluating ? (
                 <>
@@ -360,83 +364,101 @@ function EvaluateContent() {
 
           {/* In-progress banner */}
           {isEvaluating && (
-            <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-md bg-[#E2754D]/5 border border-[#E2754D]/20">
+            <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-sm bg-[#E2754D]/10 border border-[#E2754D]/20">
               <Loader2 className="h-3 w-3 animate-spin text-[#E2754D]" />
-              <span className="text-xs text-[#E2754D]">Evaluation in progress — scroll down to see progress</span>
+              <span className="text-xs text-[#E2754D]">Evaluation in progress — scroll down to see live steps</span>
             </div>
           )}
 
-          {/* Eval mode selector — SSL-style trust levels, unified Assisterr brand */}
-          <div className="mt-4">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Trust Level</p>
-            <div className="grid grid-cols-3 gap-2">
+          {/* Depth selector — renamed from trust levels */}
+          <div className="mt-6">
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[#535862] font-medium mb-3">Evaluation Depth</p>
+            <div className="grid grid-cols-3 gap-3">
               {([
                 {
                   mode: "verified" as const,
-                  icon: Shield,
-                  label: "Verified",
-                  analogy: "Domain Validated (DV)",
-                  desc: "~30s \u00b7 spot check \u00b7 1 judge",
+                  label: "Quick Scan",
+                  desc: "~30s",
+                  detail: "Spot check with 1 judge",
                 },
                 {
                   mode: "certified" as const,
-                  icon: ShieldCheck,
-                  label: "Certified",
-                  analogy: "Org Validated (OV)",
-                  desc: "~90s \u00b7 full suite \u00b7 safety probes",
+                  label: "Standard",
+                  desc: "~90s",
+                  detail: "Full suite + safety probes",
                 },
                 {
                   mode: "audited" as const,
-                  icon: ShieldAlert,
-                  label: "Audited",
-                  analogy: "Extended Validation (EV)",
-                  desc: "~3min \u00b7 full audit \u00b7 2-3 judges",
+                  label: "Deep Audit",
+                  desc: "~3 min",
+                  detail: "Full audit with 2-3 judges",
                 },
-              ]).map(({ mode, icon: Icon, label, analogy, desc }) => {
+              ]).map(({ mode, label, desc, detail }) => {
                 const isActive = evalMode === mode;
                 return (
                   <button
                     key={mode}
                     onClick={() => setEvalMode(mode)}
                     disabled={isEvaluating}
-                    className={`relative rounded-lg p-3 text-left transition-all disabled:opacity-50 cursor-pointer border-[1.5px] ${
+                    className={`rounded-sm p-4 text-left transition-all disabled:opacity-50 cursor-pointer border ${
                       isActive
-                        ? "bg-[#E2754D]/[0.07] border-[#E2754D]"
-                        : "bg-muted/30 border-[#E5E3E0] hover:border-[#E2754D]/40"
+                        ? "bg-[#E2754D]/10 border-[#E2754D]/60"
+                        : "bg-[#1a1a18] border-[#2a2a28] hover:border-[#535862]"
                     }`}
-                    style={isActive ? { boxShadow: "0 0 0 1px rgba(246,104,36,0.2)" } : undefined}
+                    style={{ transitionTimingFunction: "var(--ease)", transitionDuration: "0.3s" }}
                   >
-                    <div className="flex items-center gap-2 mb-1">
-                      <Icon className={`h-4.5 w-4.5 ${isActive ? "text-[#E2754D]" : "text-[#0E0E0C]/60"}`} />
-                      <span className={`text-sm font-semibold ${isActive ? "text-[#0E0E0C]" : "text-[#0E0E0C]/70"}`}>{label}</span>
+                    <div className="flex items-baseline justify-between mb-1">
+                      <span className={`text-sm font-display font-600 ${isActive ? "text-[#F5F5F3]" : "text-[#A0A09C]"}`}>{label}</span>
+                      <span className={`text-xs font-mono ${isActive ? "text-[#E2754D]" : "text-[#535862]"}`}>{desc}</span>
                     </div>
-                    <p className={`text-[10px] font-medium ${isActive ? "text-[#E2754D]" : "text-muted-foreground"}`}>{analogy}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{desc}</p>
-                    {isActive && (
-                      <div className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#E2754D]" />
-                    )}
+                    <p className="text-[11px] text-[#535862]">{detail}</p>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Quick examples */}
-          <div className="flex flex-wrap gap-2 mt-3">
-            <span className="text-xs text-muted-foreground">Try:</span>
+          {/* Quick-try examples — prominent on dark bg */}
+          <div className="flex flex-wrap items-center gap-2 mt-6">
+            <span className="text-[11px] uppercase tracking-wider text-[#535862] font-medium">Try:</span>
             {EXAMPLE_URLS.map((ex) => (
               <button
                 key={ex.name}
                 onClick={() => setUrl(ex.url)}
-                className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline transition-colors"
+                className="text-xs text-[#717069] hover:text-[#E2754D] border border-[#2a2a28] hover:border-[#E2754D]/30 px-2.5 py-1 rounded-sm transition-all"
                 disabled={isEvaluating}
+                style={{ transitionTimingFunction: "var(--ease)" }}
               >
                 {ex.name}
               </button>
             ))}
           </div>
-        </CardContent>
-      </Card>
+
+          {/* What gets tested — visible only when idle */}
+          {!result && !isEvaluating && steps.length === 0 && (
+            <div className="mt-16 pt-12 border-t border-[#2a2a28]">
+              <p className="text-[11px] uppercase tracking-[0.15em] text-[#535862] font-medium mb-6">What gets tested</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                {[
+                  { title: "Tool Discovery", desc: "Auto-detect all tools, validate schema, check documentation" },
+                  { title: "Functional Tests", desc: "Generate test cases per tool, call with real inputs, judge responses" },
+                  { title: "Safety Probes", desc: "Injection, extraction, PII leakage, hallucination, overflow" },
+                  { title: "Multi-Judge", desc: "2-3 LLM judges score independently, consensus via agreement" },
+                  { title: "6-Axis Score", desc: "Accuracy, Safety, Reliability, Latency, Process, Schema" },
+                  { title: "Signed Attestation", desc: "Ed25519-signed AQVC credential you can embed anywhere" },
+                ].map((item) => (
+                  <div key={item.title}>
+                    <h4 className="text-sm font-display font-600 text-[#F5F5F3] mb-1">{item.title}</h4>
+                    <p className="text-xs text-[#535862] leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
       {/* Error Banner */}
       {error && (
@@ -474,7 +496,7 @@ function EvaluateContent() {
 
       {/* Loading result from URL param */}
       {loadingResult && (
-        <Card className="bg-white shadow-sm border-[#E5E3E0]">
+        <Card className="bg-white border-[#E5E3E0]">
           <CardContent className="p-6 space-y-4">
             <Skeleton className="h-6 w-48" />
             <Skeleton className="h-4 w-full" />
@@ -483,41 +505,58 @@ function EvaluateContent() {
         </Card>
       )}
 
-      {/* Evaluation Progress */}
+      {/* Evaluation Progress — dark branded timeline */}
       {steps.length > 0 && !result && !error && (
-        <Card className="bg-white shadow-sm border-[#E5E3E0]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-[#E2754D]" />
-              Evaluation in Progress
-              <TrustLevelBadge level={evalMode} />
-              {isEvaluating && <ElapsedTimer />}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2.5">
-              {steps.map((step, i) => (
+        <div className="rounded-sm bg-[#0E0E0C] p-6 md:p-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Loader2 className="h-5 w-5 animate-spin text-[#E2754D]" />
+              <h3 className="text-base font-display font-600 text-[#F5F5F3]">Evaluating</h3>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#E2754D] border border-[#E2754D]/20 px-2 py-0.5 rounded-sm bg-[#E2754D]/5">
+                {evalMode === "verified" ? "Quick Scan" : evalMode === "certified" ? "Standard" : "Deep Audit"}
+              </span>
+            </div>
+            {isEvaluating && (
+              <span className="text-sm text-[#717069] font-mono tabular-nums">
+                <ElapsedTimer />
+              </span>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            {steps.map((step, i) => {
+              const doneCount = steps.filter(s => s.status === "done").length;
+              const totalCount = steps.length;
+              return (
                 <div key={i}>
                   <div
-                    className={`flex items-center gap-3 text-sm transition-opacity ${
-                      step.status === "pending" ? "opacity-40" : "opacity-100"
+                    className={`flex items-center gap-3 py-2 text-sm transition-all duration-300 ${
+                      step.status === "pending" ? "opacity-30" : "opacity-100"
                     }`}
                   >
                     <StepIcon status={step.status} />
-                    <span className={step.status === "running" ? "text-[#E2754D] font-medium" : ""}>{step.name}</span>
+                    <span className={`${
+                      step.status === "running" ? "text-[#E2754D] font-display font-600" :
+                      step.status === "done" ? "text-[#A0A09C]" : "text-[#535862]"
+                    }`}>
+                      {step.name}
+                    </span>
+                    {i === 0 && step.status === "done" && (
+                      <span className="ml-auto text-[10px] text-[#535862] font-mono">{doneCount}/{totalCount}</span>
+                    )}
                   </div>
                   {/* Adversarial sub-steps */}
                   {step.children && (step.status === "running" || step.status === "done") && (
-                    <div className="ml-7 mt-1.5 mb-1 space-y-1.5 border-l-2 border-border/40 pl-3">
+                    <div className="ml-7 mt-1 mb-2 space-y-1 border-l border-[#2a2a28] pl-4">
                       {step.children.map((child, ci) => (
                         <div
                           key={ci}
-                          className={`flex items-center gap-2 text-xs transition-opacity ${
-                            child.status === "pending" ? "opacity-30" : "opacity-100"
+                          className={`flex items-center gap-2 text-xs transition-all duration-300 ${
+                            child.status === "pending" ? "opacity-20" : "opacity-100"
                           }`}
                         >
                           <StepIcon status={child.status} />
-                          <span className={child.status === "running" ? "text-[#E2754D]" : "text-muted-foreground"}>
+                          <span className={child.status === "running" ? "text-[#E2754D]" : "text-[#535862]"}>
                             {child.name}
                           </span>
                         </div>
@@ -525,22 +564,33 @@ function EvaluateContent() {
                     </div>
                   )}
                 </div>
-              ))}
+              );
+            })}
+          </div>
+
+          {/* Progress bar */}
+          <div className="mt-6 pt-4 border-t border-[#2a2a28]">
+            <div className="h-1 rounded-full bg-[#1a1a18] overflow-hidden">
+              <div
+                className="h-full bg-[#E2754D] rounded-full transition-all duration-700 ease-out"
+                style={{ width: `${(steps.filter(s => s.status === "done").length / steps.length) * 100}%` }}
+              />
             </div>
-            {evaluationId && (
-              <p className="mt-3 text-[10px] text-muted-foreground/50 font-mono">
-                ID: {evaluationId}
-              </p>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+
+          {evaluationId && (
+            <p className="mt-3 text-[10px] text-[#2a2a28] font-mono">
+              {evaluationId}
+            </p>
+          )}
+        </div>
       )}
 
       {/* Results */}
       {result && (
         <div className="space-y-6 animate-fade-up">
           {/* Summary Header */}
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-2">
@@ -593,7 +643,7 @@ function EvaluateContent() {
           {/* 6-Axis Radar + Dimension Bars */}
           {(result.dimensions.accuracy > 0 || result.dimensions.safety > 0) && (
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-white shadow-sm border-[#E5E3E0]">
+              <Card className="bg-white border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">6-Axis Quality Profile</CardTitle>
                 </CardHeader>
@@ -602,7 +652,7 @@ function EvaluateContent() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white shadow-sm border-[#E5E3E0]">
+              <Card className="bg-white border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">Dimension Breakdown</CardTitle>
                 </CardHeader>
@@ -617,7 +667,7 @@ function EvaluateContent() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Tool Scores */}
             {Object.keys(result.tool_scores).length > 0 && (
-              <Card className="bg-white shadow-sm border-[#E5E3E0]">
+              <Card className="bg-white border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     Tool Scores ({Object.keys(result.tool_scores).length} tools)
@@ -649,7 +699,7 @@ function EvaluateContent() {
 
             {/* Safety Probes */}
             {result.safety_probes.length > 0 && (
-              <Card className="bg-white shadow-sm border-[#E5E3E0]">
+              <Card className="bg-white border-[#E5E3E0]">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Shield className="h-4 w-4" />
@@ -661,7 +711,7 @@ function EvaluateContent() {
                     {result.safety_probes.map((probe, idx) => (
                       <div
                         key={`${probe.probe_type}-${idx}`}
-                        className="flex items-start gap-3 p-2 rounded-lg bg-muted/30"
+                        className="flex items-start gap-3 p-2 rounded-sm bg-muted/30"
                       >
                         <ProbeIcon passed={probe.passed} />
                         <div className="flex-1 min-w-0">
@@ -692,7 +742,7 @@ function EvaluateContent() {
 
           {/* Judge Responses */}
           {result.judge_responses.length > 0 && (
-            <Card className="bg-white shadow-sm border-[#E5E3E0]">
+            <Card className="bg-white border-[#E5E3E0]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Judge Consensus Responses
@@ -701,7 +751,7 @@ function EvaluateContent() {
               <CardContent>
                 <div className="space-y-3">
                   {result.judge_responses.map((jr, i) => (
-                    <div key={i} className="p-3 rounded-lg bg-muted/30 space-y-2">
+                    <div key={i} className="p-3 rounded-sm bg-muted/30 space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <code className="text-xs font-mono bg-muted/50 px-1.5 py-0.5 rounded">{jr.tool}</code>
@@ -728,54 +778,71 @@ function EvaluateContent() {
           )}
 
           {/* Badge & Attestation */}
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Badge & Attestation</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Live badge preview */}
-              <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/30 border border-border/50">
+            <CardContent className="space-y-5">
+              {/* Laurel badge preview */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 rounded-sm bg-[#0E0E0C] border border-[#0E0E0C]">
+                <LaurelBadge
+                  score={result.score}
+                  tier={result.tier}
+                  trustLevel={result.trust_level}
+                  size="lg"
+                />
+                <div className="space-y-1.5">
+                  <p className="text-sm font-semibold text-[#F5F5F3]">Laureum Quality Badge</p>
+                  <p className="text-xs text-[#717069]">Embed in your README, website, or docs to show verified quality.</p>
+                </div>
+              </div>
+
+              {/* Live SVG badge (from backend) */}
+              <div className="flex items-center gap-3 px-3 py-2 rounded-md bg-muted/30 border border-border/50">
                 <div className="shrink-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={badgeSvgUrl}
-                    alt="AgentTrust Quality Badge"
+                    alt="Laureum Quality Badge"
                     className="h-5"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">Live quality badge — embed in your README or docs</p>
+                <p className="text-[11px] text-muted-foreground">Live badge (hotlinked, always up-to-date)</p>
               </div>
 
               {/* Embed snippets */}
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-medium text-muted-foreground">Markdown</p>
-                  <div className="flex items-center gap-2">
-                    <code className="text-[10px] font-mono bg-muted/50 px-2.5 py-1.5 rounded border border-border/50 flex-1 truncate">
-                      {badgeMarkdown}
-                    </code>
-                    <Button variant="outline" size="sm" onClick={() => handleCopy(badgeMarkdown, "markdown")} className="shrink-0 h-7 w-7 p-0">
-                      {copiedField === "markdown" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                    </Button>
+              <div>
+                <p className="label-xs mb-2">Embed Code</p>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <p className="text-[11px] font-medium text-muted-foreground">Markdown</p>
+                    <div className="flex items-center gap-2">
+                      <code className="text-[10px] font-mono bg-muted/50 px-2.5 py-1.5 rounded border border-border/50 flex-1 truncate">
+                        {badgeMarkdown}
+                      </code>
+                      <Button variant="outline" size="sm" onClick={() => handleCopy(badgeMarkdown, "markdown")} className="shrink-0 h-7 w-7 p-0">
+                        {copiedField === "markdown" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-medium text-muted-foreground">HTML</p>
-                  <div className="flex items-center gap-2">
-                    <code className="text-[10px] font-mono bg-muted/50 px-2.5 py-1.5 rounded border border-border/50 flex-1 truncate">
-                      {badgeHtml}
-                    </code>
-                    <Button variant="outline" size="sm" onClick={() => handleCopy(badgeHtml, "html")} className="shrink-0 h-7 w-7 p-0">
-                      {copiedField === "html" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                    </Button>
+                  <div className="space-y-1.5">
+                    <p className="text-[11px] font-medium text-muted-foreground">HTML</p>
+                    <div className="flex items-center gap-2">
+                      <code className="text-[10px] font-mono bg-muted/50 px-2.5 py-1.5 rounded border border-border/50 flex-1 truncate">
+                        {badgeHtml}
+                      </code>
+                      <Button variant="outline" size="sm" onClick={() => handleCopy(badgeHtml, "html")} className="shrink-0 h-7 w-7 p-0">
+                        {copiedField === "html" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Attestation */}
-              <div className="pt-2 border-t border-border/50">
-                <p className="text-xs text-muted-foreground mb-1.5">Attestation (AQVC v1.0, Ed25519):</p>
+              <div className="pt-3 border-t border-border/50">
+                <p className="label-xs mb-1.5">Attestation (AQVC v1.0, Ed25519)</p>
                 <Badge variant="outline" className="text-[10px] font-mono">
                   JWT: eyJhbGciOiJFZERTQSJ9...
                 </Badge>
@@ -784,6 +851,7 @@ function EvaluateContent() {
           </Card>
         </div>
       )}
+      </div>
     </div>
   );
 }

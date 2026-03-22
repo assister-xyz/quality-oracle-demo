@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScoreGauge } from "@/components/score-gauge";
@@ -288,27 +289,24 @@ export default function BulkPage() {
   ).length;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Bulk <span className="brand-gradient-text">Evaluation</span>
-        </h1>
-        <p className="text-muted-foreground">
-          Evaluate multiple MCP servers in parallel. Paste URLs, upload a list,
-          or use a preset.
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        eyebrow="Bulk"
+        title="Batch"
+        accent="Evaluation"
+        description="Evaluate multiple MCP servers in parallel. Paste URLs, upload a list, or use a preset."
+      />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
       {/* URL Input */}
-      <Card className="bg-white shadow-sm border-[#E5E3E0]">
+      <Card className="bg-white border-[#E5E3E0]">
         <CardContent className="p-6 space-y-4">
           <div className="flex gap-3">
             <textarea
               placeholder="Paste MCP server URLs (one per line or comma-separated)&#10;https://mcp.example.com/mcp&#10;https://another-server.com/sse"
               value={urlText}
               onChange={(e) => setUrlText(e.target.value)}
-              className="flex-1 min-h-[100px] rounded-lg border border-border bg-background px-4 py-3 text-sm font-mono resize-y focus:outline-none focus:border-[#0E0E0C] placeholder:text-muted-foreground/50"
+              className="flex-1 min-h-[100px] rounded-sm border border-border bg-background px-4 py-3 text-sm font-mono resize-y focus:outline-none focus:border-[#0E0E0C] placeholder:text-muted-foreground/50"
               disabled={isRunning}
             />
             <div className="flex flex-col gap-2">
@@ -420,7 +418,7 @@ export default function BulkPage() {
       {/* Summary Stats */}
       {completedItems.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <BarChart3 className="h-4 w-4 text-[#E2754D]" />
@@ -443,7 +441,7 @@ export default function BulkPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Shield className="h-4 w-4 text-[#DB5F94]" />
@@ -457,7 +455,7 @@ export default function BulkPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Zap className="h-4 w-4 text-[#f59e0b]" />
@@ -468,7 +466,7 @@ export default function BulkPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white shadow-sm border-[#E5E3E0]">
+          <Card className="bg-white border-[#E5E3E0]">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Download className="h-4 w-4 text-[#10b981]" />
@@ -493,11 +491,11 @@ export default function BulkPage() {
           {items.map((item) => (
             <Card
               key={item.id}
-              className={`bg-white shadow-sm border-[#E5E3E0] transition-all card-hover ${
+              className={`bg-white border-[#E5E3E0] transition-all card-hover ${
                 item.status === "completed"
                   ? "border-[#10b981]/20"
                   : item.status === "running"
-                  ? "border-[#0E0E0C]/20 shadow-md"
+                  ? "border-[#0E0E0C]/20" 
                   : item.status === "error"
                   ? "border-[#ef4444]/20"
                   : ""
@@ -640,7 +638,7 @@ export default function BulkPage() {
 
       {/* Empty state */}
       {items.length === 0 && (
-        <Card className="bg-white shadow-sm border-[#E5E3E0] border-dashed">
+        <Card className="bg-white border-[#E5E3E0] border-dashed">
           <CardContent className="p-12 text-center">
             <ListPlus className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
             <p className="text-sm text-muted-foreground mb-4">
@@ -661,6 +659,7 @@ export default function BulkPage() {
           </CardContent>
         </Card>
       )}
+      </div>
     </div>
   );
 }

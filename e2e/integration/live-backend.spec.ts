@@ -29,7 +29,7 @@ test.describe("Live Backend Integration", () => {
     await page.goto("/");
 
     // Should show dashboard title
-    await expect(page.getByRole("heading", { name: /AgentTrust/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Laureum/i })).toBeVisible();
 
     // Should show KPI cards (values may be 0 or -- if no evaluations)
     await expect(page.getByText("Total Evaluations")).toBeVisible();

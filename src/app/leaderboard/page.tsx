@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -135,16 +136,14 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          MCP Server <span className="brand-gradient-text">Leaderboard</span>
-        </h1>
-        <p className="text-muted-foreground">
-          {loading ? "Loading..." : `${servers.length} servers evaluated with multi-judge consensus scoring.`}
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        eyebrow="Leaderboard"
+        title="MCP Server"
+        accent="Rankings"
+        description={loading ? "Loading..." : `${servers.length} servers evaluated with multi-judge consensus scoring.`}
+      />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -190,7 +189,7 @@ export default function LeaderboardPage() {
 
       <div className="grid lg:grid-cols-[1fr_380px] gap-6">
         {/* Table */}
-        <Card className="bg-white shadow-sm border-[#E5E3E0] overflow-hidden">
+        <Card className="bg-white border-[#E5E3E0] overflow-hidden">
           <div className="overflow-x-auto">
             {loading ? (
               <div className="p-4 space-y-3">
@@ -327,7 +326,7 @@ export default function LeaderboardPage() {
         <div className="space-y-4">
           {displayServer ? (
             <>
-              <Card className="bg-white shadow-sm border-[#E5E3E0] sticky top-20">
+              <Card className="bg-white border-[#E5E3E0] sticky top-20">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base text-foreground">{displayServer.name}</CardTitle>
@@ -425,7 +424,7 @@ export default function LeaderboardPage() {
               </Card>
             </>
           ) : (
-            <Card className="bg-white shadow-sm border-[#E5E3E0] border-dashed">
+            <Card className="bg-white border-[#E5E3E0] border-dashed">
               <CardContent className="p-8 text-center">
                 <div className="text-muted-foreground space-y-2">
                   <Trophy className="h-8 w-8 mx-auto opacity-30" />
@@ -435,6 +434,7 @@ export default function LeaderboardPage() {
             </Card>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
