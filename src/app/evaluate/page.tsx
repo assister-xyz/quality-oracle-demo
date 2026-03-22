@@ -320,8 +320,8 @@ function EvaluateContent() {
 
   return (
     <div>
-      {/* Dark hero with the input as the dominant element */}
-      <div className="bg-[#0E0E0C] pt-24 pb-16 md:pb-20">
+      {/* Dark hero — fills viewport when idle */}
+      <div className={`bg-[#0E0E0C] pt-24 ${result || isEvaluating || steps.length > 0 ? "pb-16" : "min-h-svh pb-20"}`}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="uppercase tracking-[0.2em] text-[#717069] text-xs font-medium mb-3">
             Evaluate
@@ -433,6 +433,28 @@ function EvaluateContent() {
               </button>
             ))}
           </div>
+
+          {/* What gets tested — visible only when idle */}
+          {!result && !isEvaluating && steps.length === 0 && (
+            <div className="mt-16 pt-12 border-t border-[#2a2a28]">
+              <p className="text-[11px] uppercase tracking-[0.15em] text-[#535862] font-medium mb-6">What gets tested</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                {[
+                  { title: "Tool Discovery", desc: "Auto-detect all tools, validate schema, check documentation" },
+                  { title: "Functional Tests", desc: "Generate test cases per tool, call with real inputs, judge responses" },
+                  { title: "Safety Probes", desc: "Injection, extraction, PII leakage, hallucination, overflow" },
+                  { title: "Multi-Judge", desc: "2-3 LLM judges score independently, consensus via agreement" },
+                  { title: "6-Axis Score", desc: "Accuracy, Safety, Reliability, Latency, Process, Schema" },
+                  { title: "Signed Attestation", desc: "Ed25519-signed AQVC credential you can embed anywhere" },
+                ].map((item) => (
+                  <div key={item.title}>
+                    <h4 className="text-sm font-display font-600 text-[#F5F5F3] mb-1">{item.title}</h4>
+                    <p className="text-xs text-[#535862] leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
