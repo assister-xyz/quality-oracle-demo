@@ -6,6 +6,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useScoresList, useBackendHealth } from "@/lib/hooks";
 import { ScoreGauge } from "@/components/score-gauge";
 import { TierBadge } from "@/components/tier-badge";
+import Image from "next/image";
 import { LaurelWreath, LaurelLogo } from "@/components/laurel-logo";
 import { LaurelBadge } from "@/components/laurel-badge";
 import {
@@ -177,14 +178,21 @@ export default function LandingPage() {
         <div className="hero-glow absolute inset-0 pointer-events-none" />
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-          {/* Animated wreath — more visible */}
+          {/* Animated wreath — real brand image */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 0.8, scale: 1 }}
             transition={{ duration: 1.4, ease }}
-            className="mx-auto mb-10"
+            className="mx-auto mb-6 w-[180px] h-[240px] md:w-[200px] md:h-[265px] relative"
           >
-            <LaurelWreath size={160} className="text-[#E2754D]/50 mx-auto" />
+            <Image
+              src="/wreaths/hero-logo.png"
+              alt="Laureum"
+              fill
+              className="object-contain"
+              priority
+              unoptimized
+            />
           </motion.div>
 
           {/* Eyebrow */}
