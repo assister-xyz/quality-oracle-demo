@@ -4,6 +4,7 @@ import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { CustomCursor } from "@/components/custom-cursor";
+import { PostHogProvider, ClarityScript } from "@/components/posthog-provider";
 
 const syne = Syne({
   variable: "--font-display",
@@ -33,9 +34,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <ClarityScript />
+      </head>
       <body
         className={`${syne.variable} ${inter.variable} ${geistMono.variable} font-body antialiased`}
       >
+        <PostHogProvider />
         <CustomCursor />
         <Navbar />
         {children}
