@@ -41,6 +41,7 @@ import {
 } from "lucide-react";
 import { LaurelBadge } from "@/components/laurel-badge";
 import { LaurelIcon } from "@/components/laurel-icon";
+import { UsageCounter } from "@/components/usage-counter";
 
 const EXAMPLE_URLS = [
   { name: "GitMCP", url: "https://gitmcp.io/anthropics/anthropic-cookbook" },
@@ -332,6 +333,11 @@ function EvaluateContent() {
           <p className="text-[#A0A09C] mb-8 max-w-xl">
             Paste an agent URL, MCP server, or API endpoint. We test every tool, score 6 quality dimensions, and sign an attestation.
           </p>
+
+          {/* Usage counter */}
+          <div className="mb-6">
+            <UsageCounter />
+          </div>
 
           {/* Hero-level input — not in a card */}
           <div className="flex gap-3">
