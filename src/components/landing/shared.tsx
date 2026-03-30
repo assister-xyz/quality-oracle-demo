@@ -322,6 +322,15 @@ export function PricingPreview() {
             </div>
           ))}
         </div>
+
+        <div className="text-center mt-8">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center gap-2 text-sm text-[#717069] hover:text-white transition-colors"
+          >
+            View full pricing & comparison <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       </div>
 
       {modalTier && (

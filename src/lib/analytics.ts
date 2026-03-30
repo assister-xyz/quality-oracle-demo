@@ -85,4 +85,15 @@ export function trackPaymentIntent(tier: string) {
   });
 }
 
+export function trackPricingView() {
+  trackEvent({ event: "pricing_page_view" });
+}
+
+export function trackPricingTierClick(tier: string) {
+  trackEvent({
+    event: "pricing_tier_click",
+    properties: { tier },
+  });
+}
+
 export { getVariant, getUtmData };

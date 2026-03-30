@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useBackendHealth } from "@/lib/hooks";
-import { BarChart3, Search, Trophy, GitCompareArrows, Layers, Swords, Crown, Menu, X } from "lucide-react";
+import { BarChart3, Search, Trophy, GitCompareArrows, Layers, Swords, Crown, Menu, X, CreditCard } from "lucide-react";
 import { LaurelLogo } from "@/components/laurel-logo";
 import { useEffect, useState } from "react";
 
@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { href: "/ladder", label: "Ladder", icon: Crown },
   { href: "/compare", label: "Compare", icon: GitCompareArrows },
   { href: "/bulk", label: "Bulk", icon: Layers },
+  { href: "/pricing", label: "Pricing", icon: CreditCard },
 ];
 
 export function Navbar() {
