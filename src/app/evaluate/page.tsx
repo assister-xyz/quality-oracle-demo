@@ -42,6 +42,7 @@ import {
 import { LaurelBadge } from "@/components/laurel-badge";
 import { LaurelIcon } from "@/components/laurel-icon";
 import { UsageCounter } from "@/components/usage-counter";
+import { ShareButtons } from "@/components/share-buttons";
 
 const EXAMPLE_URLS = [
   { name: "GitMCP", url: "https://gitmcp.io/anthropics/anthropic-cookbook" },
@@ -631,6 +632,16 @@ function EvaluateContent() {
                   </div>
                 </div>
                 <ScoreGauge score={result.score} tier={result.tier} size={100} strokeWidth={8} />
+              </div>
+
+              {/* Share buttons */}
+              <div className="pt-4 border-t border-border/50 mt-4">
+                <ShareButtons
+                  score={result.score}
+                  tier={result.tier}
+                  agentName={result.name}
+                  agentUrl={result.url}
+                />
               </div>
             </CardContent>
           </Card>

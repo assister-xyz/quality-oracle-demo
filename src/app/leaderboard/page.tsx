@@ -34,6 +34,7 @@ import {
   Medal,
   ExternalLink,
 } from "lucide-react";
+import { ShareButtons } from "@/components/share-buttons";
 
 type SortField = "score" | "name" | "tools_count" | "confidence";
 type SortDir = "asc" | "desc";
@@ -418,6 +419,15 @@ export default function LeaderboardPage() {
                           View Full Report <ExternalLink className="h-3 w-3 ml-1" />
                         </Button>
                       </Link>
+
+                      <div className="mt-3 pt-3 border-t border-border/50">
+                        <ShareButtons
+                          score={displayServer.score}
+                          tier={displayServer.tier}
+                          agentName={displayServer.name}
+                          agentUrl={displayServer.url}
+                        />
+                      </div>
                     </>
                   )}
                 </CardContent>
