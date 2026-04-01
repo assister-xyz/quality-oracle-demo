@@ -272,6 +272,44 @@ export function listBattles(page = 1, limit = 20): Promise<BattleListResponse> {
   return apiFetch<BattleListResponse>(`/v1/battles?page=${page}&limit=${limit}`);
 }
 
+// ---------- Percentile & Share ----------
+export interface PercentileResponse {
+  target_id: string;
+  score: number;
+  percentile: number;
+  rank: number;
+  total_evaluated: number;
+  tier: string;
+  top_pct: number;
+}
+
+export function getPercentile(targetId: string): Promise<PercentileResponse> {
+  return apiFetch<PercentileResponse>(`/v1/stats/percentile/${encodeURIComponent(targetId)}`);
+}
+
+export interface ShareDataResponse {
+  target_id: string;
+  name: string;
+  score: number;
+  tier: string;
+  percentile: number;
+  top_pct: number;
+  total_evaluated: number;
+  tweet_text: string;
+  linkedin_text: string;
+  profile_url: string;
+  og_image_url: string;
+  badge_svg_url: string;
+  shields_url: string;
+  shields_badge: { schemaVersion: number; label: string; message: string; color: string };
+  embed_markdown: string;
+  embed_html: string;
+}
+
+export function getShareData(targetId: string): Promise<ShareDataResponse> {
+  return apiFetch<ShareDataResponse>(`/v1/score/${encodeURIComponent(targetId)}/share`);
+}
+
 // ---------- Arena (Ladder) ----------
 export interface LadderEntry {
   target_id: string;
