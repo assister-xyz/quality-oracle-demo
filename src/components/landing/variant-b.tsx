@@ -12,7 +12,7 @@ import {
 } from "./shared";
 import Link from "next/link";
 
-/* ── Variant B: "Scan, Score, Certify" (Process-focused) ── */
+/* ── Variant B: "Scan, Score, Certify your Agent" (Process-focused) ── */
 export function VariantB() {
   return (
     <div className="bg-[#0A0A1A] min-h-screen">

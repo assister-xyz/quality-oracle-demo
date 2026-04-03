@@ -4,6 +4,7 @@ import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { CustomCursor } from "@/components/custom-cursor";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { PostHogProvider, ClarityScript } from "@/components/posthog-provider";
 
 const syne = Syne({
@@ -37,6 +38,9 @@ export default function RootLayout({
       <head>
         <ClarityScript />
       </head>
+      {process.env.NEXT_PUBLIC_GTM_ID && (
+        <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
+      )}
       <body
         className={`${syne.variable} ${inter.variable} ${geistMono.variable} font-body antialiased`}
       >

@@ -32,6 +32,14 @@ function getVariant(): string {
   return cookie?.split("=")[1] || "";
 }
 
+function pushToDataLayer(event: string, properties: Record<string, unknown>) {
+  if (typeof window === "undefined") return;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const w = window as any;
+  w.dataLayer = w.dataLayer || [];
+  w.dataLayer.push({ event, ...properties });
+}
+
 function trackEvent({ event, properties = {} }: PostHogEvent) {
   const ph = getPostHog();
   const utm = getUtmData();
@@ -46,6 +54,9 @@ function trackEvent({ event, properties = {} }: PostHogEvent) {
   if (ph) {
     ph.capture(event, enrichedProps);
   }
+
+  // Push to GTM dataLayer for Google Ads conversion tracking
+  pushToDataLayer(event, enrichedProps);
 
   // Console log for development when PostHog isn't configured
   if (process.env.NODE_ENV === "development") {
