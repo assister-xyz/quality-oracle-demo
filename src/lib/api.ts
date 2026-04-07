@@ -142,11 +142,89 @@ export interface EvaluationStatusResponse {
     process_quality_report?: Record<string, unknown>;
     latency_stats?: { avg_ms?: number; p50_ms?: number; p95_ms?: number };
     questions_asked?: number;
+    // QO-045: Agent Trap Coverage (DeepMind taxonomy)
+    agent_trap_coverage?: AgentTrapCoverage;
+    // QO-017: Token & cost tracking
+    token_usage?: TokenUsage;
+    cost_usd?: number;
+    // QO-029: Code integrity
+    manifest_hash?: string;
+    detected_domain?: string;
+    // QO-044: Anti-gaming signals
+    gaming_risk?: "none" | "low" | "medium" | "high";
   } | null;
+  // QO-043: Score anomaly detection
+  score_anomaly?: ScoreAnomaly;
+  // QO-044/046: Operator identity (when battle / verified flow used)
+  operator_identity?: OperatorIdentity;
   attestation_jwt: string | null;
   badge_url: string | null;
   error: string | null;
   duration_ms: number | null;
+}
+
+// ── QO-045: Agent Trap Coverage (DeepMind taxonomy) ─────────────────────────
+
+export interface AgentTrapCoverage {
+  taxonomy_version: "deepmind_2026_v1";
+  total_trap_types: number;
+  total_testable: number;
+  total_covered: number;
+  total_passed: number | null;
+  coverage_pct: number;
+  categories: Record<string, TrapCategoryCoverage>;
+}
+
+export interface TrapCategoryCoverage {
+  testable: number;
+  covered: number;
+  passed: number | null;
+  coverage_pct: number;
+  traps: Record<string, TrapInfo>;
+}
+
+export interface TrapInfo {
+  status: "covered" | "new" | "deferred" | "n/a";
+  description: string;
+  probes: string[];
+  passed: boolean | null;
+}
+
+// ── QO-043: Score Anomaly ───────────────────────────────────────────────────
+
+export interface ScoreAnomaly {
+  anomaly_type: "first_eval_extreme" | "z_score_deviation" | "unchanged_manifest_jump";
+  severity: "low" | "medium" | "high";
+  target_id: string;
+  current_score: number;
+  details: Record<string, unknown>;
+  detected_at: string;
+}
+
+// ── QO-044/046: Operator Identity ───────────────────────────────────────────
+
+export interface OperatorIdentity {
+  operator_id: string;
+  display_name: string;
+  github_username?: string;
+  github_avatar_url?: string;
+  email?: string;
+  verified: boolean;
+  agent_count?: number;
+}
+
+// ── QO-017: Token Usage & Cost ──────────────────────────────────────────────
+
+export interface TokenUsage {
+  total_input_tokens: number;
+  total_output_tokens: number;
+  by_provider?: Record<string, { input: number; output: number; calls: number }>;
+  by_phase?: Record<string, { input: number; output: number }>;
+  optimization?: {
+    llm_calls?: number;
+    fuzzy_routed?: number;
+    cache_hits?: number;
+  };
 }
 
 export function getEvaluationStatus(evaluationId: string): Promise<EvaluationStatusResponse> {

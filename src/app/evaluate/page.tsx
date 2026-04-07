@@ -13,6 +13,13 @@ import { TrustLevelBadge } from "@/components/trust-level-badge";
 import { TrustCertificate } from "@/components/trust-certificate";
 import { DimensionBars } from "@/components/dimension-bar";
 import { QualityRadarChart } from "@/components/radar-chart";
+// QO-048: Security UI alignment components
+import { TrapCoverageMatrix } from "@/components/trap-coverage-matrix";
+import { OwaspCoverageBadge } from "@/components/owasp-coverage-badge";
+import { ScoreAnomalyBadge } from "@/components/score-anomaly-badge";
+import { OperatorBadge } from "@/components/operator-badge";
+import { GamingRiskIndicator } from "@/components/gaming-risk-indicator";
+import { CostBreakdown } from "@/components/cost-breakdown";
 import {
   type ServerEvaluation,
   type EvalStep,
@@ -657,6 +664,27 @@ function EvaluateContent() {
             />
           )}
 
+          {/* QO-048: Score anomaly + gaming risk + operator (top alerts) */}
+          {(result.score_anomaly || (result.gaming_risk && result.gaming_risk !== "none") || result.operator_identity) && (
+            <div className="space-y-3">
+              {result.score_anomaly && <ScoreAnomalyBadge anomaly={result.score_anomaly} />}
+              {(result.gaming_risk && result.gaming_risk !== "none") || result.operator_identity ? (
+                <div className="flex flex-wrap items-center gap-3">
+                  {result.operator_identity && <OperatorBadge operator={result.operator_identity} />}
+                  {result.gaming_risk && <GamingRiskIndicator risk={result.gaming_risk} />}
+                </div>
+              ) : null}
+            </div>
+          )}
+
+          {/* QO-048: OWASP Triple-Aligned coverage (always visible) */}
+          <OwaspCoverageBadge />
+
+          {/* QO-048: DeepMind Agent Trap Coverage matrix (QO-045 output) */}
+          {result.agent_trap_coverage && (
+            <TrapCoverageMatrix coverage={result.agent_trap_coverage} />
+          )}
+
           {/* 6-Axis Radar + Dimension Bars */}
           {(result.dimensions.accuracy > 0 || result.dimensions.safety > 0) && (
             <div className="grid md:grid-cols-2 gap-6">
@@ -792,6 +820,11 @@ function EvaluateContent() {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* QO-048: Cost & Token Breakdown (QO-017 output) */}
+          {(result.cost_usd != null || result.token_usage) && (
+            <CostBreakdown tokenUsage={result.token_usage} costUsd={result.cost_usd} />
           )}
 
           {/* Badge & Attestation */}
