@@ -60,6 +60,15 @@ export interface ServerEvaluation {
   evaluation_version: string;
   trust_level?: TrustLevel;
   battle_record?: { wins: number; losses: number; draws: number };
+  // QO-048: Surface fields from QO-043/044/045/017/029 that backend already returns
+  // Types are imported from api.ts to avoid duplication.
+  agent_trap_coverage?: import("./api").AgentTrapCoverage;
+  score_anomaly?: import("./api").ScoreAnomaly;
+  operator_identity?: import("./api").OperatorIdentity;
+  gaming_risk?: "none" | "low" | "medium" | "high";
+  manifest_hash?: string;
+  cost_usd?: number;
+  token_usage?: import("./api").TokenUsage;
 }
 
 export interface EvalStep {

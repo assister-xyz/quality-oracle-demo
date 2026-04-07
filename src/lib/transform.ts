@@ -172,6 +172,14 @@ export function transformEvalStatus(
     evaluated_at: new Date().toISOString(),
     evaluation_version: data.evaluation_version || "v1.0",
     trust_level: (data.eval_mode as TrustLevel) || undefined,
+    // QO-048: surface QO-043/044/045/017/029 fields backend already returns
+    agent_trap_coverage: scores?.agent_trap_coverage,
+    score_anomaly: data.score_anomaly,
+    operator_identity: data.operator_identity,
+    gaming_risk: scores?.gaming_risk,
+    manifest_hash: scores?.manifest_hash,
+    cost_usd: scores?.cost_usd,
+    token_usage: scores?.token_usage,
   };
 }
 
