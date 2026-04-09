@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
-import { trackPaymentIntent, trackEmailSubmit, getVariant } from "@/lib/analytics";
+import { trackPaymentIntent, trackEmailSubmit, trackLeadFormSubmit, getVariant } from "@/lib/analytics";
 
 interface PaymentModalProps {
   tier: string;
@@ -25,6 +25,7 @@ export function PaymentModal({ tier, onClose }: PaymentModalProps) {
 
     trackPaymentIntent(tier);
     trackEmailSubmit(!!agentUrl);
+    trackLeadFormSubmit({ email, tier, agentUrl, useCase, role });
 
     try {
       await fetch("/api/waitlist", {

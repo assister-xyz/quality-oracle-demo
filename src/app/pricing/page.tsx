@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ArrowRight, ChevronDown, Sparkles } from "lucide-react";
 import { PaymentModal } from "@/components/landing/payment-modal";
-import { trackCtaClick } from "@/lib/analytics";
+import { trackCtaClick, trackPricingView, trackPricingTierClick } from "@/lib/analytics";
 import Link from "next/link";
 
 /* ── Tier Data ── */
@@ -184,11 +184,11 @@ export default function PricingPage() {
   const promoCode = process.env.NEXT_PUBLIC_PROMO_CODE;
 
   useEffect(() => {
-    trackCtaClick("pricing_page_view");
+    trackPricingView();
   }, []);
 
   function handleTierClick(tier: (typeof TIERS)[number]) {
-    trackCtaClick(`pricing_tier_click_${tier.name.toLowerCase()}`);
+    trackPricingTierClick(tier.name.toLowerCase());
 
     if (tier.ctaAction === "link") {
       router.push(tier.ctaHref!);

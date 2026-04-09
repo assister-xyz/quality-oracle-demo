@@ -27,6 +27,7 @@ import {
   getEvalSteps,
 } from "@/lib/mock-data";
 import { submitEvaluation, getEvaluationStatus, ApiError } from "@/lib/api";
+import { trackEvaluateSubmit } from "@/lib/analytics";
 import { transformEvalStatus } from "@/lib/transform";
 import { PageHeader } from "@/components/page-header";
 import {
@@ -289,6 +290,8 @@ function EvaluateContent() {
     setResult(null);
     setError(null);
     setSteps(getEvalSteps());
+
+    trackEvaluateSubmit(url.trim(), evalMode);
 
     try {
       const response = await submitEvaluation({ target_url: url.trim(), level: 2, eval_mode: evalMode });

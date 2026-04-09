@@ -5,7 +5,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { CustomCursor } from "@/components/custom-cursor";
 import { GoogleTagManager } from "@next/third-parties/google";
-import { PostHogProvider, ClarityScript } from "@/components/posthog-provider";
+import { PostHogProvider, ClarityScript, PageViewTracker } from "@/components/posthog-provider";
 
 const syne = Syne({
   variable: "--font-display",
@@ -45,6 +45,7 @@ export default function RootLayout({
         className={`${syne.variable} ${inter.variable} ${geistMono.variable} font-body antialiased`}
       >
         <PostHogProvider />
+        <PageViewTracker />
         <CustomCursor />
         <Navbar />
         {children}

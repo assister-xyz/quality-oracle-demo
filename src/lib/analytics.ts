@@ -5,7 +5,7 @@ type PostHogEvent = {
   properties?: Record<string, unknown>;
 };
 
-function getPostHog(): { capture: (event: string, properties?: Record<string, unknown>) => void } | null {
+function getPostHog(): { capture: (event: string, properties?: Record<string, unknown>) => void; identify: (id: string, properties?: Record<string, unknown>) => void } | null {
   if (typeof window === "undefined") return null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (window as any).posthog || null;
@@ -105,6 +105,60 @@ export function trackPricingTierClick(tier: string) {
     event: "pricing_tier_click",
     properties: { tier },
   });
+}
+
+export function trackEvaluateSubmit(url: string, evalMode: string) {
+  trackEvent({
+    event: "evaluate_submit",
+    properties: { target_url: url, eval_mode: evalMode },
+  });
+}
+
+export function trackLeadFormSubmit(data: {
+  email: string;
+  tier: string;
+  agentUrl?: string;
+  useCase?: string;
+  role?: string;
+}) {
+  // Push dedicated conversion event to dataLayer for GTM
+  pushToDataLayer("lead_form_submit", {
+    email: data.email,
+    tier: data.tier,
+    has_agent_url: !!data.agentUrl,
+    role: data.role || "",
+  });
+
+  // Also capture in PostHog with full data
+  const ph = getPostHog();
+  if (ph) {
+    ph.identify(data.email, {
+      tier: data.tier,
+      agent_url: data.agentUrl || "",
+      use_case: data.useCase || "",
+      role: data.role || "",
+    });
+    ph.capture("lead_form_submit", {
+      email: data.email,
+      tier: data.tier,
+      has_agent_url: !!data.agentUrl,
+      use_case: data.useCase || "",
+      role: data.role || "",
+      ...getUtmData(),
+      variant: getVariant(),
+    });
+  }
+
+  // Fire Google Ads conversion directly if gtag is available
+  if (typeof window !== "undefined") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    if (w.gtag) {
+      w.gtag("event", "conversion", {
+        send_to: "AW-18066381680/JtsHCKDAvpYcEPC23KZD",
+      });
+    }
+  }
 }
 
 export { getVariant, getUtmData };

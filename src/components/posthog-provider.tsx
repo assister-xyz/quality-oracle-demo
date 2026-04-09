@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export function PostHogProvider() {
   useEffect(() => {
@@ -24,6 +25,35 @@ export function PostHogProvider() {
   }, []);
 
   return null;
+}
+
+function PageViewTrackerInner() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ph = (window as any).posthog;
+    if (ph) {
+      ph.capture("$pageview", { $current_url: window.location.href });
+    }
+
+    // Push to GTM dataLayer
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    w.dataLayer = w.dataLayer || [];
+    w.dataLayer.push({ event: "page_view", page_path: pathname });
+  }, [pathname, searchParams]);
+
+  return null;
+}
+
+export function PageViewTracker() {
+  return (
+    <Suspense fallback={null}>
+      <PageViewTrackerInner />
+    </Suspense>
+  );
 }
 
 export function ClarityScript() {

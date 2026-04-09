@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+
+const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+const POSTHOG_HOST = "https://us.i.posthog.com";
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,23 +25,39 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     };
 
-    // Log to console (always works)
+    // Log to Vercel runtime logs
     console.log("[Waitlist Submission]", JSON.stringify(entry));
 
-    // Try to persist to JSON file (works in dev, may not in serverless)
-    try {
-      const filePath = path.join(process.cwd(), "waitlist-data.json");
-      let existing: typeof entry[] = [];
+    // Persist to PostHog server-side (reliable, survives serverless)
+    if (POSTHOG_KEY) {
       try {
-        const data = await fs.readFile(filePath, "utf-8");
-        existing = JSON.parse(data);
-      } catch {
-        // File doesn't exist yet
+        await fetch(`${POSTHOG_HOST}/capture/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            api_key: POSTHOG_KEY,
+            event: "waitlist_submission",
+            distinct_id: email,
+            properties: {
+              email,
+              agent_url: entry.agentUrl,
+              use_case: entry.useCase,
+              role: entry.role,
+              tier: entry.tier,
+              variant: entry.variant,
+              $set: {
+                email,
+                tier: entry.tier,
+                role: entry.role,
+                agent_url: entry.agentUrl,
+              },
+            },
+            timestamp: entry.timestamp,
+          }),
+        });
+      } catch (err) {
+        console.error("[Waitlist] PostHog capture failed:", err);
       }
-      existing.push(entry);
-      await fs.writeFile(filePath, JSON.stringify(existing, null, 2));
-    } catch {
-      // In serverless environments, file writes may fail — that's OK
     }
 
     return NextResponse.json({ success: true });

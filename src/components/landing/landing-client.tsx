@@ -4,15 +4,10 @@ import { useEffect } from "react";
 import { VariantA } from "./variant-a";
 import { VariantB } from "./variant-b";
 import { VariantC } from "./variant-c";
-import { trackPageView, trackScrollDepth } from "@/lib/analytics";
+import { trackScrollDepth } from "@/lib/analytics";
 
 export function LandingPageClient({ variant }: { variant: "a" | "b" | "c" }) {
-  // Track page view on mount
-  useEffect(() => {
-    trackPageView();
-  }, []);
-
-  // Track scroll depth
+  // Track scroll depth (page views handled globally by PageViewTracker)
   useEffect(() => {
     let maxDepth = 0;
     const thresholds = [25, 50, 75, 100];
