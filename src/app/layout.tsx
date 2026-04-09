@@ -37,6 +37,13 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <ClarityScript />
+        {/* Google tag (gtag.js) — required for Google Ads conversion detection */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18066381680" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','AW-18066381680');`,
+          }}
+        />
       </head>
       {process.env.NEXT_PUBLIC_GTM_ID && (
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
