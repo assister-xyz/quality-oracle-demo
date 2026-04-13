@@ -1,4 +1,4 @@
-/* PostHog + Clarity analytics helpers */
+/* PostHog + GTM + Google Ads analytics helpers */
 
 type PostHogEvent = {
   event: string;
@@ -40,6 +40,19 @@ function pushToDataLayer(event: string, properties: Record<string, unknown>) {
   w.dataLayer.push({ event, ...properties });
 }
 
+function fireGoogleAdsConversion(label?: string) {
+  if (typeof window === "undefined") return;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const w = window as any;
+  if (w.gtag) {
+    w.gtag("event", "conversion", {
+      send_to: label
+        ? `AW-18066381680/${label}`
+        : "AW-18066381680/JtsHCKDAvpYcEPC23KZD",
+    });
+  }
+}
+
 function trackEvent({ event, properties = {} }: PostHogEvent) {
   const ph = getPostHog();
   const utm = getUtmData();
@@ -55,7 +68,7 @@ function trackEvent({ event, properties = {} }: PostHogEvent) {
     ph.capture(event, enrichedProps);
   }
 
-  // Push to GTM dataLayer for Google Ads conversion tracking
+  // Push to GTM dataLayer
   pushToDataLayer(event, enrichedProps);
 
   // Console log for development when PostHog isn't configured
@@ -73,6 +86,10 @@ export function trackCtaClick(buttonLocation: string) {
     event: "cta_click",
     properties: { button_location: buttonLocation },
   });
+
+  // Fire Google Ads conversion directly on CTA click
+  // This bypasses GTM and sends conversion signal to Google Ads immediately
+  fireGoogleAdsConversion("JtsHCKDAvpYcEPC23KZD");
 }
 
 export function trackScrollDepth(depth: number) {
@@ -149,16 +166,8 @@ export function trackLeadFormSubmit(data: {
     });
   }
 
-  // Fire Google Ads conversion directly if gtag is available
-  if (typeof window !== "undefined") {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const w = window as any;
-    if (w.gtag) {
-      w.gtag("event", "conversion", {
-        send_to: "AW-18066381680/JtsHCKDAvpYcEPC23KZD",
-      });
-    }
-  }
+  // Fire Google Ads conversion directly
+  fireGoogleAdsConversion("JtsHCKDAvpYcEPC23KZD");
 }
 
 export { getVariant, getUtmData };
