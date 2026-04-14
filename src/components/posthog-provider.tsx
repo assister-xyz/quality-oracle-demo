@@ -32,17 +32,38 @@ function PageViewTrackerInner() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    // Read variant cookie
+    const variantCookie = document.cookie
+      .split("; ")
+      .find((c) => c.startsWith("ab_variant="));
+    const variant = variantCookie?.split("=")[1] || "";
+
+    // Read UTM data cookie
+    let utmData: Record<string, string> = {};
+    try {
+      const utmCookie = document.cookie
+        .split("; ")
+        .find((c) => c.startsWith("utm_data="));
+      if (utmCookie) {
+        utmData = JSON.parse(decodeURIComponent(utmCookie.split("=")[1]));
+      }
+    } catch { /* ignore */ }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ph = (window as any).posthog;
     if (ph) {
-      ph.capture("$pageview", { $current_url: window.location.href });
+      ph.capture("$pageview", {
+        $current_url: window.location.href,
+        variant,
+        ...utmData,
+      });
     }
 
     // Push to GTM dataLayer
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const w = window as any;
     w.dataLayer = w.dataLayer || [];
-    w.dataLayer.push({ event: "page_view", page_path: pathname });
+    w.dataLayer.push({ event: "page_view", page_path: pathname, variant });
   }, [pathname, searchParams]);
 
   return null;
