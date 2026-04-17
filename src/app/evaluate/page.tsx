@@ -27,7 +27,7 @@ import {
   getEvalSteps,
 } from "@/lib/mock-data";
 import { submitEvaluation, getEvaluationStatus, ApiError } from "@/lib/api";
-import { trackEvaluateSubmit } from "@/lib/analytics";
+import { trackEvaluateSubmit, trackLeadFormSubmit } from "@/lib/analytics";
 import { transformEvalStatus } from "@/lib/transform";
 import { PageHeader } from "@/components/page-header";
 import {
@@ -157,6 +157,34 @@ export default function EvaluatePage() {
   );
 }
 
+/**
+ * Lightweight URL validator — the backend needs a real URL and will 500 on
+ * arbitrary text, but the UX cost is worse: ads-campaign analysis showed
+ * 100% of evaluate submissions were essay paragraphs, because nothing
+ * visually signalled the textarea expected a URL. Block with a friendly
+ * hint before we even hit the API.
+ */
+function validateAgentUrl(raw: string): { ok: boolean; message?: string; normalized?: string } {
+  const trimmed = raw.trim();
+  if (!trimmed) return { ok: false, message: "Paste an agent URL to evaluate" };
+  // Reject obvious non-URL text up front. Anything with a space or linebreak
+  // is almost certainly prose.
+  if (/\s/.test(trimmed)) {
+    return { ok: false, message: "That looks like text — paste the URL of your agent instead (e.g. https://mcp.deepwiki.com/mcp)" };
+  }
+  // Be tolerant: accept "foo.bar/baz" and prepend https://
+  const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  try {
+    const parsed = new URL(withScheme);
+    if (!parsed.hostname.includes(".")) {
+      return { ok: false, message: "Hostname doesn't look right — example: https://mcp.deepwiki.com/mcp" };
+    }
+    return { ok: true, normalized: withScheme };
+  } catch {
+    return { ok: false, message: "Couldn't parse that as a URL — example: https://mcp.deepwiki.com/mcp" };
+  }
+}
+
 function EvaluateContent() {
   const searchParams = useSearchParams();
   const [url, setUrl] = useState("");
@@ -168,6 +196,11 @@ function EvaluateContent() {
   const [evaluationId, setEvaluationId] = useState<string | null>(null);
   const [loadingResult, setLoadingResult] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
+  const [urlError, setUrlError] = useState<string | null>(null);
+  // Email gate shown once a result renders — empty until the user types.
+  const [leadEmail, setLeadEmail] = useState("");
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [leadError, setLeadError] = useState<string | null>(null);
 
   // Load result from URL param (?result=), reconnect from ?eval=, or recover from sessionStorage
   useEffect(() => {
@@ -284,17 +317,29 @@ function EvaluateContent() {
   }, [evaluationId]);
 
   const startEvaluation = useCallback(async () => {
-    if (!url.trim()) return;
+    const validation = validateAgentUrl(url);
+    if (!validation.ok) {
+      setUrlError(validation.message || "Invalid URL");
+      return;
+    }
 
+    const normalized = validation.normalized || url.trim();
+    setUrlError(null);
+    if (normalized !== url) setUrl(normalized);
     setIsEvaluating(true);
     setResult(null);
     setError(null);
     setSteps(getEvalSteps());
+    // Reset lead-gate state for each new evaluation so returning users can
+    // capture email multiple times across sessions.
+    setLeadSubmitted(false);
+    setLeadEmail("");
+    setLeadError(null);
 
-    trackEvaluateSubmit(url.trim(), evalMode);
+    trackEvaluateSubmit(normalized, evalMode);
 
     try {
-      const response = await submitEvaluation({ target_url: url.trim(), level: 2, eval_mode: evalMode });
+      const response = await submitEvaluation({ target_url: normalized, level: 2, eval_mode: evalMode });
       setEvaluationId(response.evaluation_id);
       // Persist to URL and sessionStorage for reconnection
       window.history.replaceState(null, "", `/evaluate?eval=${response.evaluation_id}`);
@@ -355,11 +400,17 @@ function EvaluateContent() {
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#535862]" />
               <Input
-                placeholder="https://agent.example.com/mcp or /sse"
+                placeholder="Paste an agent URL — e.g. https://mcp.deepwiki.com/mcp"
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                onChange={(e) => {
+                  setUrl(e.target.value);
+                  if (urlError) setUrlError(null);
+                }}
                 onKeyDown={(e) => e.key === "Enter" && startEvaluation()}
-                className="pl-11 h-14 text-base bg-[#1a1a18] border-[#2a2a28] text-[#F5F5F3] placeholder:text-[#535862] focus:border-[#E2754D] rounded-sm"
+                aria-invalid={!!urlError}
+                className={`pl-11 h-14 text-base bg-[#1a1a18] text-[#F5F5F3] placeholder:text-[#535862] focus:border-[#E2754D] rounded-sm ${
+                  urlError ? "border-[#9e3b3b]" : "border-[#2a2a28]"
+                }`}
                 disabled={isEvaluating}
               />
             </div>
@@ -378,6 +429,16 @@ function EvaluateContent() {
               )}
             </Button>
           </div>
+
+          {/* Friendly URL-validation hint — ads-campaign learnings: 100% of
+              prior submissions were essay text, not URLs. Block before hitting
+              the backend and show an example. */}
+          {urlError && (
+            <p className="mt-2 text-xs text-[#d97757] flex items-center gap-1.5">
+              <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+              {urlError}
+            </p>
+          )}
 
           {/* In-progress banner */}
           {isEvaluating && (
@@ -655,6 +716,89 @@ function EvaluateContent() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Email capture — high-intent placement right under the score.
+              Ads-campaign analysis showed 25 CTA clicks but 0 real leads;
+              the funnel had no email-capture surface at all. This one
+              surface replaces that gap. Non-blocking (they can still see
+              and share the score) but prominent. */}
+          {!leadSubmitted ? (
+            <Card className="bg-gradient-to-br from-[#E2754D]/5 to-[#1a1a18]/50 border-[#E2754D]/30">
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-display font-600 text-foreground mb-1">
+                      Track this agent over time
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Get a shareable signed badge and an email if the score drops — no account needed.
+                    </p>
+                  </div>
+                  <form
+                    className="flex gap-2 w-full md:w-auto md:min-w-[340px]"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const email = leadEmail.trim();
+                      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                        setLeadError("Enter a valid email");
+                        return;
+                      }
+                      setLeadError(null);
+                      trackLeadFormSubmit({
+                        email,
+                        tier: result.tier,
+                        agentUrl: result.url,
+                        useCase: "score_watch",
+                        role: "",
+                      });
+                      setLeadSubmitted(true);
+                    }}
+                  >
+                    <Input
+                      type="email"
+                      required
+                      placeholder="you@company.com"
+                      value={leadEmail}
+                      onChange={(e) => {
+                        setLeadEmail(e.target.value);
+                        if (leadError) setLeadError(null);
+                      }}
+                      aria-invalid={!!leadError}
+                      className={`h-11 bg-[#1a1a18] text-[#F5F5F3] placeholder:text-[#535862] focus:border-[#E2754D] rounded-sm flex-1 ${
+                        leadError ? "border-[#9e3b3b]" : "border-[#2a2a28]"
+                      }`}
+                    />
+                    <Button
+                      type="submit"
+                      className="h-11 px-5 bg-[#E2754D] text-white font-semibold hover:bg-[#c9633f] rounded-sm text-sm uppercase tracking-wider whitespace-nowrap"
+                    >
+                      Get Badge
+                    </Button>
+                  </form>
+                </div>
+                {leadError && (
+                  <p className="mt-2 text-xs text-[#d97757] flex items-center gap-1.5">
+                    <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+                    {leadError}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-gradient-to-br from-[#E2754D]/5 to-[#1a1a18]/50 border-[#E2754D]/30">
+              <CardContent className="p-6 flex items-center gap-3">
+                <CheckCircle2 className="h-5 w-5 text-[#E2754D] flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">
+                    You&apos;re on the list.
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    We&apos;ll email <span className="font-mono">{leadEmail}</span> if {result.name}&apos;s score changes or drops out of its tier.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Trust Certificate */}
           {result.trust_level && (
