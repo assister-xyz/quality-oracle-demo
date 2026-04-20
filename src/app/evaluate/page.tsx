@@ -188,7 +188,7 @@ function validateAgentUrl(raw: string): { ok: boolean; message?: string; normali
 function EvaluateContent() {
   const searchParams = useSearchParams();
   const [url, setUrl] = useState("");
-  const [evalMode, setEvalMode] = useState<"verified" | "certified" | "audited">("certified");
+  const [evalMode, setEvalMode] = useState<"verified" | "certified" | "audited">("verified");
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [steps, setSteps] = useState<EvalStep[]>([]);
   const [result, setResult] = useState<ServerEvaluation | null>(null);

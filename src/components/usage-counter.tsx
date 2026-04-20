@@ -47,6 +47,11 @@ export function UsageCounter() {
 
   if (!mounted) return null;
 
+  // Hide counter for first-visit users (no evaluations run yet).
+  // Showing "0/5 evaluations used" on first paint creates loss-aversion friction
+  // that suppresses the funnel. Reveal only after the user commits to an eval.
+  if (used === 0) return null;
+
   const remaining = Math.max(0, FREE_TIER_LIMIT - used);
   const atLimit = remaining === 0;
   const nearLimit = remaining <= 2 && remaining > 0;
