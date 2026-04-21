@@ -35,7 +35,7 @@ type ScoresResponse = {
 export const metadata: Metadata = {
   title: "April 2026 MCP Quality Report — Laureum",
   description:
-    "Independent quality scoring of 30+ public MCP servers. 6-axis evaluation — accuracy, safety, reliability, process quality, latency, schema quality — with adversarial probes.",
+    "Independent quality scoring of 30+ public MCP servers. 6-axis evaluation — accuracy, safety, reliability, process quality, latency, schema quality — with adversarial probes. Updated April 2026.",
   openGraph: {
     title: "April 2026 MCP Quality Report — Laureum",
     description:
