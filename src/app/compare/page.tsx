@@ -206,6 +206,116 @@ function DimensionCompareRow({
   );
 }
 
+function formatCpcrCell(value: number | null | undefined): string {
+  if (value == null) return "—";
+  if (value === 0) return "$0.000000";
+  if (value < 0.000001) return `$${value.toExponential(2)}`;
+  return `$${value.toFixed(6)}`;
+}
+
+// QO-051: CPCR side-by-side with winner highlight per row.
+// Lower cost = better → winner is the side with the smaller non-null value.
+function CPCRCompareCard({
+  serverA,
+  serverB,
+}: {
+  serverA: ServerEvaluation;
+  serverB: ServerEvaluation;
+}) {
+  const rows: { label: string; helper: string; a: number | null; b: number | null }[] = [
+    {
+      label: "Binary",
+      helper: "cost / correct_count",
+      a: serverA.cpcr?.cpcr ?? null,
+      b: serverB.cpcr?.cpcr ?? null,
+    },
+    {
+      label: "Weighted",
+      helper: "partial credit",
+      a: serverA.cpcr?.weighted_cpcr ?? null,
+      b: serverB.cpcr?.weighted_cpcr ?? null,
+    },
+    {
+      label: "Shadow",
+      helper: "market rate · public",
+      a: serverA.cpcr?.shadow_cpcr ?? null,
+      b: serverB.cpcr?.shadow_cpcr ?? null,
+    },
+  ];
+
+  const winnerOf = (a: number | null, b: number | null): "a" | "b" | null => {
+    if (a == null && b == null) return null;
+    if (a == null) return "b";
+    if (b == null) return "a";
+    if (a === b) return null;
+    return a < b ? "a" : "b";
+  };
+
+  return (
+    <Card className="bg-white border-[#E5E3E0]" data-testid="cpcr-compare">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+          <GitCompareArrows className="h-4 w-4" />
+          Cost per Correct Response
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border/50">
+                <th className="text-left px-2 py-2 text-xs font-medium text-muted-foreground">
+                  Variant
+                </th>
+                <th className="text-right px-2 py-2 text-xs font-medium text-[#E2754D]">
+                  {serverA.name}
+                </th>
+                <th className="text-right px-2 py-2 text-xs font-medium text-[#DB5F94]">
+                  {serverB.name}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => {
+                const winner = winnerOf(row.a, row.b);
+                return (
+                  <tr
+                    key={row.label}
+                    className="border-b border-border/30 last:border-0"
+                    data-testid={`cpcr-row-${row.label.toLowerCase()}`}
+                  >
+                    <td className="px-2 py-2">
+                      <div className="text-xs font-medium text-foreground">{row.label}</div>
+                      <div className="text-[10px] text-muted-foreground">{row.helper}</div>
+                    </td>
+                    <td
+                      className={`text-right px-2 py-2 font-mono text-xs tabular-nums ${
+                        winner === "a" ? "font-bold text-[#E2754D]" : "text-foreground/80"
+                      }`}
+                    >
+                      {formatCpcrCell(row.a)}
+                    </td>
+                    <td
+                      className={`text-right px-2 py-2 font-mono text-xs tabular-nums ${
+                        winner === "b" ? "font-bold text-[#DB5F94]" : "text-foreground/80"
+                      }`}
+                    >
+                      {formatCpcrCell(row.b)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-3 text-[10px] text-muted-foreground">
+          Lower = better. Shadow CPCR uses paid-API market rates so free-tier evals stay comparable.
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function ComparePage() {
   const { servers, loading } = useScoresList({ limit: 100, sort: "score" });
   const [serverA, setServerA] = useState<ServerEvaluation | null>(null);
@@ -428,6 +538,12 @@ export default function ComparePage() {
               </CardContent>
             </Card>
           </div>
+
+          {/* QO-051: CPCR Comparison — cost per correct response.
+              Only renders when at least one side has CPCR data. */}
+          {(serverA.cpcr || serverB.cpcr) && (
+            <CPCRCompareCard serverA={serverA} serverB={serverB} />
+          )}
 
           {/* Tool Scores Comparison */}
           {allTools.length > 0 && (

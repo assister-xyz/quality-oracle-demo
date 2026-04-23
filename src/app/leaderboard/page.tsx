@@ -36,9 +36,24 @@ import {
 } from "lucide-react";
 import { ShareButtons } from "@/components/share-buttons";
 
-type SortField = "score" | "name" | "tools_count" | "confidence";
+type SortField = "score" | "name" | "tools_count" | "confidence" | "value";
 type SortDir = "asc" | "desc";
 type TierFilter = QualityTier | "all";
+
+// QO-051: Value score = quality per dollar (PinchBench model).
+// Uses shadow_cpcr (market rate) so free-tier evals are ranked fairly.
+// Returns null when shadow_cpcr is missing or ≤ 0 so table renders "—".
+function computeValue(server: ServerEvaluation): number | null {
+  const shadow = server.cpcr?.shadow_cpcr;
+  if (shadow == null || shadow <= 0) return null;
+  return server.score / shadow;
+}
+
+function formatValue(value: number | null): string {
+  if (value == null) return "—";
+  if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+  return value.toFixed(0);
+}
 
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1)
@@ -114,6 +129,16 @@ export default function LeaderboardPage() {
     }
 
     list.sort((a, b) => {
+      // QO-051: Value column → score / shadow_cpcr. Servers without CPCR
+      // sort to the bottom regardless of direction (nulls last).
+      if (sortField === "value") {
+        const av = computeValue(a);
+        const bv = computeValue(b);
+        if (av === null && bv === null) return 0;
+        if (av === null) return 1;
+        if (bv === null) return -1;
+        return sortDir === "asc" ? av - bv : bv - av;
+      }
       const av = a[sortField];
       const bv = b[sortField];
       if (typeof av === "string" && typeof bv === "string") {
@@ -230,6 +255,15 @@ export default function LeaderboardPage() {
                         Tools <SortIcon field="tools_count" />
                       </div>
                     </th>
+                    <th
+                      className="text-center px-4 py-3 text-xs font-medium text-muted-foreground cursor-pointer hover:text-foreground hidden md:table-cell"
+                      onClick={() => toggleSort("value")}
+                      title="Quality per dollar — score ÷ shadow CPCR (market rate). Higher = better."
+                    >
+                      <div className="flex items-center justify-center gap-1">
+                        Value <SortIcon field="value" />
+                      </div>
+                    </th>
                     <th className="text-center px-4 py-3 text-xs font-medium text-muted-foreground hidden lg:table-cell">
                       Dimensions
                     </th>
@@ -292,6 +326,14 @@ export default function LeaderboardPage() {
                         </td>
                         <td className="px-4 py-3 text-center hidden md:table-cell">
                           <span className="font-mono text-xs">{server.tools_count}</span>
+                        </td>
+                        <td
+                          className="px-4 py-3 text-center hidden md:table-cell"
+                          data-testid={`value-cell-${server.id}`}
+                        >
+                          <span className="font-mono text-xs text-foreground">
+                            {formatValue(computeValue(server))}
+                          </span>
                         </td>
                         <td className="px-4 py-3 hidden lg:table-cell">
                           <div className="flex gap-3">

@@ -147,6 +147,9 @@ export interface EvaluationStatusResponse {
     // QO-017: Token & cost tracking
     token_usage?: TokenUsage;
     cost_usd?: number;
+    shadow_cost_usd?: number;
+    // QO-051: CPCR block
+    cpcr?: CPCRScores;
     // QO-029: Code integrity
     manifest_hash?: string;
     detected_domain?: string;
@@ -227,6 +230,20 @@ export interface TokenUsage {
   };
 }
 
+// ── QO-051: Cost per Correct Response ───────────────────────────────────────
+
+export interface CPCRScores {
+  correct_threshold: number;
+  correct_count: number;
+  total_responses: number;
+  // All three nullable — null means "not enough correct responses to measure".
+  cpcr: number | null;
+  weighted_cpcr: number | null;
+  // shadow_cpcr is the canonical public value (uses market rates so free-tier
+  // evals aren't artificially $0).
+  shadow_cpcr: number | null;
+}
+
 export function getEvaluationStatus(evaluationId: string): Promise<EvaluationStatusResponse> {
   return apiFetch<EvaluationStatusResponse>(`/v1/evaluate/${evaluationId}`);
 }
@@ -255,6 +272,10 @@ export interface ScoresListItem {
   latency_stats?: { avg_ms?: number; p50_ms?: number; p95_ms?: number; p99_ms?: number };
   duration_ms?: number | null;
   last_eval_mode?: string | null;
+  // QO-051: CPCR for leaderboard Value sort
+  cost_usd?: number | null;
+  shadow_cost_usd?: number | null;
+  cpcr?: CPCRScores | null;
 }
 
 export interface ScoresListResponse {
@@ -286,6 +307,10 @@ export function getScore(targetId: string) {
     evaluation_count: number;
     evaluation_version: string | null;
     last_evaluated_at: string | null;
+    // QO-051
+    cost_usd?: number | null;
+    shadow_cost_usd?: number | null;
+    cpcr?: CPCRScores | null;
   }>(`/v1/score/${encodeURIComponent(targetId)}`);
 }
 
