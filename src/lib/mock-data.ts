@@ -68,7 +68,10 @@ export interface ServerEvaluation {
   gaming_risk?: "none" | "low" | "medium" | "high";
   manifest_hash?: string;
   cost_usd?: number;
+  shadow_cost_usd?: number;
   token_usage?: import("./api").TokenUsage;
+  // QO-051: CPCR block (3 variants — binary, weighted, shadow)
+  cpcr?: import("./api").CPCRScores;
 }
 
 export interface EvalStep {

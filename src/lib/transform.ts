@@ -179,7 +179,9 @@ export function transformEvalStatus(
     gaming_risk: scores?.gaming_risk,
     manifest_hash: scores?.manifest_hash,
     cost_usd: scores?.cost_usd,
+    shadow_cost_usd: scores?.shadow_cost_usd,
     token_usage: scores?.token_usage,
+    cpcr: scores?.cpcr,
   };
 }
 
@@ -217,5 +219,8 @@ export function transformScoreItem(item: ScoresListItem): ServerEvaluation {
     evaluated_at: item.last_evaluated_at || new Date().toISOString(),
     evaluation_version: "v1.0",
     trust_level: (item.last_eval_mode as TrustLevel) || undefined,
+    cost_usd: item.cost_usd ?? undefined,
+    shadow_cost_usd: item.shadow_cost_usd ?? undefined,
+    cpcr: item.cpcr ?? undefined,
   };
 }

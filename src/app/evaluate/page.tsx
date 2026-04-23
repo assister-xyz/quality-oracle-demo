@@ -969,9 +969,14 @@ function EvaluateContent() {
             </Card>
           )}
 
-          {/* QO-048: Cost & Token Breakdown (QO-017 output) */}
-          {(result.cost_usd != null || result.token_usage) && (
-            <CostBreakdown tokenUsage={result.token_usage} costUsd={result.cost_usd} />
+          {/* QO-048/QO-051: Cost & CPCR Breakdown */}
+          {(result.cost_usd != null || result.token_usage || result.cpcr) && (
+            <CostBreakdown
+              tokenUsage={result.token_usage}
+              costUsd={result.cost_usd}
+              shadowCostUsd={result.shadow_cost_usd}
+              cpcr={result.cpcr}
+            />
           )}
 
           {/* Badge & Attestation */}
