@@ -22,6 +22,12 @@
  *
  * Auth: protected by `CRON_SECRET` matching the `Authorization`
  * header — Vercel signs cron invocations with this header.
+ *
+ * AC10 (DNSSEC) is a DEPLOY-TIME check, not implementable in this
+ * route. The release pipeline must run `dig +dnssec laureum.ai +short`
+ * and assert the AD (Authentic Data) flag is set before promoting a
+ * new build. Tracked in IMPLEMENTATION_HANDOFF.md L25/L328 of the
+ * laureum-skills-2026-04-25 research bundle.
  */
 import { NextRequest, NextResponse } from "next/server";
 
