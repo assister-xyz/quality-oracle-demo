@@ -20,6 +20,10 @@ import {
   discoverTarget,
   type DiscoveryResult,
 } from "@/services/discover.service";
+import {
+  fetchGithubSkill,
+  looksLikeGithubSkillUrl,
+} from "@/services/skill-fetcher.service";
 import { ScoreGauge } from "@/components/score-gauge";
 import { TierBadge } from "@/components/tier-badge";
 import { TrustLevelBadge } from "@/components/trust-level-badge";
@@ -421,6 +425,51 @@ function EvaluateContent() {
       resetForNewEval();
 
       trackEvaluateSubmit(normalized, evalMode);
+
+      // GitHub-skill URL branch — fetch the SKILL.md bundle and route to
+      // /v1/evaluate/skill so probes, activator, and AQVC issuance pick
+      // up the parsed frontmatter+body. Triggered when the URL is a
+      // github.com tree/blob path AND the user picked "skill" (or auto
+      // and the URL pattern matches obviously).
+      const isGithubSkill =
+        looksLikeGithubSkillUrl(normalized) &&
+        (input.type_override === "skill" || input.type_override === "auto");
+      if (isGithubSkill) {
+        try {
+          const bundle = await fetchGithubSkill(normalized);
+          const response = await submitSkillEvaluation({
+            frontmatter: bundle.frontmatter,
+            body: bundle.body,
+            source: bundle.source,
+            filename: bundle.filename,
+            level: 2,
+            eval_mode: evalMode,
+          });
+          setEvaluationId(response.evaluation_id);
+          window.history.replaceState(
+            null,
+            "",
+            `/evaluate?eval=${response.evaluation_id}`,
+          );
+          sessionStorage.setItem("qo_eval_id", response.evaluation_id);
+          setSteps((prev) => {
+            const next = [...prev];
+            next[0] = { ...next[0], status: "running" };
+            return next;
+          });
+          return;
+        } catch (err) {
+          const detail =
+            err instanceof Error ? err.message : String(err ?? "");
+          if (input.type_override === "skill") {
+            setStructuredError({ kind: "generic", detail });
+            setIsEvaluating(false);
+            return;
+          }
+          // type_override === "auto": fall through to discover path
+          console.warn("[QO-060] skill fetch failed, falling back to discover", detail);
+        }
+      }
 
       // Auto-detect via /v1/discover before kicking off the eval. We do it
       // up-front (rather than reading from /v1/evaluate/{id}/progress) so
