@@ -386,8 +386,10 @@ function EvaluateContent() {
           <h1 className="text-3xl md:text-5xl font-display font-700 text-[#F5F5F3] tracking-tight mb-3">
             Verify any <span className="text-[#E2754D]">AI agent</span>
           </h1>
-          <p className="text-[#A0A09C] mb-8 max-w-xl">
-            Paste an agent URL, MCP server, or API endpoint. We test every tool, score 6 quality dimensions, and sign an attestation.
+          <p data-testid="evaluate-hero-copy" className="text-[#A0A09C] mb-8 max-w-xl">
+            {process.env.NEXT_PUBLIC_LAUREUM_MULTITARGET_LIVE === "true"
+              ? "Paste any URL — MCP server, A2A agent, REST chat — or drop a SKILL.md. We test every capability, score 6 dimensions, and sign an AQVC attestation."
+              : "Paste an MCP server URL, drop a SKILL.md, or pick a target type. We test every tool, score 6 dimensions, and sign an AQVC attestation."}
           </p>
 
           {/* Usage counter */}
