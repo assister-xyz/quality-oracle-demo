@@ -76,6 +76,28 @@ export function submitEvaluation(req: SubmitEvalRequest): Promise<SubmitEvalResp
   });
 }
 
+// QO-060: Submit a Claude Skill via drag-drop (frontmatter + body) instead
+// of a URL. Backend persists the skill bundle and returns a regular
+// evaluation_id to poll.
+export interface SubmitSkillRequest {
+  frontmatter: Record<string, unknown>;
+  body: string;
+  source: "drag" | "github";
+  /** Optional original filename for traceability. */
+  filename?: string;
+  level?: number;
+  eval_mode?: "verified" | "certified" | "audited";
+}
+
+export function submitSkillEvaluation(
+  req: SubmitSkillRequest,
+): Promise<SubmitEvalResponse> {
+  return apiFetch<SubmitEvalResponse>("/v1/evaluate/skill", {
+    method: "POST",
+    body: JSON.stringify(req),
+  });
+}
+
 export interface EvaluationStatusResponse {
   evaluation_id: string;
   status: "pending" | "running" | "completed" | "failed";
