@@ -14,18 +14,29 @@ import Link from "next/link";
 
 /* ── Variant A: "Battle-test" (Arena-focused) ── */
 export function VariantA() {
+  const multitargetLive =
+    process.env.NEXT_PUBLIC_LAUREUM_MULTITARGET_LIVE === "true";
+  const subHeadline = multitargetLive
+    ? "Any MCP server, A2A agent, or Claude Skill. Six-axis scoring, adversarial probes, and a signed AQVC attestation you can embed anywhere."
+    : "Today: any MCP server. Coming soon: A2A agents and Claude Skills. Six-axis scoring, adversarial probes, and a signed AQVC attestation you can embed anywhere.";
+
   return (
     <div className="bg-[#0A0A1A] min-h-screen">
       {/* HERO */}
-      <section className="min-h-svh flex flex-col items-center justify-center px-6">
+      <section
+        data-testid="hero"
+        className="min-h-svh flex flex-col items-center justify-center px-6"
+      >
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-800 text-white tracking-tight leading-[0.95]">
             Battle-test your AI agents before they go live
           </h1>
 
-          <p className="mt-6 text-lg md:text-xl text-[#717069] max-w-2xl mx-auto">
-            15 OWASP security probes &middot; Head-to-head arena with Elo
-            rankings &middot; Free
+          <p
+            data-testid="hero-subheadline"
+            className="mt-6 text-lg md:text-xl text-[#717069] max-w-2xl mx-auto"
+          >
+            {subHeadline}
           </p>
 
           <div className="mt-10">

@@ -14,18 +14,29 @@ import Link from "next/link";
 
 /* ── Variant B: "Scan, Score, Certify your Agent" (Process-focused) ── */
 export function VariantB() {
+  const multitargetLive =
+    process.env.NEXT_PUBLIC_LAUREUM_MULTITARGET_LIVE === "true";
+  const subHeadline = multitargetLive
+    ? "Any MCP server, A2A agent, or Claude Skill. Six-axis scoring, adversarial probes, and a signed AQVC attestation you can embed anywhere."
+    : "Today: any MCP server. Coming soon: A2A agents and Claude Skills. Six-axis scoring, adversarial probes, and a signed AQVC attestation you can embed anywhere.";
+
   return (
     <div className="bg-[#0A0A1A] min-h-screen">
       {/* HERO */}
-      <section className="min-h-svh flex flex-col items-center justify-center px-6">
+      <section
+        data-testid="hero"
+        className="min-h-svh flex flex-col items-center justify-center px-6"
+      >
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-800 text-white tracking-tight leading-[0.95]">
             Scan, Score, Certify your AI agents
           </h1>
 
-          <p className="mt-6 text-lg md:text-xl text-[#717069] max-w-2xl mx-auto">
-            6-axis quality evaluation &middot; Embeddable trust badges &middot;
-            W3C credentials
+          <p
+            data-testid="hero-subheadline"
+            className="mt-6 text-lg md:text-xl text-[#717069] max-w-2xl mx-auto"
+          >
+            {subHeadline}
           </p>
 
           <div className="mt-10">
