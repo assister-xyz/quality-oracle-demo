@@ -7,6 +7,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+// QO-060: Multi-target input + discovery cascade UI
+import { MultiTargetInput } from "@/components/multi-target-input";
+import { DiscoveryTimeline } from "@/components/discovery-timeline";
+import { DEFAULT_SAMPLES } from "@/components/sample-chips";
+import { ErrorBanner, type EvaluateError } from "@/components/error-banner";
+import {
+  useEvaluateSlice,
+  type SkillDropPreview,
+} from "@/store/evaluate-slice";
+import {
+  discoverTarget,
+  type DiscoveryResult,
+} from "@/services/discover.service";
 import { ScoreGauge } from "@/components/score-gauge";
 import { TierBadge } from "@/components/tier-badge";
 import { TrustLevelBadge } from "@/components/trust-level-badge";
@@ -26,12 +39,16 @@ import {
   type TrustLevel,
   getEvalSteps,
 } from "@/lib/mock-data";
-import { submitEvaluation, getEvaluationStatus, ApiError } from "@/lib/api";
+import {
+  submitEvaluation,
+  submitSkillEvaluation,
+  getEvaluationStatus,
+  ApiError,
+} from "@/lib/api";
 import { trackEvaluateSubmit, trackLeadFormSubmit } from "@/lib/analytics";
 import { transformEvalStatus } from "@/lib/transform";
 import { PageHeader } from "@/components/page-header";
 import {
-  Search,
   Loader2,
   CheckCircle2,
   XCircle,
@@ -51,17 +68,6 @@ import { LaurelBadge } from "@/components/laurel-badge";
 import { LaurelIcon } from "@/components/laurel-icon";
 import { UsageCounter } from "@/components/usage-counter";
 import { ShareButtons } from "@/components/share-buttons";
-
-const EXAMPLE_URLS = [
-  { name: "GitMCP", url: "https://gitmcp.io/anthropics/anthropic-cookbook" },
-  { name: "Cloudflare", url: "https://docs.mcp.cloudflare.com/sse" },
-  { name: "TweetSave", url: "https://mcp.tweetsave.org/sse" },
-  { name: "HuggingFace", url: "https://huggingface.co/mcp" },
-  { name: "DeepWiki", url: "https://mcp.deepwiki.com/mcp" },
-  { name: "Manifold", url: "https://api.manifold.markets/v0/mcp" },
-  { name: "Ferryhopper", url: "https://mcp.ferryhopper.com/mcp" },
-  { name: "Context7", url: "https://mcp.context7.com/mcp" },
-];
 
 // Map backend progress_pct to our evaluation steps
 // Adversarial probes (step 4) span 60-75%, sub-steps animate within that range
@@ -197,18 +203,35 @@ function EvaluateContent() {
   const [loadingResult, setLoadingResult] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
   const [urlError, setUrlError] = useState<string | null>(null);
+  // QO-060: multi-target slice (target type override, discovery cascade,
+  // skill drop preview). Keeps the rest of the existing flow untouched —
+  // URL state and evalMode still drive `submitEvaluation`.
+  const evalSlice = useEvaluateSlice();
+  const [structuredError, setStructuredError] = useState<EvaluateError | null>(
+    null,
+  );
+  const [discoveryActive, setDiscoveryActive] = useState(false);
   // Email gate shown once a result renders — empty until the user types.
   const [leadEmail, setLeadEmail] = useState("");
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [leadError, setLeadError] = useState<string | null>(null);
 
-  // Load result from URL param (?result=), reconnect from ?eval=, or recover from sessionStorage
+  // Load result from URL param (?result=), reconnect from ?eval=, or recover from sessionStorage.
+  // QO-060 AC8: also pre-fill `?url=X` so bookmarked links keep working.
   useEffect(() => {
     // Skip if already evaluating (prevents reconnect banner flash during active eval)
     if (isEvaluating || evaluationId) return;
 
     const resultId = searchParams.get("result");
     const evalId = searchParams.get("eval") || sessionStorage.getItem("qo_eval_id");
+    const urlParam = searchParams.get("url");
+    // AC8: bookmarked `/evaluate?url=https://...` should pre-fill the
+    // multi-target input. Take precedence only when neither result nor
+    // eval is in flight, and only when the input is currently empty so we
+    // don't clobber what the user is typing.
+    if (urlParam && !resultId && !evalId && !url) {
+      setUrl(urlParam);
+    }
 
     if (resultId) {
       setLoadingResult(true);
@@ -316,51 +339,167 @@ function EvaluateContent() {
     };
   }, [evaluationId]);
 
-  const startEvaluation = useCallback(async () => {
-    const validation = validateAgentUrl(url);
-    if (!validation.ok) {
-      setUrlError(validation.message || "Invalid URL");
-      return;
-    }
-
-    const normalized = validation.normalized || url.trim();
-    setUrlError(null);
-    if (normalized !== url) setUrl(normalized);
+  // QO-060: helper that resets the page state at the start of every eval,
+  // shared between the legacy URL flow and the multi-target flow.
+  const resetForNewEval = useCallback(() => {
     setIsEvaluating(true);
     setResult(null);
     setError(null);
+    setStructuredError(null);
     setSteps(getEvalSteps());
+    evalSlice.setDiscoveryCascade(null);
+    setDiscoveryActive(false);
     // Reset lead-gate state for each new evaluation so returning users can
     // capture email multiple times across sessions.
     setLeadSubmitted(false);
     setLeadEmail("");
     setLeadError(null);
+  }, [evalSlice]);
 
-    trackEvaluateSubmit(normalized, evalMode);
+  /**
+   * QO-060 — multi-target submit handler.
+   *
+   * Routes per type-override:
+   *   - `skill`           → POST /v1/evaluate/skill  (drag-drop body)
+   *   - `auto`            → GET  /v1/discover, then POST /v1/evaluate
+   *                          with `target_type` + URL
+   *   - everything else   → POST /v1/evaluate with the explicit target_type
+   *
+   * AC8 (backward compat): when the bookmarked `?url=X` query is detected
+   * earlier in the lifecycle, the legacy `startEvaluation` continues to
+   * fire — this multi-target path is only reached via the hero submit
+   * button.
+   */
+  const runMultiTarget = useCallback(
+    async (input: {
+      url?: string;
+      skill_md?: SkillDropPreview;
+      type_override: import("@/services/discover.service").TargetType;
+    }) => {
+      // Skill drag-drop branch — routes to the dedicated skill endpoint.
+      if (input.skill_md) {
+        resetForNewEval();
+        try {
+          const response = await submitSkillEvaluation({
+            frontmatter: input.skill_md.frontmatter,
+            body: input.skill_md.body,
+            source: input.skill_md.source,
+            filename: input.skill_md.filename,
+            level: 2,
+            eval_mode: evalMode,
+          });
+          setEvaluationId(response.evaluation_id);
+          window.history.replaceState(
+            null,
+            "",
+            `/evaluate?eval=${response.evaluation_id}`,
+          );
+          sessionStorage.setItem("qo_eval_id", response.evaluation_id);
+          setSteps((prev) => {
+            const next = [...prev];
+            next[0] = { ...next[0], status: "running" };
+            return next;
+          });
+        } catch (err) {
+          const detail =
+            err instanceof ApiError ? err.message : String(err ?? "");
+          setStructuredError({ kind: "generic", detail });
+          setIsEvaluating(false);
+        }
+        return;
+      }
 
-    try {
-      const response = await submitEvaluation({ target_url: normalized, level: 2, eval_mode: evalMode });
-      setEvaluationId(response.evaluation_id);
-      // Persist to URL and sessionStorage for reconnection
-      window.history.replaceState(null, "", `/evaluate?eval=${response.evaluation_id}`);
-      sessionStorage.setItem("qo_eval_url", url.trim());
-      sessionStorage.setItem("qo_eval_id", response.evaluation_id);
-      // Set first step to running
-      setSteps((prev) => {
-        const next = [...prev];
-        next[0] = { ...next[0], status: "running" };
-        return next;
-      });
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to submit evaluation");
-      setIsEvaluating(false);
-      setSteps((prev) => {
-        const next = [...prev];
-        next[0] = { ...next[0], status: "error" };
-        return next;
-      });
-    }
-  }, [url, evalMode]);
+      // URL branch — validate first.
+      const validation = validateAgentUrl(input.url ?? "");
+      if (!validation.ok) {
+        setUrlError(validation.message || "Invalid URL");
+        return;
+      }
+      const normalized = validation.normalized || input.url!.trim();
+      setUrlError(null);
+      setUrl(normalized);
+      resetForNewEval();
+
+      trackEvaluateSubmit(normalized, evalMode);
+
+      // Auto-detect via /v1/discover before kicking off the eval. We do it
+      // up-front (rather than reading from /v1/evaluate/{id}/progress) so
+      // the cascade timeline can populate within ~1-3s, even when the
+      // eval queue is busy.
+      let resolved_type: string | null = null;
+      let cascade: DiscoveryResult | null = null;
+      if (input.type_override === "auto") {
+        setDiscoveryActive(true);
+        try {
+          cascade = await discoverTarget(normalized);
+          evalSlice.setDiscoveryCascade(cascade);
+          resolved_type = cascade.detected_type;
+          if (resolved_type === null) {
+            setStructuredError({ kind: "cascade-failed" });
+            setIsEvaluating(false);
+            setDiscoveryActive(false);
+            return;
+          }
+          if (cascade.needs_auth) {
+            setStructuredError({ kind: "needs-auth" });
+            setIsEvaluating(false);
+            setDiscoveryActive(false);
+            return;
+          }
+        } catch (err) {
+          // Backend not reachable / non-200: don't hard-fail — fall back
+          // to letting the eval pipeline figure it out. Preserve the
+          // detail in case the user reports it.
+          const detail =
+            err instanceof ApiError ? err.message : String(err ?? "");
+          console.warn("[QO-060] discover failed, deferring to backend", detail);
+        } finally {
+          setDiscoveryActive(false);
+        }
+      } else {
+        // Explicit override → skip cascade entirely (AC3).
+        resolved_type = input.type_override;
+      }
+
+      try {
+        const response = await submitEvaluation({
+          target_url: normalized,
+          target_type: resolved_type ?? undefined,
+          level: 2,
+          eval_mode: evalMode,
+        });
+        setEvaluationId(response.evaluation_id);
+        window.history.replaceState(
+          null,
+          "",
+          `/evaluate?eval=${response.evaluation_id}`,
+        );
+        sessionStorage.setItem("qo_eval_url", normalized);
+        sessionStorage.setItem("qo_eval_id", response.evaluation_id);
+        setSteps((prev) => {
+          const next = [...prev];
+          next[0] = { ...next[0], status: "running" };
+          return next;
+        });
+        // AC5: surface the manifest-less notice when cascade landed on
+        // rest_chat / generic chat.
+        if (resolved_type === "rest_chat") {
+          setStructuredError({ kind: "manifestless-notice" });
+        }
+      } catch (err) {
+        const detail =
+          err instanceof ApiError ? err.message : String(err ?? "");
+        setStructuredError({ kind: "generic", detail });
+        setIsEvaluating(false);
+        setSteps((prev) => {
+          const next = [...prev];
+          next[0] = { ...next[0], status: "error" };
+          return next;
+        });
+      }
+    },
+    [evalMode, evalSlice, resetForNewEval],
+  );
 
   const badgeBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
   const badgeSvgUrl = result ? `${badgeBaseUrl}/v1/badge/${encodeURIComponent(result.url)}.svg` : "";
@@ -380,16 +519,14 @@ function EvaluateContent() {
       {/* Dark hero — fills viewport when idle */}
       <div className={`bg-[#0E0E0C] pt-24 ${result || isEvaluating || steps.length > 0 ? "pb-16" : "min-h-svh pb-20"}`}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="uppercase tracking-[0.2em] text-[#717069] text-xs font-medium mb-3">
+          <p className="uppercase tracking-[0.2em] text-[#A0A09C] text-xs font-medium mb-3">
             Evaluate
           </p>
           <h1 className="text-3xl md:text-5xl font-display font-700 text-[#F5F5F3] tracking-tight mb-3">
             Verify any <span className="text-[#E2754D]">AI agent</span>
           </h1>
-          <p data-testid="evaluate-hero-copy" className="text-[#A0A09C] mb-8 max-w-xl">
-            {process.env.NEXT_PUBLIC_LAUREUM_MULTITARGET_LIVE === "true"
-              ? "Paste any URL — MCP server, A2A agent, REST chat — or drop a SKILL.md. We test every capability, score 6 dimensions, and sign an AQVC attestation."
-              : "Paste an MCP server URL, drop a SKILL.md, or pick a target type. We test every tool, score 6 dimensions, and sign an AQVC attestation."}
+          <p className="text-[#A0A09C] mb-8 max-w-xl">
+            Paste an MCP server URL, drop a SKILL.md, or pick a target type. We test every tool, score 6 dimensions, and sign an AQVC attestation.
           </p>
 
           {/* Usage counter */}
@@ -397,50 +534,26 @@ function EvaluateContent() {
             <UsageCounter />
           </div>
 
-          {/* Hero-level input — not in a card */}
-          <div className="flex gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#535862]" />
-              <Input
-                placeholder="Paste an agent URL — e.g. https://mcp.deepwiki.com/mcp"
-                value={url}
-                onChange={(e) => {
-                  setUrl(e.target.value);
-                  if (urlError) setUrlError(null);
-                }}
-                onKeyDown={(e) => e.key === "Enter" && startEvaluation()}
-                aria-invalid={!!urlError}
-                className={`pl-11 h-14 text-base bg-[#1a1a18] text-[#F5F5F3] placeholder:text-[#535862] focus:border-[#E2754D] rounded-sm ${
-                  urlError ? "border-[#9e3b3b]" : "border-[#2a2a28]"
-                }`}
-                disabled={isEvaluating}
-              />
-            </div>
-            <Button
-              onClick={startEvaluation}
-              disabled={isEvaluating || !url.trim()}
-              className="h-14 px-8 bg-[#E2754D] text-white font-semibold hover:bg-[#c9633f] rounded-sm text-sm uppercase tracking-wider"
-            >
-              {isEvaluating ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Evaluating...
-                </>
-              ) : (
-                "Evaluate"
-              )}
-            </Button>
-          </div>
-
-          {/* Friendly URL-validation hint — ads-campaign learnings: 100% of
-              prior submissions were essay text, not URLs. Block before hitting
-              the backend and show an example. */}
-          {urlError && (
-            <p className="mt-2 text-xs text-[#d97757] flex items-center gap-1.5">
-              <AlertTriangle className="h-3 w-3 flex-shrink-0" />
-              {urlError}
-            </p>
-          )}
+          {/* QO-060: Multi-target hero input (replaces the MCP-only input
+              from QO-018 / QO-049). Drag-drop is scoped to this card per
+              N1; sample chips and the type-override dropdown live inside
+              the component. */}
+          <MultiTargetInput
+            url={url}
+            onUrlChange={(next) => {
+              setUrl(next);
+              if (urlError) setUrlError(null);
+            }}
+            targetType={evalSlice.state.targetTypeOverride}
+            onTargetTypeChange={evalSlice.setTargetTypeOverride}
+            skillPreview={evalSlice.state.skillDropPreview}
+            onSkillPreviewChange={evalSlice.setSkillDropPreview}
+            samples={DEFAULT_SAMPLES}
+            busy={isEvaluating}
+            validationError={urlError}
+            describedBy={urlError ? "url-error-hint" : undefined}
+            onSubmit={runMultiTarget}
+          />
 
           {/* In-progress banner */}
           {isEvaluating && (
@@ -450,9 +563,33 @@ function EvaluateContent() {
             </div>
           )}
 
+          {/* QO-060: Discovery cascade timeline (10-step manifest probes).
+              Renders only while a cascade is in flight or after one has
+              just resolved (auto mode). For explicit type overrides the
+              timeline stays hidden — AC3. */}
+          {(discoveryActive || evalSlice.state.discoveryCascade) && (
+            <div className="mt-6">
+              <DiscoveryTimeline
+                cascade={evalSlice.state.discoveryCascade}
+                active={discoveryActive}
+              />
+            </div>
+          )}
+
+          {/* QO-060: Structured error / notice banner. Carries cascade
+              failures (AC6), needs-auth, manifest-less notice (AC5). */}
+          {structuredError && (
+            <div className="mt-4">
+              <ErrorBanner
+                error={structuredError}
+                onDismiss={() => setStructuredError(null)}
+              />
+            </div>
+          )}
+
           {/* Depth selector — renamed from trust levels */}
           <div className="mt-6">
-            <p className="text-[11px] uppercase tracking-[0.15em] text-[#535862] font-medium mb-3">Evaluation Depth</p>
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[#A0A09C] font-medium mb-3">Evaluation Depth</p>
             <div className="grid grid-cols-3 gap-3">
               {([
                 {
@@ -489,35 +626,19 @@ function EvaluateContent() {
                   >
                     <div className="flex items-baseline justify-between mb-1">
                       <span className={`text-sm font-display font-600 ${isActive ? "text-[#F5F5F3]" : "text-[#A0A09C]"}`}>{label}</span>
-                      <span className={`text-xs font-mono ${isActive ? "text-[#E2754D]" : "text-[#535862]"}`}>{desc}</span>
+                      <span className={`text-xs font-mono ${isActive ? "text-[#E2754D]" : "text-[#A0A09C]"}`}>{desc}</span>
                     </div>
-                    <p className="text-[11px] text-[#535862]">{detail}</p>
+                    <p className="text-[11px] text-[#A0A09C]">{detail}</p>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Quick-try examples — prominent on dark bg */}
-          <div className="flex flex-wrap items-center gap-2 mt-6">
-            <span className="text-[11px] uppercase tracking-wider text-[#535862] font-medium">Try:</span>
-            {EXAMPLE_URLS.map((ex) => (
-              <button
-                key={ex.name}
-                onClick={() => setUrl(ex.url)}
-                className="text-xs text-[#717069] hover:text-[#E2754D] border border-[#2a2a28] hover:border-[#E2754D]/30 px-2.5 py-1 rounded-sm transition-all"
-                disabled={isEvaluating}
-                style={{ transitionTimingFunction: "var(--ease)" }}
-              >
-                {ex.name}
-              </button>
-            ))}
-          </div>
-
           {/* What gets tested — visible only when idle */}
           {!result && !isEvaluating && steps.length === 0 && (
             <div className="mt-16 pt-12 border-t border-[#2a2a28]">
-              <p className="text-[11px] uppercase tracking-[0.15em] text-[#535862] font-medium mb-6">What gets tested</p>
+              <h2 className="text-[11px] uppercase tracking-[0.15em] text-[#A0A09C] font-medium mb-6">What gets tested</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                 {[
                   { title: "Tool Discovery", desc: "Auto-detect all tools, validate schema, check documentation" },
@@ -528,8 +649,8 @@ function EvaluateContent() {
                   { title: "Signed Attestation", desc: "Ed25519-signed AQVC credential you can embed anywhere" },
                 ].map((item) => (
                   <div key={item.title}>
-                    <h4 className="text-sm font-display font-600 text-[#F5F5F3] mb-1">{item.title}</h4>
-                    <p className="text-xs text-[#535862] leading-relaxed">{item.desc}</p>
+                    <h3 className="text-sm font-display font-600 text-[#F5F5F3] mb-1">{item.title}</h3>
+                    <p className="text-xs text-[#A0A09C] leading-relaxed">{item.desc}</p>
                   </div>
                 ))}
               </div>

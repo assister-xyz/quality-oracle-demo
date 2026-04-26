@@ -134,6 +134,8 @@ export function Navbar() {
               )} />
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
+                aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                aria-expanded={mobileOpen}
                 className={cn(
                   "p-2 rounded-sm transition-colors",
                   textColor ? "text-[#F5F5F3] hover:bg-white/10" : "text-foreground hover:bg-[#F1EFED]"
