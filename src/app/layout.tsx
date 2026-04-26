@@ -55,7 +55,7 @@ export default function RootLayout({
         <PageViewTracker />
         <CustomCursor />
         <Navbar />
-        {children}
+        <main id="main-content">{children}</main>
       </body>
     </html>
   );
