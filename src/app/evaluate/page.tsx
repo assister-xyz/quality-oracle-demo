@@ -270,7 +270,11 @@ function EvaluateContent() {
             sessionStorage.removeItem("qo_eval_url");
             sessionStorage.removeItem("qo_eval_id");
           } else if (data.status === "failed") {
-            setError(data.error || "Evaluation failed");
+            if (data.error_type === "schema_unobtainable") {
+              setStructuredError({ kind: "schema-unobtainable" });
+            } else {
+              setError(data.error || "Evaluation failed");
+            }
             window.history.replaceState(null, "", "/evaluate");
             sessionStorage.removeItem("qo_eval_url");
             sessionStorage.removeItem("qo_eval_id");
@@ -313,7 +317,11 @@ function EvaluateContent() {
           sessionStorage.removeItem("qo_eval_id");
         } else if (data.status === "failed") {
           clearInterval(interval);
-          setError(data.error || "Evaluation failed");
+          if (data.error_type === "schema_unobtainable") {
+            setStructuredError({ kind: "schema-unobtainable" });
+          } else {
+            setError(data.error || "Evaluation failed");
+          }
           setIsEvaluating(false);
           setEvaluationId(null);
           window.history.replaceState(null, "", "/evaluate");
