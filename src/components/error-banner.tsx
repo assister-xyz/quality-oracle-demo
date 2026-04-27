@@ -1,8 +1,12 @@
 "use client";
 
-import { AlertTriangle, KeyRound, FileWarning } from "lucide-react";
+import { useState } from "react";
+
+import { AlertTriangle, KeyRound, FileWarning, Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { notifyWhenSupported, ApiError } from "@/lib/api";
 
 /**
  * QO-060 — Inline error banners surfaced by the multi-target evaluate flow.
@@ -33,6 +37,9 @@ export interface EvaluateError {
 
 interface ErrorBannerProps {
   error: EvaluateError;
+  /** Optional eval ID. When provided + error.kind="schema-unobtainable",
+      the banner renders a "Notify me when supported" email gate (QO-065). */
+  evaluationId?: string | null;
   onDismiss?: () => void;
   onRetry?: () => void;
 }
@@ -94,6 +101,72 @@ const TONE_STYLES: Record<
   },
 };
 
+// QO-065 — Lead capture inline form for schema-unobtainable failures.
+// Frictionless email gate; on submit POSTs to /v1/notify-when-supported.
+function NotifyWhenSupportedGate({ evaluationId }: { evaluationId: string }) {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">(
+    "idle",
+  );
+  const [errMsg, setErrMsg] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.includes("@")) return;
+    setStatus("submitting");
+    setErrMsg(null);
+    try {
+      await notifyWhenSupported(evaluationId, email);
+      setStatus("done");
+    } catch (err) {
+      setStatus("error");
+      setErrMsg(err instanceof ApiError ? err.message : "Couldn't capture — try again");
+    }
+  }
+
+  if (status === "done") {
+    return (
+      <div className="mt-3 flex items-center gap-2 text-xs text-[#10b981]">
+        <Check className="h-3.5 w-3.5" aria-hidden="true" />
+        Got it — we&apos;ll email you when this URL pattern is supported.
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="mt-3 flex flex-col gap-2">
+      <p className="text-[11px] text-[#A0A09C]">
+        Want us to email you when we add support for this URL pattern?
+      </p>
+      <div className="flex gap-2">
+        <Input
+          type="email"
+          placeholder="you@company.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={status === "submitting"}
+          required
+          className="h-8 max-w-[260px] bg-[#1a1a18] text-xs text-[#F5F5F3] placeholder:text-[#535862] border-[#2a2a28]"
+          data-testid="notify-when-supported-email"
+        />
+        <Button
+          type="submit"
+          variant="outline"
+          size="sm"
+          disabled={status === "submitting" || !email.includes("@")}
+          className="h-8 text-xs border-[#E2754D] text-[#E2754D] hover:bg-[#E2754D]/10"
+          data-testid="notify-when-supported-submit"
+        >
+          {status === "submitting" ? "Sending..." : "Notify me"}
+        </Button>
+      </div>
+      {errMsg && (
+        <p className="text-[10px] text-[#d97757]">{errMsg}</p>
+      )}
+    </form>
+  );
+}
+
 function IconForKind({
   kind,
   className,
@@ -108,10 +181,18 @@ function IconForKind({
   return <AlertTriangle className={className} aria-hidden="true" />;
 }
 
-export function ErrorBanner({ error, onDismiss, onRetry }: ErrorBannerProps) {
+export function ErrorBanner({
+  error,
+  evaluationId,
+  onDismiss,
+  onRetry,
+}: ErrorBannerProps) {
   const copy = COPY[error.kind];
   const styles = TONE_STYLES[copy.tone];
   const body = error.message ?? copy.body;
+
+  const showLeadGate =
+    error.kind === "schema-unobtainable" && Boolean(evaluationId);
 
   return (
     <div
@@ -131,6 +212,9 @@ export function ErrorBanner({ error, onDismiss, onRetry }: ErrorBannerProps) {
           <p className="mt-2 text-[10px] font-mono text-[#717069] break-all">
             {error.detail}
           </p>
+        )}
+        {showLeadGate && evaluationId && (
+          <NotifyWhenSupportedGate evaluationId={evaluationId} />
         )}
         {(onDismiss || onRetry) && (
           <div className="mt-3 flex gap-2">

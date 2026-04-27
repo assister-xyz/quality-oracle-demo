@@ -214,6 +214,9 @@ function EvaluateContent() {
   const [structuredError, setStructuredError] = useState<EvaluateError | null>(
     null,
   );
+  // QO-065: persist the last failed evaluation_id so the schema-unobtainable
+  // banner can offer "Notify me when supported" with a real backing eval row.
+  const [lastFailedEvalId, setLastFailedEvalId] = useState<string | null>(null);
   const [discoveryActive, setDiscoveryActive] = useState(false);
   // Email gate shown once a result renders — empty until the user types.
   const [leadEmail, setLeadEmail] = useState("");
@@ -272,6 +275,7 @@ function EvaluateContent() {
           } else if (data.status === "failed") {
             if (data.error_type === "schema_unobtainable") {
               setStructuredError({ kind: "schema-unobtainable" });
+              setLastFailedEvalId(data.evaluation_id);
             } else {
               setError(data.error || "Evaluation failed");
             }
@@ -319,6 +323,7 @@ function EvaluateContent() {
           clearInterval(interval);
           if (data.error_type === "schema_unobtainable") {
             setStructuredError({ kind: "schema-unobtainable" });
+            setLastFailedEvalId(data.evaluation_id);
           } else {
             setError(data.error || "Evaluation failed");
           }
@@ -639,7 +644,11 @@ function EvaluateContent() {
             <div className="mt-4">
               <ErrorBanner
                 error={structuredError}
-                onDismiss={() => setStructuredError(null)}
+                evaluationId={lastFailedEvalId}
+                onDismiss={() => {
+                  setStructuredError(null);
+                  setLastFailedEvalId(null);
+                }}
               />
             </div>
           )}
