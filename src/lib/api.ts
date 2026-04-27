@@ -271,6 +271,26 @@ export function getEvaluationStatus(evaluationId: string): Promise<EvaluationSta
   return apiFetch<EvaluationStatusResponse>(`/v1/evaluate/${evaluationId}`);
 }
 
+// QO-065: capture lead when an eval fails (URL not supported, schema
+// unobtainable, etc.). No API key required server-side — frictionless.
+export function notifyWhenSupported(
+  evaluationId: string,
+  email: string,
+  note?: string,
+): Promise<{ captured: boolean; message: string }> {
+  return apiFetch<{ captured: boolean; message: string }>(
+    "/v1/notify-when-supported",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        evaluation_id: evaluationId,
+        email,
+        note: note || null,
+      }),
+    },
+  );
+}
+
 // ---------- Scores ----------
 export interface ScoresListParams {
   limit?: number;
