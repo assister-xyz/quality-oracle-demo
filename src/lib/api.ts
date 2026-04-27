@@ -185,6 +185,7 @@ export interface EvaluationStatusResponse {
   attestation_jwt: string | null;
   badge_url: string | null;
   error: string | null;
+  error_type: string | null;
   duration_ms: number | null;
 }
 

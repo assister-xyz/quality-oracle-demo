@@ -20,6 +20,7 @@ export type EvaluateErrorKind =
   | "empty-manifest"
   | "needs-auth"
   | "manifestless-notice"
+  | "schema-unobtainable"
   | "generic";
 
 export interface EvaluateError {
@@ -59,6 +60,11 @@ const COPY: Record<
     title: "Manifest-less mode",
     body: "Detected as Generic chat (REST). Note: no manifest, so latency and schema_quality axes won't be measured. Score capped at Verified tier.",
     tone: "info",
+  },
+  "schema-unobtainable": {
+    title: "Looks like a website, not an agent endpoint",
+    body: "We sent test prompts but didn't get chat-style responses — usually means the URL is a marketing page, not an agent. Paste an MCP server URL, an A2A agent-card.json, an OpenAPI spec, or a chat API endpoint instead. Need help? hello@laureum.ai",
+    tone: "warning",
   },
   generic: {
     title: "Evaluation error",
